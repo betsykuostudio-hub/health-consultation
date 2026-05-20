@@ -720,13 +720,11 @@ function buildSchedule(dayIdx, doses, useSlim, useProbio){
     ...extra,
   ];
 
-  const fiberItems = (extras=[]) => ({
-    items:[
-      {icon:'🌿',text:'纖維',key:'fiber',unit:'片',defaultVal:2, productId:'fiber'},
-      {icon:'💧',text:'水',key:'water500',unit:'ml',defaultVal:500},
-      ...extras,
-    ]
-  });
+  const fiberItems = (extras=[]) => [
+    {icon:'🌿',text:'纖維',key:'fiber',unit:'片',defaultVal:2, productId:'fiber'},
+    {icon:'💧',text:'水',key:'water500',unit:'ml',defaultVal:500},
+    ...extras,
+  ];
 
   const mainMealItems = (extras=[]) => [
     {icon:'🥛',text:'蛋白素',key:'protein',unit:'匙',defaultVal:d.protein_snack||1, productId:'protein'},
@@ -741,7 +739,7 @@ function buildSchedule(dayIdx, doses, useSlim, useProbio){
   const probio3 = useProbio ? [{icon:'🦠',text:'活悅益生菌',key:'probio',unit:'包',defaultVal:3, productId:'probio'}] : [];
   const activ1 = useProbio ? [{icon:'🦠',text:'活悅益生菌',key:'activ',unit:'包',defaultVal:1, productId:'probio'}] : [];
 
-  const FB = (time, extras=[]) => ({ time, title:'餐前', ...fiberItems(extras) });
+  const FB = (time, extras=[]) => ({ time, title:'餐前', items: fiberItems(extras) });
 
   if(type==='prep') return [
     FB('07:45', slimItem),
