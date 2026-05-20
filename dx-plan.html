@@ -1,276 +1,184 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>DX 健康管理計畫</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --purple: #7c3aed;
-    --purple-dark: #5b21b6;
-    --purple-light: #ede9fe;
-    --purple-mid: #a78bfa;
-    --bg: #faf5ff;
-    --white: #ffffff;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-300: #d1d5db;
-    --gray-500: #6b7280;
-    --gray-700: #374151;
-    --green: #16a34a;
-    --green-bg: #dcfce7;
-    --orange: #ea580c;
-    --orange-bg: #ffedd5;
-    --blue: #2563eb;
-    --blue-bg: #dbeafe;
-    --yellow: #d97706;
-    --yellow-bg: #fef3c7;
-    --teal: #0891b2;
-    --teal-bg: #cffafe;
-    --red: #dc2626;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    max-width: 480px;
-    margin: 0 auto;
-    color: var(--gray-700);
-  }
-  .screen { display: none; min-height: 100vh; }
-  .screen.active { display: block; }
+:root{
+  --purple:#7c3aed;--purple-dark:#5b21b6;--purple-light:#ede9fe;--purple-mid:#a78bfa;
+  --bg:#faf5ff;--white:#ffffff;
+  --gray-100:#f3f4f6;--gray-300:#d1d5db;--gray-500:#6b7280;--gray-700:#374151;
+  --green:#16a34a;--green-bg:#dcfce7;
+  --orange:#ea580c;--orange-bg:#ffedd5;
+  --blue:#2563eb;--blue-bg:#dbeafe;
+  --yellow:#d97706;--yellow-bg:#fef3c7;
+  --teal:#0891b2;--teal-bg:#cffafe;
+  --red:#dc2626;--red-bg:#fee2e2;
+  --pink:#be185d;--pink-bg:#fce7f3;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh;max-width:480px;margin:0 auto;color:var(--gray-700)}
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
 
-  /* ── HEADER ── */
-  .header {
-    background: var(--purple);
-    color: white;
-    padding: 16px 20px 14px;
-    display: flex; align-items: center; gap: 12px;
-    position: sticky; top: 0; z-index: 100;
-  }
-  .header-title { font-size: 18px; font-weight: 700; flex: 1; }
-  .header-sub { font-size: 13px; opacity: .75; }
-  .back-btn {
-    background: rgba(255,255,255,.2); border: none; color: white;
-    width: 36px; height: 36px; border-radius: 10px;
-    font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  }
+/* HEADER */
+.header{background:var(--purple);color:white;padding:16px 20px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.header-title{font-size:18px;font-weight:700;flex:1}
+.back-btn{background:rgba(255,255,255,.2);border:none;color:white;width:36px;height:36px;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
-  /* ── SETUP SCREEN ── */
-  .setup-hero {
-    background: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple) 60%, var(--purple-mid) 100%);
-    color: white; padding: 36px 24px 28px; text-align: center;
-  }
-  .setup-hero .emoji { font-size: 52px; margin-bottom: 12px; }
-  .setup-hero h1 { font-size: 26px; font-weight: 900; margin-bottom: 6px; }
-  .setup-hero p { font-size: 14px; opacity: .8; line-height: 1.6; }
-  .setup-body { padding: 24px 20px 100px; }
-  .section-title {
-    font-size: 13px; font-weight: 700; color: var(--purple);
-    text-transform: uppercase; letter-spacing: .05em;
-    margin-bottom: 12px; margin-top: 24px;
-  }
-  .field-group { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 16px; }
-  .field-row {
-    display: flex; align-items: center; padding: 14px 16px;
-    border-bottom: 1px solid var(--gray-100);
-    gap: 12px;
-  }
-  .field-row:last-child { border-bottom: none; }
-  .field-label { font-size: 14px; font-weight: 500; flex: 1; color: var(--gray-700); }
-  .field-unit { font-size: 13px; color: var(--gray-500); }
-  .field-input {
-    border: none; outline: none; font-size: 15px; font-weight: 600;
-    color: var(--purple-dark); text-align: right; width: 80px;
-    font-family: 'Noto Sans TC', sans-serif; background: transparent;
-  }
-  .field-input::placeholder { color: var(--gray-300); font-weight: 400; }
-  input[type=date].field-input { width: 140px; }
+/* SETUP */
+.setup-hero{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,var(--purple-mid) 100%);color:white;padding:36px 24px 28px;text-align:center}
+.setup-hero .emoji{font-size:52px;margin-bottom:12px}
+.setup-hero h1{font-size:26px;font-weight:900;margin-bottom:6px}
+.setup-hero p{font-size:14px;opacity:.8;line-height:1.6}
+.setup-body{padding:24px 20px 100px}
+.section-title{font-size:13px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;margin-top:24px}
+.field-group{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
+.field-row{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--gray-100);gap:12px}
+.field-row:last-child{border-bottom:none}
+.field-label{font-size:14px;font-weight:500;flex:1;color:var(--gray-700)}
+.field-unit{font-size:13px;color:var(--gray-500);flex-shrink:0}
+.field-input{border:none;outline:none;font-size:15px;font-weight:600;color:var(--purple-dark);text-align:right;width:80px;font-family:'Noto Sans TC',sans-serif;background:transparent}
+.field-input::placeholder{color:var(--gray-300);font-weight:400}
+input[type=date].field-input{width:145px;overflow:hidden}
+.notice-box{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#9a3412;line-height:1.7}
+.notice-box strong{display:block;margin-bottom:4px}
+.big-btn{width:100%;background:var(--purple);color:white;border:none;border-radius:16px;padding:18px;font-size:17px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s,transform .1s}
+.big-btn:active{transform:scale(.97);background:var(--purple-dark)}
 
-  .notice-box {
-    background: #fff7ed; border: 1px solid #fed7aa;
-    border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
-    font-size: 13px; color: #9a3412; line-height: 1.7;
-  }
-  .notice-box strong { display: block; margin-bottom: 4px; }
+/* CALENDAR */
+.cal-summary{background:var(--purple);color:white;padding:16px 20px;display:flex;gap:16px}
+.cal-stat{flex:1;text-align:center}
+.cal-stat-num{font-size:24px;font-weight:900}
+.cal-stat-label{font-size:11px;opacity:.75;margin-top:2px}
+.cal-grid{padding:16px 12px}
+.cal-week-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.cal-week-label{text-align:center;font-size:11px;font-weight:700;color:var(--gray-500);padding:4px 0}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:transform .1s}
+.cal-day:active{transform:scale(.92)}
+.cal-day.empty{pointer-events:none}
+.cal-day .day-num{font-size:12px;font-weight:700}
+.cal-day .day-type{font-size:8px;font-weight:600;margin-top:1px;opacity:.85}
+.cal-day.today{box-shadow:0 0 0 2.5px var(--purple)}
+.cal-day .check{position:absolute;top:2px;right:3px;font-size:9px}
+.type-pretest{background:#f1f5f9;color:#475569}
+.type-prep{background:#e0e7ff;color:#3730a3}
+.type-probio{background:#fce7f3;color:#9d174d}
+.type-fiber{background:#d1fae5;color:#065f46}
+.type-protein{background:#fef3c7;color:#92400e}
+.type-meta{background:#cffafe;color:#164e63}
+.type-empty{background:var(--gray-100);color:var(--gray-300)}
+.legend{padding:0 12px 16px;display:flex;flex-wrap:wrap;gap:8px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-700)}
+.legend-dot{width:14px;height:14px;border-radius:4px;flex-shrink:0}
 
-  .big-btn {
-    width: 100%; background: var(--purple); color: white;
-    border: none; border-radius: 16px; padding: 18px;
-    font-size: 17px; font-weight: 700; cursor: pointer;
-    font-family: 'Noto Sans TC', sans-serif;
-    transition: background .15s, transform .1s;
-  }
-  .big-btn:active { transform: scale(.97); background: var(--purple-dark); }
+/* DAY VIEW */
+.day-hero{padding:20px 20px 16px;color:white}
+.day-hero-row{display:flex;align-items:flex-start;justify-content:space-between}
+.day-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700;margin-bottom:10px}
+.day-title{font-size:22px;font-weight:900;margin-bottom:4px}
+.day-date{font-size:13px;opacity:.75}
+.progress-ring-wrap{display:flex;flex-direction:column;align-items:center}
+.progress-ring-label{font-size:11px;opacity:.75;margin-top:4px}
+.checklist{padding:12px 16px 100px}
+.time-block{background:white;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.time-block-header{display:flex;align-items:center;padding:12px 14px 10px;gap:10px;border-bottom:1px solid var(--gray-100)}
+.time-tag{background:var(--purple-light);color:var(--purple-dark);font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0}
+.time-block-title{font-size:13px;color:var(--gray-500);font-weight:500;flex:1}
+.time-block-check{margin-left:auto;width:28px;height:28px;border-radius:50%;border:2px solid var(--gray-300);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;flex-shrink:0}
+.time-block-check.checked{background:var(--green);border-color:var(--green);color:white}
+.item-list{padding:8px 14px 10px}
+.item-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-100);font-size:14px}
+.item-row:last-child{border-bottom:none}
+.item-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.item-text{flex:1;color:var(--gray-700)}
+.item-amount-input{width:48px;text-align:center;font-size:14px;font-weight:700;color:var(--purple-dark);border:1.5px solid var(--purple-light);border-radius:8px;padding:3px 4px;outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light)}
+.item-amount-input:focus{border-color:var(--purple);background:white}
+.stock-badge{font-size:11px;padding:2px 7px;border-radius:20px;font-weight:700;flex-shrink:0}
+.stock-ok{background:var(--green-bg);color:var(--green)}
+.stock-low{background:var(--yellow-bg);color:var(--yellow)}
+.stock-out{background:var(--red-bg);color:var(--red)}
 
-  /* ── CALENDAR SCREEN ── */
-  .cal-summary {
-    background: var(--purple); color: white;
-    padding: 16px 20px; display: flex; gap: 16px;
-  }
-  .cal-stat { flex: 1; text-align: center; }
-  .cal-stat-num { font-size: 26px; font-weight: 900; }
-  .cal-stat-label { font-size: 11px; opacity: .75; margin-top: 2px; }
-  .cal-grid { padding: 16px 12px; }
-  .cal-week-header {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    margin-bottom: 6px;
-  }
-  .cal-week-label { text-align: center; font-size: 11px; font-weight: 700; color: var(--gray-500); padding: 4px 0; }
-  .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-  .cal-day {
-    aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; cursor: pointer;
-    font-size: 12px; font-weight: 600; position: relative;
-    transition: transform .1s;
-  }
-  .cal-day:active { transform: scale(.92); }
-  .cal-day.empty { pointer-events: none; }
-  .cal-day .day-num { font-size: 13px; font-weight: 700; }
-  .cal-day .day-type { font-size: 8px; font-weight: 600; margin-top: 1px; opacity: .85; }
-  .cal-day.today { box-shadow: 0 0 0 2.5px var(--purple); }
-  .cal-day.done .check { position: absolute; top: 2px; right: 3px; font-size: 9px; }
-  .cal-day.partial .check { position: absolute; top: 2px; right: 3px; font-size: 9px; }
+/* STATS */
+.stats-body{padding:16px 16px 100px}
+.stat-card{background:white;border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stat-card-title{font-size:13px;font-weight:700;color:var(--gray-500);margin-bottom:14px}
+.big-stat{font-size:42px;font-weight:900;color:var(--purple-dark)}
+.big-stat-unit{font-size:16px;font-weight:500;color:var(--gray-500);margin-left:4px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{font-size:12px;color:var(--gray-500);width:60px;flex-shrink:0;text-align:right}
+.bar-track{flex:1;height:10px;background:var(--gray-100);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;background:var(--purple);transition:width .4s}
+.bar-val{font-size:12px;font-weight:700;color:var(--purple-dark);width:36px}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.week-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.week-cell.done{background:var(--green);color:white}
+.week-cell.partial{background:var(--yellow-bg);color:var(--yellow)}
+.week-cell.missed{background:var(--gray-100);color:var(--gray-300)}
+.week-cell.future{background:var(--purple-light);color:var(--purple-mid)}
 
-  /* Day type colors */
-  .type-prep    { background: #e0e7ff; color: #3730a3; }
-  .type-probio  { background: #fce7f3; color: #9d174d; }
-  .type-fiber   { background: #d1fae5; color: #065f46; }
-  .type-protein { background: #fef3c7; color: #92400e; }
-  .type-meta    { background: #cffafe; color: #164e63; }
-  .type-empty   { background: var(--gray-100); color: var(--gray-300); }
+/* SUPPLY (備品) */
+.supply-body{padding:16px 16px 100px}
+.supply-total-card{background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border-radius:16px;padding:20px;margin-bottom:16px;text-align:center}
+.supply-total-label{font-size:13px;opacity:.8;margin-bottom:4px}
+.supply-total-num{font-size:36px;font-weight:900}
+.supply-total-sub{font-size:12px;opacity:.7;margin-top:4px}
+.supply-item{background:white;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.supply-item-header{display:flex;align-items:center;padding:14px 16px 10px;gap:10px;border-bottom:1px solid var(--gray-100)}
+.supply-item-name{font-size:15px;font-weight:700;flex:1;color:var(--gray-700)}
+.supply-item-formal{font-size:11px;color:var(--gray-500);margin-top:2px}
+.supply-item-price{font-size:13px;font-weight:700;color:var(--purple-dark)}
+.supply-detail{padding:12px 16px}
+.supply-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;border-bottom:1px solid var(--gray-100)}
+.supply-row:last-child{border-bottom:none}
+.supply-row-label{color:var(--gray-500);flex:1}
+.supply-row-val{font-weight:600;color:var(--gray-700)}
+.supply-stock-row{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:13px}
+.supply-stock-input{width:60px;text-align:center;font-size:14px;font-weight:700;color:var(--purple-dark);border:1.5px solid var(--purple-light);border-radius:8px;padding:4px;outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light)}
+.supply-stock-input:focus{border-color:var(--purple);background:white}
+.days-left-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
 
-  .legend { padding: 0 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray-700); }
-  .legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+/* NOTES */
+.notes-body{padding:0 0 100px}
+.notes-section{padding:16px 16px 0}
+.notes-section-title{font-size:14px;font-weight:900;color:var(--purple-dark);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.note-card{background:white;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);font-size:14px;line-height:1.75;color:var(--gray-700)}
+.note-card strong{color:var(--gray-900);font-weight:700}
+.warning-card{background:var(--red-bg);border:1px solid #fecaca;border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:13px;color:var(--red);line-height:1.7}
+.task-card{background:white;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;gap:12px;align-items:flex-start}
+.task-num{width:28px;height:28px;border-radius:50%;background:var(--purple);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;margin-top:1px}
+.task-content{flex:1;font-size:14px;line-height:1.7;color:var(--gray-700)}
+.task-content strong{font-weight:700;color:var(--gray-800);display:block;margin-bottom:4px}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.tag-ok{background:var(--green-bg);color:var(--green)}
+.tag-no{background:var(--red-bg);color:var(--red)}
+.tag-caution{background:var(--yellow-bg);color:var(--yellow)}
+.qa-card{background:white;border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
+.qa-q{padding:14px 16px;font-size:14px;font-weight:700;color:var(--purple-dark);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.qa-a{padding:0 16px;font-size:13px;line-height:1.8;color:var(--gray-700);max-height:0;overflow:hidden;transition:max-height .3s,padding .3s}
+.qa-a.open{max-height:600px;padding:0 16px 14px}
+.divider{height:8px;background:var(--gray-100)}
 
-  /* ── DAY SCREEN ── */
-  .day-hero {
-    padding: 20px 20px 16px; color: white;
-  }
-  .day-hero-row { display: flex; align-items: flex-start; justify-content: space-between; }
-  .day-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(255,255,255,.2); border-radius: 20px;
-    padding: 5px 12px; font-size: 13px; font-weight: 700; margin-bottom: 10px;
-  }
-  .day-title { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
-  .day-date { font-size: 13px; opacity: .75; }
-  .progress-ring-wrap { display: flex; flex-direction: column; align-items: center; }
-  .progress-ring-label { font-size: 11px; opacity: .75; margin-top: 4px; }
-  .checklist { padding: 12px 16px 100px; }
-  .time-block { background: white; border-radius: 14px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-  .time-block-header {
-    display: flex; align-items: center; padding: 12px 14px 10px;
-    gap: 10px; border-bottom: 1px solid var(--gray-100);
-  }
-  .time-tag {
-    background: var(--purple-light); color: var(--purple-dark);
-    font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
-  }
-  .time-block-title { font-size: 13px; color: var(--gray-500); font-weight: 500; }
-  .time-block-check {
-    margin-left: auto; width: 28px; height: 28px; border-radius: 50%;
-    border: 2px solid var(--gray-300); background: white; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; transition: all .15s; flex-shrink: 0;
-  }
-  .time-block-check.checked { background: var(--green); border-color: var(--green); color: white; }
-  .item-list { padding: 8px 14px 10px; }
-  .item-row {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px;
-  }
-  .item-row:last-child { border-bottom: none; }
-  .item-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
-  .item-text { flex: 1; color: var(--gray-700); }
-  .item-amount-input {
-    width: 48px; text-align: center; font-size: 14px; font-weight: 700;
-    color: var(--purple-dark); border: 1.5px solid var(--purple-light);
-    border-radius: 8px; padding: 3px 4px; outline: none;
-    font-family: 'Noto Sans TC', sans-serif; background: var(--purple-light);
-  }
-  .item-amount-input:focus { border-color: var(--purple); background: white; }
-
-  /* ── STATS SCREEN ── */
-  .stats-body { padding: 16px 16px 100px; }
-  .stat-card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-  .stat-card-title { font-size: 13px; font-weight: 700; color: var(--gray-500); margin-bottom: 14px; }
-  .big-stat { font-size: 42px; font-weight: 900; color: var(--purple-dark); }
-  .big-stat-unit { font-size: 16px; font-weight: 500; color: var(--gray-500); margin-left: 4px; }
-  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .bar-label { font-size: 12px; color: var(--gray-500); width: 60px; flex-shrink: 0; text-align: right; }
-  .bar-track { flex: 1; height: 10px; background: var(--gray-100); border-radius: 99px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 99px; background: var(--purple); transition: width .4s; }
-  .bar-val { font-size: 12px; font-weight: 700; color: var(--purple-dark); width: 36px; }
-  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  .week-cell {
-    aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700;
-  }
-  .week-cell.done { background: var(--green); color: white; }
-  .week-cell.partial { background: var(--yellow-bg); color: var(--yellow); }
-  .week-cell.missed { background: var(--gray-100); color: var(--gray-300); }
-  .week-cell.future { background: var(--purple-light); color: var(--purple-mid); }
-
-  /* ── NOTES SCREEN ── */
-  .notes-body { padding: 16px 16px 100px; }
-  .note-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-  .note-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--purple); color: white; border-radius: 50%; font-size: 12px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
-  .note-text { font-size: 14px; line-height: 1.7; color: var(--gray-700); display: flex; align-items: flex-start; }
-  .warning-card { background: #fef2f2; border: 1px solid #fecaca; border-radius: 14px; padding: 16px; margin-bottom: 10px; }
-  .warning-text { font-size: 13px; color: var(--red); line-height: 1.7; }
-
-  /* ── BOTTOM NAV ── */
-  #nav-bar {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 480px;
-    background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
-    border-top: 1px solid var(--gray-100);
-    display: flex; padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-    z-index: 200;
-  }
-  .nav-btn {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    gap: 3px; border: none; background: transparent; cursor: pointer;
-    padding: 6px 0; position: relative; transition: all .15s;
-  }
-  .nav-icon { font-size: 22px; transition: all .15s; }
-  .nav-label { font-size: 11px; font-weight: 500; color: var(--gray-500); transition: all .15s; }
-  .nav-btn.active .nav-label { color: var(--purple); font-weight: 700; }
-  .nav-btn.active .nav-icon { transform: scale(1.15); }
-  .nav-indicator {
-    position: absolute; bottom: 0; width: 32px; height: 3px;
-    border-radius: 3px 3px 0 0; background: var(--purple);
-    opacity: 0; transition: opacity .15s;
-  }
-  .nav-btn.active .nav-indicator { opacity: 1; }
-
-  /* ── NOT STARTED ── */
-  .not-started {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 60vh; padding: 40px 24px; text-align: center;
-  }
-  .not-started .emoji { font-size: 64px; margin-bottom: 20px; }
-  .not-started h2 { font-size: 20px; font-weight: 800; color: var(--purple-dark); margin-bottom: 8px; }
-  .not-started p { font-size: 14px; color: var(--gray-500); line-height: 1.7; margin-bottom: 24px; }
-  .outline-btn {
-    border: 2px solid var(--purple); color: var(--purple); background: transparent;
-    border-radius: 14px; padding: 13px 28px; font-size: 15px; font-weight: 700;
-    cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
-  }
-
-  /* Scrollable content area */
-  .scroll-area { overflow-y: auto; }
+/* BOTTOM NAV */
+#nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--gray-100);display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:200}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;cursor:pointer;padding:5px 0;position:relative;transition:all .15s}
+.nav-icon{font-size:20px;transition:all .15s}
+.nav-label{font-size:10px;font-weight:500;color:var(--gray-500);transition:all .15s}
+.nav-btn.active .nav-label{color:var(--purple);font-weight:700}
+.nav-btn.active .nav-icon{transform:scale(1.15)}
+.nav-indicator{position:absolute;bottom:0;width:28px;height:3px;border-radius:3px 3px 0 0;background:var(--purple);opacity:0;transition:opacity .15s}
+.nav-btn.active .nav-indicator{opacity:1}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════ -->
-<!-- SCREEN: SETUP                            -->
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+     SCREEN: SETUP
+══════════════════════════════════════ -->
 <div id="screen-setup" class="screen active">
   <div class="setup-hero">
     <div class="emoji">🎯</div>
@@ -278,43 +186,51 @@
     <p>45 天完整計畫追蹤<br/>設定一次，每天跟著走</p>
   </div>
   <div class="setup-body">
-    <div class="section-title">計畫設定</div>
+    <div class="section-title">計畫日期設定</div>
     <div class="field-group">
       <div class="field-row">
-        <span class="field-label">📅 開始日期</span>
-        <input type="date" class="field-input" id="start-date" />
+        <span class="field-label">🩸 前測日（抽血/體組成）</span>
+        <div style="overflow:hidden"><input type="date" class="field-input" id="pretest-date"/></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">📅 第 1 天（準備日）</span>
+        <div style="overflow:hidden"><input type="date" class="field-input" id="start-date"/></div>
       </div>
     </div>
-
-    <div class="section-title">個人劑量設定（匙 / 錠）</div>
     <div class="notice-box">
-      <strong>💡 這些是菜單中的空格</strong>
-      每天顯示行程時會帶入你填的數字。若不確定可先留空，執行中也能修改。
+      <strong>💡 日期說明</strong>
+      前測日為抽血、拍照、體組成的量測日，與第 1 天不一定相鄰，可分開設定。
+    </div>
+
+    <div class="section-title">個人劑量設定</div>
+    <div class="notice-box">
+      <strong>💡 菜單空格說明</strong>
+      蛋白素、卵磷脂粉基本 1 湯匙（可增加）；錠狀基本 1 顆。不確定可先留空，執行中可隨時修改。
     </div>
     <div class="field-group">
       <div class="field-row">
         <span class="field-label">🥛 蛋白素（小餐）</span>
-        <input type="number" class="field-input" id="dose-protein-snack" placeholder="匙數" min="0.5" step="0.5" />
+        <input type="number" class="field-input" id="dose-protein-snack" placeholder="1" min="0.5" step="0.5"/>
         <span class="field-unit">匙</span>
       </div>
       <div class="field-row">
         <span class="field-label">🧬 卵磷脂粉（小餐）</span>
-        <input type="number" class="field-input" id="dose-lecithin-snack" placeholder="匙數" min="0.5" step="0.5" />
+        <input type="number" class="field-input" id="dose-lecithin-snack" placeholder="1" min="0.5" step="0.5"/>
         <span class="field-unit">匙</span>
       </div>
       <div class="field-row">
-        <span class="field-label">🔵 B 群</span>
-        <input type="number" class="field-input" id="dose-b" placeholder="錠數" min="1" step="1" />
+        <span class="field-label">🔵 雙效B群能量錠</span>
+        <input type="number" class="field-input" id="dose-b" placeholder="1" min="1" step="1"/>
         <span class="field-unit">錠</span>
       </div>
       <div class="field-row">
-        <span class="field-label">🟡 鈣鎂</span>
-        <input type="number" class="field-input" id="dose-ca" placeholder="錠數" min="1" step="1" />
+        <span class="field-label">🟡 加美D鈣片</span>
+        <input type="number" class="field-input" id="dose-ca" placeholder="1" min="1" step="1"/>
         <span class="field-unit">錠</span>
       </div>
       <div class="field-row">
-        <span class="field-label">🟠 維生素 C</span>
-        <input type="number" class="field-input" id="dose-c" placeholder="錠數" min="1" step="1" />
+        <span class="field-label">🟠 強效C營養片</span>
+        <input type="number" class="field-input" id="dose-c" placeholder="1" min="1" step="1"/>
         <span class="field-unit">錠</span>
       </div>
     </div>
@@ -322,30 +238,28 @@
     <div class="section-title">選配補充品</div>
     <div class="field-group">
       <div class="field-row">
-        <span class="field-label">使用瘦瘦菌？</span>
-        <select class="field-input" id="use-slim" style="width:80px;text-align:right">
+        <span class="field-label">使用易孅菌膠囊（瘦瘦菌）？</span>
+        <select class="field-input" id="use-slim" style="width:60px">
           <option value="yes">有</option>
           <option value="no">無</option>
         </select>
       </div>
       <div class="field-row">
-        <span class="field-label">使用活悅益生菌？</span>
-        <select class="field-input" id="use-probio" style="width:80px;text-align:right">
+        <span class="field-label">使用活悅益生菌膠囊？</span>
+        <select class="field-input" id="use-probio" style="width:60px">
           <option value="yes">有</option>
           <option value="no">無</option>
         </select>
       </div>
     </div>
 
-    <div style="margin-top: 8px;">
-      <button class="big-btn" onclick="startPlan()">🚀 開始計畫</button>
-    </div>
+    <button class="big-btn" onclick="startPlan()">🚀 開始計畫</button>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════ -->
-<!-- SCREEN: CALENDAR                         -->
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+     SCREEN: CALENDAR
+══════════════════════════════════════ -->
 <div id="screen-calendar" class="screen">
   <div class="header">
     <span style="font-size:22px">🎯</span>
@@ -355,10 +269,8 @@
   <div class="cal-summary" id="cal-summary"></div>
   <div class="cal-grid">
     <div class="cal-week-header">
-      <div class="cal-week-label">一</div>
-      <div class="cal-week-label">二</div>
-      <div class="cal-week-label">三</div>
-      <div class="cal-week-label">四</div>
+      <div class="cal-week-label">一</div><div class="cal-week-label">二</div>
+      <div class="cal-week-label">三</div><div class="cal-week-label">四</div>
       <div class="cal-week-label">五</div>
       <div class="cal-week-label" style="color:#ef4444">六</div>
       <div class="cal-week-label" style="color:#ef4444">日</div>
@@ -366,6 +278,7 @@
     <div class="cal-days" id="cal-days"></div>
   </div>
   <div class="legend">
+    <div class="legend-item"><div class="legend-dot type-pretest"></div>前測日</div>
     <div class="legend-item"><div class="legend-dot type-prep"></div>準備日</div>
     <div class="legend-item"><div class="legend-dot type-probio"></div>益菌蛋白日</div>
     <div class="legend-item"><div class="legend-dot type-fiber"></div>纖體日</div>
@@ -374,9 +287,9 @@
   </div>
 </div>
 
-<!-- ════════════════════════════════════════ -->
-<!-- SCREEN: DAY CHECKLIST                    -->
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+     SCREEN: DAY
+══════════════════════════════════════ -->
 <div id="screen-day" class="screen">
   <div class="day-hero" id="day-hero">
     <div class="day-hero-row">
@@ -390,19 +303,27 @@
           <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="5"/>
           <circle id="progress-circle" cx="30" cy="30" r="24" fill="none" stroke="white" stroke-width="5"
             stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="150.8"
-            transform="rotate(-90 30 30)" style="transition: stroke-dashoffset .4s"/>
+            transform="rotate(-90 30 30)" style="transition:stroke-dashoffset .4s"/>
         </svg>
         <div class="progress-ring-label" id="progress-label">0/0</div>
       </div>
     </div>
-    <button class="back-btn" style="margin-top:8px" onclick="goToCalendar()">← 返回日曆</button>
+    <button class="back-btn" style="margin-top:10px" onclick="goToCalendar()">← 返回日曆</button>
+  </div>
+  <!-- pretest notice -->
+  <div id="pretest-notice" style="display:none;margin:16px;background:white;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+    <div style="font-size:18px;font-weight:900;color:#475569;margin-bottom:10px">🩸 前測日</div>
+    <div style="font-size:14px;line-height:1.8;color:var(--gray-700)">
+      今天是計畫前的量測日，請完成以下項目：
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px" id="pretest-checklist"></div>
+    </div>
   </div>
   <div class="checklist" id="checklist"></div>
 </div>
 
-<!-- ════════════════════════════════════════ -->
-<!-- SCREEN: STATS                            -->
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+     SCREEN: STATS
+══════════════════════════════════════ -->
 <div id="screen-stats" class="screen">
   <div class="header">
     <span style="font-size:22px">📊</span>
@@ -411,661 +332,845 @@
   <div class="stats-body" id="stats-body"></div>
 </div>
 
-<!-- ════════════════════════════════════════ -->
-<!-- SCREEN: NOTES                            -->
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+     SCREEN: SUPPLY 備品
+══════════════════════════════════════ -->
+<div id="screen-supply" class="screen">
+  <div class="header">
+    <span style="font-size:22px">📦</span>
+    <span class="header-title">備品管理</span>
+  </div>
+  <div class="supply-body" id="supply-body"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: NOTES 須知
+══════════════════════════════════════ -->
 <div id="screen-notes" class="screen">
   <div class="header">
     <span style="font-size:22px">📋</span>
     <span class="header-title">計畫須知</span>
   </div>
-  <div class="notes-body">
-    <div class="section-title" style="margin-top:0">每日基本要求</div>
-    <div class="note-card"><div class="note-text"><span class="note-num">1</span>每天喝水 2000–3000cc、走路 10000 步、拍打膽經各 50 下或十分鐘健身操 2 次</div></div>
-    <div class="note-card"><div class="note-text"><span class="note-num">2</span>魚油、B 群、長效 C、鈣鎂片，因個人體質可加量</div></div>
-    <div class="note-card"><div class="note-text"><span class="note-num">3</span>以不讓自己肚子餓為原則，一天至少 7 匙蛋白素。晚上 8 點後不進食，餓了就喝蛋白素，晚上 11 點前睡</div></div>
-    <div class="note-card"><div class="note-text"><span class="note-num">4</span>期間不吃麵類、茶、含咖啡因飲料，不吃油炸食物、含糖高的食物、辛辣刺激性食物</div></div>
-    <div class="section-title">食物說明</div>
+
+  <!-- 計畫前準備 -->
+  <div class="notes-section">
+    <div class="notes-section-title">📌 計畫開始前：四個小任務</div>
+    <div class="task-card"><div class="task-num">1</div><div class="task-content"><strong>準備好輕鬆自在想變健康的心 💪</strong></div></div>
+    <div class="task-card"><div class="task-num">2</div><div class="task-content"><strong>暫停乳製品攝取 🚫</strong>健管期間避免牛奶、起司、優格、奶粉、奶精等。乳糖與脂肪可能干擾消化與排毒。</div></div>
+    <div class="task-card"><div class="task-num">3</div><div class="task-content"><strong>記錄體組成＋身形照 📷</strong>穿貼身衣服，正面、側面、背面各一張，使用同一角度與背景方便比對。務必量腰圍。露出腰部更清楚看到身體變化。</div></div>
+    <div class="task-card"><div class="task-num">4</div><div class="task-content"><strong>完成抽血檢查 💉</strong>作為健康數據的起點。健管結束後再去抽一次血對比。</div></div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 健檢說明 -->
+  <div class="notes-section">
+    <div class="notes-section-title">🏥 健康檢查說明</div>
     <div class="note-card">
-      <div class="note-text" style="flex-direction:column; gap:6px">
-        <div>🥩 <strong>蛋白質食物 2 份</strong>：約 2 兩 / 共 75g 的瘦肉煮熟，沾少許醬油或鹽</div>
-        <div>🍎 <strong>水果 1 份</strong>：100 公克</div>
-        <div>🌾 <strong>穀物 80g</strong>（新陳代謝日）</div>
+      <strong>#一定要做健康檢查</strong><br/>
+      執行健管前、後，去「免費成人健檢的診所」。30 歲以上 1~5 年免費一次（看年齡），用健保卡，最好先打電話預約。<br/><br/>
+      抽完血再約一次看診時間，只需付掛號費，給醫師看診、拿報告。
+    </div>
+    <div class="note-card">
+      <strong>健檢時需要的數字</strong>
+      <div class="tag-row">
+        <span class="tag tag-ok">✅ 總膽固醇</span><span class="tag tag-ok">✅ 高密度膽固醇</span>
+        <span class="tag tag-ok">✅ 低密度膽固醇</span><span class="tag tag-ok">✅ 飯前血糖</span>
+        <span class="tag tag-ok">✅ 三酸甘油酯</span><span class="tag tag-ok">✅ GOT/GPT</span>
+        <span class="tag tag-ok">✅ 腎絲球過濾率</span><span class="tag tag-ok">✅ 尿酸</span>
+        <span class="tag tag-caution">💰 醣化血紅素 HbA1C（自費約200元）</span>
+      </div>
+      <div style="margin-top:10px;font-size:13px;color:var(--gray-500)">健管結束後抽血約 1000 多元（自費）</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 事前準備工具 -->
+  <div class="notes-section">
+    <div class="notes-section-title">🛠️ 事前準備工具</div>
+    <div class="note-card">
+      <strong>體脂計 📍</strong><br/>
+      建議能雙手拉起的手握式款，可精確測量骨骼肌率。<br/>
+      至少需要數值：體重、體脂、骨骼肌、基礎代謝、內臟脂肪、體年齡、BMI
+    </div>
+    <div class="note-card">
+      <strong>秤食物的磅秤（需要）📍</strong><br/>
+      可以更認識食物份量（重量）。建議用秤秤看一次 75g 的蛋白質食物，之後外食就能大概抓量。
+    </div>
+    <div class="note-card">
+      <strong>📱 時間印章 App</strong><br/>
+      建議下載，用來拍攝每一餐的照片，方便記錄飲食、日期與時間。<br/>
+      <a href="https://apps.apple.com/tw/app/id1115974495" style="color:var(--purple);font-weight:700">👉 App Store 下載連結</a>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 飲食規範 -->
+  <div class="notes-section">
+    <div class="notes-section-title">🚫 飲食禁止清單</div>
+    <div class="note-card">
+      <div class="tag-row">
+        <span class="tag tag-no">❌ 醃類/麵類</span><span class="tag tag-no">❌ 含糖食物</span>
+        <span class="tag tag-no">❌ 碳水化合物</span><span class="tag tag-no">❌ 酒</span>
+        <span class="tag tag-no">❌ 茶</span><span class="tag tag-no">❌ 咖啡因飲料</span>
+        <span class="tag tag-no">❌ 油炸食物</span><span class="tag tag-no">❌ 辛辣刺激</span>
+        <span class="tag tag-no">❌ 牛奶/優酪乳/優格</span><span class="tag tag-no">❌ 豆乾</span>
+        <span class="tag tag-no">❌ 小番茄（糖份高）</span>
+      </div>
+      <div style="margin-top:10px;font-size:13px;color:var(--gray-500)">少醣、少碳水、少油、少鹽。大番茄當生菜用，不當水果。</div>
+    </div>
+    <div class="note-card">
+      <strong>BODYKEY / 智慧草本系列 / XS / 水美飲</strong><br/>
+      準備日可以吃，益菌蛋白日以後都不行。
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 各日型說明 -->
+  <div class="notes-section">
+    <div class="notes-section-title">📅 各日型菜單重點</div>
+
+    <div class="note-card">
+      <strong>🌱 準備日（3天）</strong><br/>
+      蛋白素基本 1 湯匙（增加也可以）；錠狀基本 1 顆。早/午/晚餐正常吃，搭配蛋白素+卵磷脂粉+綠茶素+魚油+DX。
+    </div>
+
+    <div class="note-card">
+      <strong>🦠 益菌蛋白日（3天）— 計畫關鍵！</strong><br/>
+      這 3 天務必依菜單原則，是啟動身體從燃碳水轉為燃脂的關鍵，完成即達成 80%。<br/><br/>
+      <div class="tag-row">
+        <span class="tag tag-no">❌ 碳水化合物</span><span class="tag tag-no">❌ 糖飲料</span>
+        <span class="tag tag-no">❌ 咖啡因</span><span class="tag tag-no">❌ 青菜</span>
+        <span class="tag tag-no">❌ 水果</span>
+        <span class="tag tag-ok">✅ 牛/雞/豬肉</span><span class="tag tag-ok">✅ 魚/海鮮</span>
+        <span class="tag tag-ok">✅ 豆腐（75g）</span>
       </div>
     </div>
-    <div class="section-title">選配補充品</div>
+
     <div class="note-card">
-      <div class="note-text" style="flex-direction:column; gap:4px">
-        <div>⭐ 瘦瘦菌、活悅益生菌 為選配</div>
+      <strong>🥚 蛋白日（每週一）</strong><br/>
+      禁：青菜、水果。可：肉魚豆蛋（75g），蒸煮為主，不炸炒烤，少滷。<br/>
+      整點先喝蛋白素再吃餐。
+    </div>
+
+    <div class="note-card">
+      <strong>🥦 纖體日</strong><br/>
+      早餐：水煮蛋 1 顆 + 水果 100g<br/>
+      午/晚餐：蛋白質 75g + 水果 100g + 生菜 60g + 熟菜 60g<br/>
+      水果只吃芭樂及蘋果（各 100g）。記得定時進食、細嚼慢嚥。
+    </div>
+
+    <div class="note-card">
+      <strong>⚡ 新陳代謝日</strong><br/>
+      早餐：水煮蛋 1 顆 + 水果 1 份 + 穀物 80g<br/>
+      午/晚餐：蛋白質 3-4 份 + 生菜不限 + 熟蔬菜 60g + 水果 1 份 + 穀物 80g<br/>
+      食物量很多，請安排時間運動！吃這麼多還是會繼續瘦。<br/>
+      <span style="color:var(--red);font-size:13px">⚠️ 穀物要吃整粒，不可用五穀粉取代（會血糖震盪）</span>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 蔬菜水果醬料 -->
+  <div class="notes-section">
+    <div class="notes-section-title">🥗 蔬果＆醬料選擇</div>
+    <div class="note-card">
+      <strong>生菜種類</strong><br/>
+      甜椒、蘿蔔、小黃瓜、牛番茄、羽衣甘藍、苜蓿芽、紫高麗、豆苗、石蓮花、美生菜、結球萵苣…<br/>
+      怕吃草的可從牛番茄、小黃瓜開始試。全聯、大潤發有特別生菜如綠火焰。
+    </div>
+    <div class="note-card">
+      <strong>熟菜</strong>：以葉綠色蔬菜為主（養肝）<br/><br/>
+      <strong>醬料</strong>
+      <div class="tag-row">
+        <span class="tag tag-ok">✅ 原味優格醬</span><span class="tag tag-ok">✅ 油醋醬</span>
+        <span class="tag tag-ok">✅ 和風醬油（少量）</span><span class="tag tag-ok">✅ 清醬油（少量）</span>
+        <span class="tag tag-no">❌ 醬油膏</span><span class="tag tag-no">❌ 凱撒醬</span>
+        <span class="tag tag-no">❌ 沙拉醬</span>
       </div>
     </div>
-    <div class="section-title" style="color: var(--red)">重要警示</div>
-    <div class="warning-card"><div class="warning-text">⚠️ 若有心臟疾病、癌症、腎臟疾病、肝炎患者不建議施行</div></div>
-    <div class="warning-card"><div class="warning-text">⚠️ 本計畫非屬醫療行為，請勿自行停用醫生開立藥物</div></div>
-    <div class="warning-card"><div class="warning-text">⚠️ 本菜單純屬建議量，可依個人需求酌量調整</div></div>
+    <div class="note-card">
+      <strong>穀物推薦</strong>：桂格「10超纖穀豆飯」（免洗免泡）<br/>
+      一次煮一包 320g，用筷子壓 4 等份，放冷凍庫，外帶方便。
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 蛋白質份量 -->
+  <div class="notes-section">
+    <div class="notes-section-title">🥩 蛋白質份量說明</div>
+    <div class="note-card">
+      一份蛋白質 ≈ 7g，「三指寬」或「半個手心」<br/>
+      <strong>兩份 = 75g 熟重 = 16g 蛋白質</strong><br/><br/>
+      <strong>禽畜肉蛋</strong>：雞胸肉30g、里肌肉35g、雞腿半隻40g、蛋55g<br/>
+      <strong>海鮮</strong>：草蝦4隻30g、魚肉35g、花枝35g、小文蛤15顆90g<br/>
+      <strong>黃豆</strong>：豆腐半盒140g、豆漿190ml<br/>
+      <span style="color:var(--red);font-size:13px">⚠️ 健管期間不吃豆乾</span>
+    </div>
+    <div class="note-card">
+      有標示蛋白質克數的品項，看一餐要 16 克（兩份）。<br/>
+      沒標示的建議用秤，秤過一次 75g 後外食能大概抓量。
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 每日基本要求 -->
+  <div class="notes-section">
+    <div class="notes-section-title">📌 每日基本要求</div>
+    <div class="note-card">1️⃣ 每天喝水 2000–3000cc（額外，不含蛋白素水）、走路 10000 步、拍打膽經各 50 下或十分鐘健身操 2 次</div>
+    <div class="note-card">2️⃣ 魚油、B 群、長效 C、鈣鎂片，因個人體質可加量</div>
+    <div class="note-card">3️⃣ 以不讓自己肚子餓為原則，一天至少 7 匙蛋白素。晚上 8 點後不進食，餓了就喝蛋白素，晚上 11 點前睡</div>
+    <div class="note-card">4️⃣ 健管餐是「低油」不是「無油」，自煮時要加少量油，可用油噴瓶控制</div>
+    <div class="note-card">
+      <strong>每日自我檢視</strong><br/>
+      ✅ 蛋白素 7 匙<br/>
+      ✅ 額外喝好水 2~3000cc 以上<br/>
+      ✅ 11 點前上床睡覺
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 常見 QA -->
+  <div class="notes-section">
+    <div class="notes-section-title">❓ 常見 QA</div>
+
+    <div class="qa-card">
+      <div class="qa-q" onclick="toggleQA(this)">喝水 2000-3000cc 會不會水中毒？<span>▼</span></div>
+      <div class="qa-a">執行健管就是要促進身體新陳代謝，足量的好水才能讓你吃進去的營養品在人體充分發揮作用，再加上運動讓效果更好。天天喝水 4 到 6 千從沒有人中毒過。</div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q" onclick="toggleQA(this)">便秘怎麼辦？<span>▼</span></div>
+      <div class="qa-a">
+        1. 每天早上加 10cc 安麗橄欖油／奇亞籽油到蛋白素水<br/>
+        2. 水果選芭樂，不要吃蘋果（蘋果鐵質高）<br/>
+        3. 加複合益生菌<br/>
+        4. 水量增加<br/>
+        5. 健管餐是低油不是無油，自煮要加少量油
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q" onclick="toggleQA(this)">可以用五穀粉取代什穀飯嗎？<span>▼</span></div>
+      <div class="qa-a">不行。穀物磨成粉後膳食纖維屏障被打破，澱粉快速變成葡萄糖，等於喝糖水，會造成血糖震盪。新陳代謝日的穀物一定要吃整粒，推薦桂格「10超纖穀豆飯」。</div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q" onclick="toggleQA(this)">為什麼健管菜單要吃生菜？<span>▼</span></div>
+      <div class="qa-a">生菜沒有加熱過，保有更多酵素（幫助消化）和維生素 ABCDE。害怕吃草感的可從牛番茄、小黃瓜開始試試看。</div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q" onclick="toggleQA(this)">纖體日水果只能吃什麼？<span>▼</span></div>
+      <div class="qa-a">只吃芭樂及蘋果，共 100g。芭樂通常很大顆，盡量選小顆的一半；蘋果在超市買小顆的，吃 3/4 的量。大番茄當生菜用，不當水果。不吃小番茄（糖份甜度高）。</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 警示 -->
+  <div class="notes-section" style="padding-bottom:16px">
+    <div class="notes-section-title" style="color:var(--red)">⚠️ 重要警示</div>
+    <div class="warning-card">若有心臟疾病、癌症、腎臟疾病、肝炎患者不建議施行</div>
+    <div class="warning-card">本計畫非屬醫療行為，請勿自行停用醫生開立藥物</div>
+    <div class="warning-card">本菜單純屬建議量，可依個人需求酌量調整</div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════ -->
-<!-- BOTTOM NAV                               -->
-<!-- ════════════════════════════════════════ -->
+<!-- BOTTOM NAV -->
 <div id="nav-bar" style="display:none">
   <button class="nav-btn" id="nav-calendar" onclick="showCalendar()">
-    <div class="nav-icon">📅</div>
-    <div class="nav-label">行程</div>
-    <div class="nav-indicator"></div>
+    <div class="nav-icon">📅</div><div class="nav-label">行程</div><div class="nav-indicator"></div>
   </button>
   <button class="nav-btn" id="nav-today" onclick="goToToday()">
-    <div class="nav-icon">✅</div>
-    <div class="nav-label">今日打卡</div>
-    <div class="nav-indicator"></div>
+    <div class="nav-icon">✅</div><div class="nav-label">今日</div><div class="nav-indicator"></div>
   </button>
   <button class="nav-btn" id="nav-stats" onclick="showStats()">
-    <div class="nav-icon">📊</div>
-    <div class="nav-label">統計</div>
-    <div class="nav-indicator"></div>
+    <div class="nav-icon">📊</div><div class="nav-label">統計</div><div class="nav-indicator"></div>
   </button>
-  <button class="nav-btn" id="nav-notes" onclick="showScreen('screen-notes', 'nav-notes')">
-    <div class="nav-icon">📋</div>
-    <div class="nav-label">須知</div>
-    <div class="nav-indicator"></div>
+  <button class="nav-btn" id="nav-supply" onclick="showSupply()">
+    <div class="nav-icon">📦</div><div class="nav-label">備品</div><div class="nav-indicator"></div>
+  </button>
+  <button class="nav-btn" id="nav-notes" onclick="showScreen('screen-notes','nav-notes')">
+    <div class="nav-icon">📋</div><div class="nav-label">須知</div><div class="nav-indicator"></div>
   </button>
 </div>
 
 <script>
-// ════════════════════════════════════════
-// DATA & STATE
-// ════════════════════════════════════════
+// ══════════════════════════════════════
+// STATE & STORAGE
+// ══════════════════════════════════════
 let state = {
-  startDate: null,     // ISO string
-  doses: {},           // { protein_snack, lecithin_snack, b, ca, c }
+  startDate: null,
+  pretestDate: null,
+  doses: {},
   useSlim: true,
   useProbio: true,
-  checks: {},          // { "day-N-block-M": true/false }
-  amounts: {},         // { "day-N-block-M-item-K": value }
+  checks: {},
+  amounts: {},
+  stock: {},      // { productId: currentStock }
 };
-
-const STORAGE_KEY = 'dx_plan_v1';
-
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function loadState() {
+const STORAGE_KEY = 'dx_plan_v2';
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function loadState(){
   const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) { try { state = JSON.parse(raw); } catch(e) {} }
+  if(raw){ try{ state = {...state, ...JSON.parse(raw)}; }catch(e){} }
 }
 
-// ════════════════════════════════════════
-// DAY TYPE SCHEDULE (45 days)
-// day index 0 = 準備日 1, day 44 = last day
-// ════════════════════════════════════════
-// Week1: days 0-2 prep, days 3-5 probio, days 6-9 fiber
-// Week2-4: fiber 3 / protein 1 repeating
-// Week5: fiber 3 / protein 1 / meta 3
-// Week6-7: fiber 3 / protein 1 / meta 6
+// ══════════════════════════════════════
+// DATE HELPERS (LOCAL TIME, no UTC bug)
+// ══════════════════════════════════════
+function dateToISO(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+function todayISO(){ return dateToISO(new Date()); }
+function addDays(iso, n){
+  const d = new Date(iso+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return dateToISO(d);
+}
+function daysBetween(a, b){
+  const da = new Date(a+'T00:00:00'), db = new Date(b+'T00:00:00');
+  return Math.round((db-da)/86400000);
+}
+function formatDateLabel(iso){
+  const d = new Date(iso+'T00:00:00');
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${'日一二三四五六'[d.getDay()]})`;
+}
+
+// ══════════════════════════════════════
+// PRODUCT DATABASE (備品)
+// ══════════════════════════════════════
+const PRODUCTS = [
+  { id:'fiber',   name:'纖維嚼片',       formal:'纖維嚼片',                   unit:'片', pkgQty:90,  price:670,  recQty:9,   recUnit:'罐', icon:'🌿',
+    calcNote:'2片×3餐×45天=270片÷30片=9罐',
+    dailyUse: d => (d==='prep'||d==='fiber'||d==='protein'||d==='meta') ? 6 : (d==='probio' ? 6 : 0) },
+  { id:'protein', name:'蛋白素',          formal:'優質蛋白素（全植物配方家庭號）', unit:'匙', pkgQty:90,  price:1890, recQty:4,   recUnit:'大罐', icon:'🥛',
+    calcNote:'1匙×7餐×45=315匙÷90匙=3.5罐',
+    dailyUse: d => 7 },
+  { id:'lecithin',name:'卵磷脂粉',        formal:'蜂蜜卵磷脂粉',               unit:'匙', pkgQty:135, price:2150, recQty:3,   recUnit:'罐', icon:'🧬',
+    calcNote:'1匙×7餐×45=315匙÷135匙=2.3罐',
+    dailyUse: d => 7 },
+  { id:'dx',      name:'DOUBLE X',        formal:'DOUBLE X蔬果綜合營養片補充包', unit:'組', pkgQty:62,  price:2200, recQty:3,   recUnit:'盒', icon:'💊',
+    calcNote:'1組×3餐×45=135組÷62=2.2盒',
+    dailyUse: d => 3 },
+  { id:'greentea',name:'綠茶素',          formal:'綠茶素膠囊',                 unit:'粒', pkgQty:60,  price:1855, recQty:3,   recUnit:'罐', icon:'🍵',
+    calcNote:'1粒×3餐×45=135粒÷60=2.5罐',
+    dailyUse: d => 3 },
+  { id:'fishoil', name:'魚油',            formal:'三倍強效魚油膠囊',           unit:'粒', pkgQty:60,  price:1590, recQty:3,   recUnit:'罐', icon:'🐟',
+    calcNote:'1粒×3餐×45=135粒÷60=2.25罐',
+    dailyUse: d => 3 },
+  { id:'bvit',    name:'B群',             formal:'雙效B群能量錠',              unit:'錠', pkgQty:120, price:990,  recQty:2,   recUnit:'罐', icon:'🔵',
+    calcNote:'1錠×4餐×45=180錠÷120=1.5罐',
+    dailyUse: d => 4 },
+  { id:'calcium', name:'鈣鎂',            formal:'加美D鈣片',                  unit:'錠', pkgQty:180, price:660,  recQty:1,   recUnit:'罐', icon:'🟡',
+    calcNote:'1錠×4餐×45=180錠÷180=1罐',
+    dailyUse: d => 4 },
+  { id:'vitc',    name:'維生素C',         formal:'強效C營養片',                unit:'錠', pkgQty:60,  price:925,  recQty:3,   recUnit:'罐', icon:'🟠',
+    calcNote:'1錠×4餐×45=180錠÷60=3罐',
+    dailyUse: d => 4 },
+  { id:'probio',  name:'益生菌',          formal:'活悅益生菌膠囊',             unit:'包', pkgQty:30,  price:1650, recQty:1,   recUnit:'盒', icon:'🦠',
+    calcNote:'第一週益菌蛋白日3天，每餐各3包×9餐=27包=1盒',
+    dailyUse: d => d==='probio' ? 9 : 0 },
+  { id:'slim',    name:'瘦瘦菌',          formal:'易孅菌膠囊',                 unit:'包', pkgQty:30,  price:null, recQty:null,recUnit:'（選配）', icon:'⭐',
+    calcNote:'選配，依個人需求',
+    dailyUse: d => 2 },
+  { id:'shaker',  name:'搖搖杯',          formal:'搖搖杯',                     unit:'個', pkgQty:1,   price:160,  recQty:1,   recUnit:'個', icon:'🥤',
+    calcNote:'DOUBLE X一盒訂盒子的，另加100元',
+    dailyUse: d => 0 },
+];
+
+// ══════════════════════════════════════
+// DAY TYPES (45 days, index 0–44)
+// ══════════════════════════════════════
 const DAY_TYPES = (() => {
-  // Map day index (0-44) to type
   const t = [];
-  // Days 1-3 = prep (idx 0,1,2)
-  t.push('prep','prep','prep');
-  // Days 4-6 = probio (idx 3,4,5)
-  t.push('probio','probio','probio');
-  // Days 7-10 = fiber (idx 6,7,8,9)
-  t.push('fiber','fiber','fiber','fiber');
-  // Week 2 (days 11-17): protein 1, fiber 6  → days 11 protein, 12-17 fiber
-  t.push('protein','fiber','fiber','fiber','fiber','fiber','fiber');
-  // Week 3 (days 18-24): protein 1, fiber 6
-  t.push('protein','fiber','fiber','fiber','fiber','fiber','fiber');
-  // Week 4 (days 25-31): protein 1, fiber 6
-  t.push('protein','fiber','fiber','fiber','fiber','fiber','fiber');
-  // Week 5 (days 32-38): protein 1, fiber 2, meta 4 → day32 protein, 33 fiber, 34 fiber, 35-38 meta
-  t.push('protein','fiber','fiber','meta','meta','meta','meta');
-  // Week 6 (days 39-45): protein 1, meta 6
-  t.push('protein','meta','meta','meta','meta','meta','meta');
-  return t; // length 45
+  t.push('prep','prep','prep');           // 1-3
+  t.push('probio','probio','probio');     // 4-6
+  t.push('fiber','fiber','fiber','fiber');// 7-10
+  for(let w=0;w<3;w++) t.push('protein','fiber','fiber','fiber','fiber','fiber','fiber'); // W2-4
+  t.push('protein','fiber','fiber','meta','meta','meta','meta'); // W5
+  t.push('protein','meta','meta','meta','meta','meta','meta');   // W6
+  return t; // 45 items
 })();
 
 const TYPE_INFO = {
-  prep:    { label: '準備日', color: 'type-prep',    emoji: '🌱', heroColor: '#3730a3', heroBg: '#4338ca' },
-  probio:  { label: '益菌蛋白日', color: 'type-probio', emoji: '🦠', heroColor: '#9d174d', heroBg: '#be185d' },
-  fiber:   { label: '纖體日', color: 'type-fiber',   emoji: '🥦', heroColor: '#065f46', heroBg: '#059669' },
-  protein: { label: '蛋白日', color: 'type-protein', emoji: '🥚', heroColor: '#92400e', heroBg: '#d97706' },
-  meta:    { label: '新陳代謝日', color: 'type-meta',  emoji: '⚡', heroColor: '#164e63', heroBg: '#0891b2' },
+  pretest: { label:'前測日',    color:'type-pretest', emoji:'🩸', heroBg:'#334155' },
+  prep:    { label:'準備日',    color:'type-prep',    emoji:'🌱', heroBg:'#4338ca' },
+  probio:  { label:'益菌蛋白日',color:'type-probio',  emoji:'🦠', heroBg:'#be185d' },
+  fiber:   { label:'纖體日',    color:'type-fiber',   emoji:'🥦', heroBg:'#059669' },
+  protein: { label:'蛋白日',    color:'type-protein', emoji:'🥚', heroBg:'#d97706' },
+  meta:    { label:'新陳代謝日',color:'type-meta',    emoji:'⚡', heroBg:'#0891b2' },
 };
 
-// ════════════════════════════════════════
+// ══════════════════════════════════════
 // SCHEDULE BUILDER
-// Returns array of time-blocks for a given day index (0-44)
-// ════════════════════════════════════════
-function buildSchedule(dayIdx, doses, useSlim, useProbio) {
+// ══════════════════════════════════════
+function buildSchedule(dayIdx, doses, useSlim, useProbio){
   const type = DAY_TYPES[dayIdx];
   const d = doses;
-  const ps = d.protein_snack || '?';
-  const ls = d.lecithin_snack || '?';
-  const b  = d.b  || '?';
-  const ca = d.ca || '?';
-  const c  = d.c  || '?';
 
-  const slim2 = useSlim  ? ' + 瘦瘦菌 2' : '';
-  const slim2a = useSlim ? '+瘦瘦菌 2' : '';
-  const probio3 = useProbio ? '+活悅益生菌 x3' : '';
-  const probio1 = useProbio ? '+活悅益生菌 1' : '';
-  const slimProbio = (useSlim ? '瘦瘦菌 2' : '') + (useProbio ? (useSlim ? ' 活悅益生菌 1' : '活悅益生菌 1') : '');
-
-  // Common small-meal items
-  const snackItems = (extra) => [
-    { icon:'🥛', text:'蛋白素', key:'protein', unit:'匙', defaultVal: d.protein_snack },
-    { icon:'🧬', text:'卵磷脂粉', key:'lecithin', unit:'匙', defaultVal: d.lecithin_snack },
-    { icon:'🔵', text:'B 群', key:'b', unit:'錠', defaultVal: d.b },
-    { icon:'🟡', text:'鈣鎂', key:'ca', unit:'錠', defaultVal: d.ca },
-    { icon:'🟠', text:'維生素 C', key:'c', unit:'錠', defaultVal: d.c },
-    { icon:'💧', text:'水', key:'water300', unit:'ml', defaultVal: 300 },
-    ...(extra||[]),
+  const snackItems = (extra=[]) => [
+    {icon:'🥛',text:'蛋白素',key:'protein',unit:'匙',defaultVal:d.protein_snack||1, productId:'protein'},
+    {icon:'🧬',text:'卵磷脂粉',key:'lecithin',unit:'匙',defaultVal:d.lecithin_snack||1, productId:'lecithin'},
+    {icon:'🔵',text:'B群',key:'b',unit:'錠',defaultVal:d.b||1, productId:'bvit'},
+    {icon:'🟡',text:'鈣鎂',key:'ca',unit:'錠',defaultVal:d.ca||1, productId:'calcium'},
+    {icon:'🟠',text:'維生素C',key:'c',unit:'錠',defaultVal:d.c||1, productId:'vitc'},
+    {icon:'💧',text:'水',key:'water300',unit:'ml',defaultVal:300},
+    ...extra,
   ];
 
-  // Fiber blocks (before meal)
-  const fiberBlock = (time, extras) => ({
-    time, title: '餐前', items: [
-      { icon:'🌿', text:'纖維', key:'fiber', unit:'片', defaultVal: 2 },
-      { icon:'💧', text:'水', key:'water500', unit:'ml', defaultVal: 500 },
-      ...(extras||[]),
+  const fiberItems = (extras=[]) => ({
+    items:[
+      {icon:'🌿',text:'纖維',key:'fiber',unit:'片',defaultVal:2, productId:'fiber'},
+      {icon:'💧',text:'水',key:'water500',unit:'ml',defaultVal:500},
+      ...extras,
     ]
   });
 
-  // Main meal blocks
-  const mainMeal = (time, label, extras) => ({
-    time, title: label, items: [
-      { icon:'🥛', text:'蛋白素', key:'protein', unit:'匙', defaultVal: d.protein_snack },
-      { icon:'🧬', text:'卵磷脂粉', key:'lecithin', unit:'匙', defaultVal: d.lecithin_snack },
-      { icon:'🟢', text:'綠茶素', key:'greentea', unit:'粒', defaultVal: 1 },
-      { icon:'🐟', text:'魚油', key:'fishoil', unit:'粒', defaultVal: 1 },
-      { icon:'💊', text:'DOUBLE X', key:'dx', unit:'份', defaultVal: 1 },
-      ...(extras||[]),
-    ]
-  });
-
-  if (type === 'prep') {
-    return [
-      fiberBlock('07:45', useSlim ? [{ icon:'🦠', text:'瘦瘦菌', key:'slim', unit:'包', defaultVal: 2 }] : []),
-      mainMeal('08:00', '早餐', [{ icon:'🍳', text:'正常吃', key:'normal', unit:'', defaultVal: '' }]),
-      { time:'10:00', title:'小餐', items: snackItems() },
-      fiberBlock('11:45'),
-      mainMeal('12:00', '午餐', [{ icon:'🍳', text:'正常吃', key:'normal2', unit:'', defaultVal: '' }]),
-      { time:'14:00', title:'小餐', items: snackItems() },
-      { time:'16:00', title:'小餐', items: snackItems() },
-      fiberBlock('17:45'),
-      mainMeal('18:00', '晚餐', [{ icon:'🍳', text:'正常吃', key:'normal3', unit:'', defaultVal: '' }]),
-      { time:'20:00', title:'小餐', items: snackItems() },
-    ];
-  }
-
-  if (type === 'probio') {
-    const probioItems = useProbio
-      ? [{ icon:'🦠', text:'益生菌', key:'probio', unit:'包', defaultVal: 3 }]
-      : [];
-    return [
-      fiberBlock('07:45', [
-        ...(useSlim ? [{ icon:'🦠', text:'瘦瘦菌', key:'slim', unit:'包', defaultVal: 2 }] : []),
-        ...probioItems,
-      ]),
-      mainMeal('08:00', '早餐', [{ icon:'🥚', text:'水煮蛋', key:'egg', unit:'顆', defaultVal: 1 }]),
-      { time:'10:00', title:'小餐', items: snackItems() },
-      fiberBlock('11:45', useProbio ? [{ icon:'🦠', text:'益生菌', key:'probio2', unit:'包', defaultVal: 3 }] : []),
-      mainMeal('12:00', '午餐', [{ icon:'🥩', text:'蛋白質食物', key:'prot_food', unit:'份', defaultVal: 2 }]),
-      { time:'14:00', title:'小餐', items: snackItems() },
-      { time:'16:00', title:'小餐', items: snackItems() },
-      fiberBlock('17:45', useProbio ? [{ icon:'🦠', text:'益生菌', key:'probio3', unit:'包', defaultVal: 3 }] : []),
-      mainMeal('18:00', '晚餐', [{ icon:'🥩', text:'蛋白質食物', key:'prot_food2', unit:'份', defaultVal: 2 }]),
-      { time:'20:00', title:'小餐', items: snackItems() },
-    ];
-  }
-
-  const fiberExtras = [
-    ...(useSlim ? [{ icon:'🦠', text:'瘦瘦菌', key:'slim', unit:'包', defaultVal: 2 }] : []),
-    ...(useProbio ? [{ icon:'🦠', text:'活悅益生菌', key:'activ', unit:'包', defaultVal: 1 }] : []),
+  const mainMealItems = (extras=[]) => [
+    {icon:'🥛',text:'蛋白素',key:'protein',unit:'匙',defaultVal:d.protein_snack||1, productId:'protein'},
+    {icon:'🧬',text:'卵磷脂粉',key:'lecithin',unit:'匙',defaultVal:d.lecithin_snack||1, productId:'lecithin'},
+    {icon:'🍵',text:'綠茶素',key:'greentea',unit:'粒',defaultVal:1, productId:'greentea'},
+    {icon:'🐟',text:'魚油',key:'fishoil',unit:'粒',defaultVal:1, productId:'fishoil'},
+    {icon:'💊',text:'DOUBLE X',key:'dx',unit:'組',defaultVal:1, productId:'dx'},
+    ...extras,
   ];
 
-  if (type === 'fiber') {
-    return [
-      fiberBlock('07:45', fiberExtras),
-      mainMeal('08:00', '早餐', [
-        { icon:'🥚', text:'水煮蛋', key:'egg', unit:'顆', defaultVal: 1 },
-        { icon:'🍎', text:'水果', key:'fruit', unit:'份', defaultVal: 1 },
-      ]),
-      { time:'10:00', title:'小餐', items: snackItems() },
-      fiberBlock('11:45'),
-      mainMeal('12:00', '午餐', [
-        { icon:'🥩', text:'蛋白質食物', key:'prot_food', unit:'份', defaultVal: 2 },
-        { icon:'🥬', text:'生/熟蔬菜各', key:'veg', unit:'g', defaultVal: 60 },
-        { icon:'🍎', text:'水果', key:'fruit2', unit:'份', defaultVal: 1 },
-      ]),
-      { time:'14:00', title:'小餐', items: snackItems() },
-      { time:'16:00', title:'小餐', items: snackItems() },
-      fiberBlock('17:45'),
-      mainMeal('18:00', '晚餐', [
-        { icon:'🥩', text:'蛋白質食物', key:'prot_food2', unit:'份', defaultVal: 2 },
-        { icon:'🥬', text:'生/熟蔬菜各', key:'veg2', unit:'g', defaultVal: 60 },
-        { icon:'🍎', text:'水果', key:'fruit3', unit:'份', defaultVal: 1 },
-      ]),
-      { time:'20:00', title:'小餐', items: snackItems() },
-    ];
-  }
+  const slimItem = useSlim ? [{icon:'⭐',text:'瘦瘦菌',key:'slim',unit:'包',defaultVal:2, productId:'slim'}] : [];
+  const probio3 = useProbio ? [{icon:'🦠',text:'活悅益生菌',key:'probio',unit:'包',defaultVal:3, productId:'probio'}] : [];
+  const activ1 = useProbio ? [{icon:'🦠',text:'活悅益生菌',key:'activ',unit:'包',defaultVal:1, productId:'probio'}] : [];
 
-  if (type === 'protein') {
-    return [
-      fiberBlock('07:45', fiberExtras),
-      mainMeal('08:00', '早餐', [{ icon:'🥚', text:'水煮蛋', key:'egg', unit:'顆', defaultVal: 1 }]),
-      { time:'10:00', title:'小餐', items: snackItems() },
-      fiberBlock('11:45'),
-      mainMeal('12:00', '午餐', [{ icon:'🥩', text:'蛋白質食物', key:'prot_food', unit:'份', defaultVal: 2 }]),
-      { time:'14:00', title:'小餐', items: snackItems() },
-      { time:'16:00', title:'小餐', items: snackItems() },
-      fiberBlock('17:45'),
-      mainMeal('18:00', '晚餐', [{ icon:'🥩', text:'蛋白質食物', key:'prot_food2', unit:'份', defaultVal: 2 }]),
-      { time:'20:00', title:'小餐', items: snackItems() },
-    ];
-  }
+  const FB = (time, extras=[]) => ({ time, title:'餐前', ...fiberItems(extras) });
+
+  if(type==='prep') return [
+    FB('07:45', slimItem),
+    {time:'08:00',title:'早餐',items:[...mainMealItems([{icon:'🍳',text:'正常吃',key:'normal',unit:'',defaultVal:''}])]},
+    {time:'10:00',title:'小餐',items:snackItems()},
+    FB('11:45'),
+    {time:'12:00',title:'午餐',items:[...mainMealItems([{icon:'🍳',text:'正常吃',key:'normal2',unit:'',defaultVal:''}])]},
+    {time:'14:00',title:'小餐',items:snackItems()},
+    {time:'16:00',title:'小餐',items:snackItems()},
+    FB('17:45'),
+    {time:'18:00',title:'晚餐',items:[...mainMealItems([{icon:'🍳',text:'正常吃',key:'normal3',unit:'',defaultVal:''}])]},
+    {time:'20:00',title:'小餐',items:snackItems()},
+  ];
+
+  if(type==='probio') return [
+    FB('07:45', [...slimItem, ...probio3]),
+    {time:'08:00',title:'早餐',items:[...mainMealItems([{icon:'🥚',text:'水煮蛋',key:'egg',unit:'顆',defaultVal:1}])]},
+    {time:'10:00',title:'小餐',items:snackItems()},
+    FB('11:45', probio3),
+    {time:'12:00',title:'午餐',items:[...mainMealItems([{icon:'🥩',text:'蛋白質食物',key:'prot',unit:'份',defaultVal:2}])]},
+    {time:'14:00',title:'小餐',items:snackItems()},
+    {time:'16:00',title:'小餐',items:snackItems()},
+    FB('17:45', probio3),
+    {time:'18:00',title:'晚餐',items:[...mainMealItems([{icon:'🥩',text:'蛋白質食物',key:'prot2',unit:'份',defaultVal:2}])]},
+    {time:'20:00',title:'小餐',items:snackItems()},
+  ];
+
+  const fiberExtras = [...slimItem, ...activ1];
+
+  if(type==='fiber') return [
+    FB('07:45', fiberExtras),
+    {time:'08:00',title:'早餐',items:[...mainMealItems([{icon:'🥚',text:'水煮蛋',key:'egg',unit:'顆',defaultVal:1},{icon:'🍎',text:'水果',key:'fruit',unit:'g',defaultVal:100}])]},
+    {time:'10:00',title:'小餐',items:snackItems()},
+    FB('11:45'),
+    {time:'12:00',title:'午餐',items:[...mainMealItems([{icon:'🥩',text:'蛋白質食物',key:'prot',unit:'g',defaultVal:75},{icon:'🥬',text:'生菜',key:'veg',unit:'g',defaultVal:60},{icon:'🥦',text:'熟菜',key:'cooked',unit:'g',defaultVal:60},{icon:'🍎',text:'水果',key:'fruit2',unit:'g',defaultVal:100}])]},
+    {time:'14:00',title:'小餐',items:snackItems()},
+    {time:'16:00',title:'小餐',items:snackItems()},
+    FB('17:45'),
+    {time:'18:00',title:'晚餐',items:[...mainMealItems([{icon:'🥩',text:'蛋白質食物',key:'prot2',unit:'g',defaultVal:75},{icon:'🥬',text:'生菜',key:'veg2',unit:'g',defaultVal:60},{icon:'🥦',text:'熟菜',key:'cooked2',unit:'g',defaultVal:60},{icon:'🍎',text:'水果',key:'fruit3',unit:'g',defaultVal:100}])]},
+    {time:'20:00',title:'小餐',items:snackItems()},
+  ];
+
+  if(type==='protein') return [
+    FB('07:45', fiberExtras),
+    {time:'08:00',title:'早餐',items:[...mainMealItems([{icon:'🥚',text:'水煮蛋',key:'egg',unit:'顆',defaultVal:1}])]},
+    {time:'10:00',title:'小餐',items:snackItems()},
+    FB('11:45'),
+    {time:'12:00',title:'午餐',items:[...mainMealItems([{icon:'🥩',text:'蛋白質食物',key:'prot',unit:'g',defaultVal:75}])]},
+    {time:'14:00',title:'小餐',items:snackItems()},
+    {time:'16:00',title:'小餐',items:snackItems()},
+    FB('17:45'),
+    {time:'18:00',title:'晚餐',items:[...mainMealItems([{icon:'🥩',text:'蛋白質食物',key:'prot2',unit:'g',defaultVal:75}])]},
+    {time:'20:00',title:'小餐',items:snackItems()},
+  ];
 
   // meta
   return [
-    fiberBlock('07:45', fiberExtras),
-    mainMeal('08:00', '早餐', [
-      { icon:'🥚', text:'水煮蛋', key:'egg', unit:'顆', defaultVal: 1 },
-      { icon:'🍎', text:'水果', key:'fruit', unit:'份', defaultVal: 1 },
-      { icon:'🌾', text:'穀物', key:'grain', unit:'g', defaultVal: 80 },
-    ]),
-    { time:'10:00', title:'小餐', items: snackItems() },
-    fiberBlock('11:45'),
-    mainMeal('12:00', '午餐', [
-      { icon:'🥩', text:'蛋白質食物', key:'prot_food', unit:'份', defaultVal: '3-4' },
-      { icon:'🥬', text:'生菜不限/熟蔬菜', key:'veg', unit:'g', defaultVal: 60 },
-      { icon:'🍎', text:'水果', key:'fruit2', unit:'份', defaultVal: 1 },
-      { icon:'🌾', text:'穀物', key:'grain2', unit:'g', defaultVal: 80 },
-    ]),
-    { time:'14:00', title:'小餐', items: snackItems() },
-    { time:'16:00', title:'小餐', items: snackItems() },
-    fiberBlock('17:45'),
-    mainMeal('18:00', '晚餐', [
-      { icon:'🥩', text:'蛋白質食物', key:'prot_food2', unit:'份', defaultVal: '3-4' },
-      { icon:'🥬', text:'生菜不限/熟蔬菜', key:'veg2', unit:'g', defaultVal: 60 },
-      { icon:'🍎', text:'水果', key:'fruit3', unit:'份', defaultVal: 1 },
-      { icon:'🌾', text:'穀物', key:'grain3', unit:'g', defaultVal: 80 },
-    ]),
-    { time:'20:00', title:'小餐', items: snackItems() },
+    FB('07:45', fiberExtras),
+    {time:'08:00',title:'早餐',items:[...mainMealItems([{icon:'🥚',text:'水煮蛋',key:'egg',unit:'顆',defaultVal:1},{icon:'🍎',text:'水果',key:'fruit',unit:'份',defaultVal:1},{icon:'🌾',text:'穀物',key:'grain',unit:'g',defaultVal:80}])]},
+    {time:'10:00',title:'小餐',items:snackItems()},
+    FB('11:45'),
+    {time:'12:00',title:'午餐',items:[...mainMealItems([{icon:'🥩',text:'蛋白質食物',key:'prot',unit:'份',defaultVal:'3-4'},{icon:'🥬',text:'生菜不限',key:'veg',unit:'g',defaultVal:60},{icon:'🥦',text:'熟蔬菜',key:'cooked',unit:'g',defaultVal:60},{icon:'🍎',text:'水果',key:'fruit2',unit:'份',defaultVal:1},{icon:'🌾',text:'穀物',key:'grain2',unit:'g',defaultVal:80}])]},
+    {time:'14:00',title:'小餐',items:snackItems()},
+    {time:'16:00',title:'小餐',items:snackItems()},
+    FB('17:45'),
+    {time:'18:00',title:'晚餐',items:[...mainMealItems([{icon:'🥩',text:'蛋白質食物',key:'prot2',unit:'份',defaultVal:'3-4'},{icon:'🥬',text:'生菜不限',key:'veg2',unit:'g',defaultVal:60},{icon:'🥦',text:'熟蔬菜',key:'cooked2',unit:'g',defaultVal:60},{icon:'🍎',text:'水果',key:'fruit3',unit:'份',defaultVal:1},{icon:'🌾',text:'穀物',key:'grain3',unit:'g',defaultVal:80}])]},
+    {time:'20:00',title:'小餐',items:snackItems()},
   ];
 }
 
-// ════════════════════════════════════════
+// ══════════════════════════════════════
 // NAVIGATION
-// ════════════════════════════════════════
-function showScreen(id, navId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+// ══════════════════════════════════════
+function showScreen(id, navId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  if (navId) document.getElementById(navId)?.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(navId) document.getElementById(navId)?.classList.add('active');
   window.scrollTo(0,0);
 }
-
-function showCalendar() {
-  renderCalendar();
-  showScreen('screen-calendar', 'nav-calendar');
+function showCalendar(){ renderCalendar(); showScreen('screen-calendar','nav-calendar'); }
+function goToCalendar(){ showCalendar(); }
+function showStats(){ renderStats(); showScreen('screen-stats','nav-stats'); }
+function showSupply(){ renderSupply(); showScreen('screen-supply','nav-supply'); }
+function showSettings(){
+  document.getElementById('nav-bar').style.display='none';
+  if(state.startDate) document.getElementById('start-date').value=state.startDate;
+  if(state.pretestDate) document.getElementById('pretest-date').value=state.pretestDate;
+  const d=state.doses||{};
+  if(d.protein_snack) document.getElementById('dose-protein-snack').value=d.protein_snack;
+  if(d.lecithin_snack) document.getElementById('dose-lecithin-snack').value=d.lecithin_snack;
+  if(d.b) document.getElementById('dose-b').value=d.b;
+  if(d.ca) document.getElementById('dose-ca').value=d.ca;
+  if(d.c) document.getElementById('dose-c').value=d.c;
+  document.getElementById('use-slim').value=state.useSlim===false?'no':'yes';
+  document.getElementById('use-probio').value=state.useProbio===false?'no':'yes';
+  showScreen('screen-setup',null);
 }
 
-function goToCalendar() { showCalendar(); }
-
-function showStats() {
-  renderStats();
-  showScreen('screen-stats', 'nav-stats');
-}
-
-function showSettings() {
-  document.getElementById('nav-bar').style.display = 'none';
-  // Pre-fill
-  if (state.startDate) document.getElementById('start-date').value = state.startDate;
-  const d = state.doses || {};
-  if (d.protein_snack) document.getElementById('dose-protein-snack').value = d.protein_snack;
-  if (d.lecithin_snack) document.getElementById('dose-lecithin-snack').value = d.lecithin_snack;
-  if (d.b) document.getElementById('dose-b').value = d.b;
-  if (d.ca) document.getElementById('dose-ca').value = d.ca;
-  if (d.c) document.getElementById('dose-c').value = d.c;
-  document.getElementById('use-slim').value = state.useSlim === false ? 'no' : 'yes';
-  document.getElementById('use-probio').value = state.useProbio === false ? 'no' : 'yes';
-  showScreen('screen-setup', null);
-}
-
-// ════════════════════════════════════════
+// ══════════════════════════════════════
 // SETUP
-// ════════════════════════════════════════
-function startPlan() {
-  const sd = document.getElementById('start-date').value;
-  if (!sd) { alert('請先設定開始日期'); return; }
-  state.startDate = sd;
-  state.doses = {
-    protein_snack: parseFloat(document.getElementById('dose-protein-snack').value) || null,
-    lecithin_snack: parseFloat(document.getElementById('dose-lecithin-snack').value) || null,
-    b: parseFloat(document.getElementById('dose-b').value) || null,
-    ca: parseFloat(document.getElementById('dose-ca').value) || null,
-    c: parseFloat(document.getElementById('dose-c').value) || null,
+// ══════════════════════════════════════
+function startPlan(){
+  const sd=document.getElementById('start-date').value;
+  if(!sd){ alert('請先設定第 1 天（準備日）的日期'); return; }
+  state.startDate=sd;
+  state.pretestDate=document.getElementById('pretest-date').value||null;
+  state.doses={
+    protein_snack: parseFloat(document.getElementById('dose-protein-snack').value)||null,
+    lecithin_snack: parseFloat(document.getElementById('dose-lecithin-snack').value)||null,
+    b: parseFloat(document.getElementById('dose-b').value)||null,
+    ca: parseFloat(document.getElementById('dose-ca').value)||null,
+    c: parseFloat(document.getElementById('dose-c').value)||null,
   };
-  state.useSlim = document.getElementById('use-slim').value === 'yes';
-  state.useProbio = document.getElementById('use-probio').value === 'yes';
+  state.useSlim=document.getElementById('use-slim').value==='yes';
+  state.useProbio=document.getElementById('use-probio').value==='yes';
   saveState();
-  document.getElementById('nav-bar').style.display = 'flex';
+  document.getElementById('nav-bar').style.display='flex';
   showCalendar();
 }
 
-// ════════════════════════════════════════
-// CALENDAR RENDER
-// ════════════════════════════════════════
-function dateToISO(d) { return d.toISOString().split('T')[0]; }
-function addDays(iso, n) {
-  const d = new Date(iso + 'T00:00:00');
-  d.setDate(d.getDate() + n);
-  return dateToISO(d);
-}
-function daysBetween(a, b) {
-  const da = new Date(a + 'T00:00:00'), db = new Date(b + 'T00:00:00');
-  return Math.round((db - da) / 86400000);
+// ══════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════
+function getDayProgress(dayIdx){
+  const schedule=buildSchedule(dayIdx,state.doses||{},state.useSlim,state.useProbio);
+  let done=0;
+  schedule.forEach((_,bi)=>{ if((state.checks||{})[`day${dayIdx}b${bi}`]) done++; });
+  return {done,total:schedule.length};
 }
 
-function getDayProgress(dayIdx) {
-  // Count checked blocks
-  const key = `day${dayIdx}`;
-  const allKeys = Object.keys(state.checks || {}).filter(k => k.startsWith(key + 'b'));
-  const schedule = buildSchedule(dayIdx, state.doses||{}, state.useSlim, state.useProbio);
-  const total = schedule.length;
-  let done = 0;
-  schedule.forEach((_, bi) => { if ((state.checks||{})[`day${dayIdx}b${bi}`]) done++; });
-  return { done, total };
-}
+function renderCalendar(){
+  const today=todayISO();
+  const start=state.startDate;
+  const todayIdx=daysBetween(start,today);
 
-function renderCalendar() {
-  const today = dateToISO(new Date());
-  const start = state.startDate;
-
-  // Summary
-  let totalDone = 0, totalPossible = 0;
-  const todayIdx = daysBetween(start, today);
-
-  for (let i = 0; i < 45; i++) {
-    const isoDate = addDays(start, i);
-    if (isoDate <= today) {
-      const { done, total } = getDayProgress(i);
-      totalDone += done;
-      totalPossible += total;
-    }
+  let totalDone=0,totalPossible=0;
+  for(let i=0;i<45;i++){
+    const iso=addDays(start,i);
+    if(iso<=today){ const {done,total}=getDayProgress(i); totalDone+=done; totalPossible+=total; }
   }
+  const pct=totalPossible>0?Math.round(totalDone/totalPossible*100):0;
+  const planDay=todayIdx>=0&&todayIdx<45?todayIdx+1:null;
 
-  const pct = totalPossible > 0 ? Math.round(totalDone / totalPossible * 100) : 0;
-  const planDay = todayIdx >= 0 && todayIdx < 45 ? todayIdx + 1 : null;
-
-  document.getElementById('cal-summary').innerHTML = `
-    <div class="cal-stat">
-      <div class="cal-stat-num">${planDay ? `第 ${planDay} 天` : '—'}</div>
-      <div class="cal-stat-label">今天</div>
-    </div>
-    <div class="cal-stat">
-      <div class="cal-stat-num">${pct}%</div>
-      <div class="cal-stat-label">整體完成率</div>
-    </div>
-    <div class="cal-stat">
-      <div class="cal-stat-num">${Math.max(0, 45 - Math.max(0, todayIdx + 1))}</div>
-      <div class="cal-stat-label">剩餘天數</div>
-    </div>
+  document.getElementById('cal-summary').innerHTML=`
+    <div class="cal-stat"><div class="cal-stat-num">${planDay?`第${planDay}天`:'—'}</div><div class="cal-stat-label">今天</div></div>
+    <div class="cal-stat"><div class="cal-stat-num">${pct}%</div><div class="cal-stat-label">完成率</div></div>
+    <div class="cal-stat"><div class="cal-stat-num">${Math.max(0,45-Math.max(0,todayIdx+1))}</div><div class="cal-stat-label">剩餘天數</div></div>
   `;
 
-  // Build grid: start from Monday of the week containing start date
-  const startDt = new Date(start + 'T00:00:00');
-  const dow = (startDt.getDay() + 6) % 7; // Mon=0
-  const gridStart = new Date(startDt);
-  gridStart.setDate(gridStart.getDate() - dow);
+  const startDt=new Date(start+'T00:00:00');
+  const dow=(startDt.getDay()+6)%7;
+  const gridStart=new Date(startDt); gridStart.setDate(gridStart.getDate()-dow);
 
-  const endDate = addDays(start, 44);
-  const endDt = new Date(endDate + 'T00:00:00');
-  const endDow = (endDt.getDay() + 6) % 7;
-  const gridEnd = new Date(endDt);
-  gridEnd.setDate(gridEnd.getDate() + (6 - endDow));
+  const endDate=addDays(start,44);
+  const endDt=new Date(endDate+'T00:00:00');
+  const endDow=(endDt.getDay()+6)%7;
+  const gridEnd=new Date(endDt); gridEnd.setDate(gridEnd.getDate()+(6-endDow));
 
-  let html = '';
-  let cur = new Date(gridStart);
-  while (cur <= gridEnd) {
-    const iso = dateToISO(cur);
-    const dayIdx = daysBetween(start, iso);
-    const isInPlan = dayIdx >= 0 && dayIdx < 45;
+  let html='';
+  let cur=new Date(gridStart);
+  while(cur<=gridEnd){
+    const iso=dateToISO(cur);
+    const dayIdx=daysBetween(start,iso);
+    const isPre=state.pretestDate&&iso===state.pretestDate;
+    const isInPlan=dayIdx>=0&&dayIdx<45;
 
-    if (!isInPlan) {
-      html += `<div class="cal-day empty type-empty"><div class="day-num" style="color:var(--gray-300)">${cur.getDate()}</div></div>`;
+    if(!isInPlan&&!isPre){
+      html+=`<div class="cal-day empty type-empty"><div class="day-num" style="color:var(--gray-300)">${cur.getDate()}</div></div>`;
+    } else if(isPre){
+      const isToday=iso===today;
+      html+=`<div class="cal-day type-pretest${isToday?' today':''}" onclick="openPretestDay()">
+        <div class="day-num">${cur.getDate()}</div>
+        <div class="day-type">🩸</div>
+      </div>`;
     } else {
-      const type = DAY_TYPES[dayIdx];
-      const ti = TYPE_INFO[type];
-      const isToday = iso === today;
-      const { done, total } = getDayProgress(dayIdx);
-      const isPast = iso < today;
-      const fullDone = done === total;
-      const partial = done > 0 && done < total;
-
-      html += `<div class="cal-day ${ti.color}${isToday?' today':''}${fullDone?' done':''}${partial?' partial':''}" onclick="openDay(${dayIdx})">
+      const type=DAY_TYPES[dayIdx];
+      const ti=TYPE_INFO[type];
+      const isToday=iso===today;
+      const {done,total}=getDayProgress(dayIdx);
+      const fullDone=done===total&&total>0;
+      const partial=done>0&&done<total;
+      html+=`<div class="cal-day ${ti.color}${isToday?' today':''}${fullDone?' done':''}${partial?' partial':''}" onclick="openDay(${dayIdx})">
         <div class="day-num">${cur.getDate()}</div>
         <div class="day-type">${ti.emoji}</div>
-        ${fullDone ? '<div class="check">✅</div>' : (partial ? '<div class="check">🔶</div>' : '')}
+        ${fullDone?'<div class="check">✅</div>':(partial?'<div class="check">🔶</div>':'')}
       </div>`;
     }
-    cur.setDate(cur.getDate() + 1);
+    cur.setDate(cur.getDate()+1);
   }
-  document.getElementById('cal-days').innerHTML = html;
+  document.getElementById('cal-days').innerHTML=html;
 }
 
-// ════════════════════════════════════════
+// ══════════════════════════════════════
 // TODAY
-// ════════════════════════════════════════
-function goToToday() {
-  const today = dateToISO(new Date());
-  const dayIdx = daysBetween(state.startDate, today);
-  if (dayIdx < 0 || dayIdx >= 45) {
-    alert('今天不在計畫範圍內');
-    showCalendar();
-    return;
-  }
+// ══════════════════════════════════════
+function goToToday(){
+  const today=todayISO();
+  if(state.pretestDate&&today===state.pretestDate){ openPretestDay(); document.getElementById('nav-today').classList.add('active'); return; }
+  const dayIdx=daysBetween(state.startDate,today);
+  if(dayIdx<0||dayIdx>=45){ alert('今天不在計畫範圍內'); showCalendar(); return; }
   openDay(dayIdx);
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('nav-today').classList.add('active');
 }
 
-// ════════════════════════════════════════
-// DAY VIEW
-// ════════════════════════════════════════
-let currentDayIdx = null;
+// ══════════════════════════════════════
+// PRETEST DAY
+// ══════════════════════════════════════
+function openPretestDay(){
+  const ti=TYPE_INFO['pretest'];
+  const hero=document.getElementById('day-hero');
+  hero.style.background=`linear-gradient(135deg,#1e293b,${ti.heroBg})`;
+  document.getElementById('day-badge').innerHTML='🩸 前測日';
+  document.getElementById('day-title').textContent='計畫前量測';
+  document.getElementById('day-date').textContent=state.pretestDate?formatDateLabel(state.pretestDate):'';
+  document.getElementById('progress-circle').style.strokeDashoffset=150.8;
+  document.getElementById('progress-label').textContent='';
 
-function openDay(dayIdx) {
-  currentDayIdx = dayIdx;
-  const type = DAY_TYPES[dayIdx];
-  const ti = TYPE_INFO[type];
-  const isoDate = addDays(state.startDate, dayIdx);
-  const dt = new Date(isoDate + 'T00:00:00');
-  const dateStr = `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')} (${['日','一','二','三','四','五','六'][dt.getDay()]})`;
-
-  // Hero
-  const hero = document.getElementById('day-hero');
-  hero.style.background = `linear-gradient(135deg, ${ti.heroColor}, ${ti.heroBg})`;
-
-  document.getElementById('day-badge').innerHTML = `${ti.emoji} ${ti.label}`;
-  document.getElementById('day-title').textContent = `第 ${dayIdx + 1} 天`;
-  document.getElementById('day-date').textContent = dateStr;
-
-  renderChecklist(dayIdx);
-  showScreen('screen-day', null);
+  document.getElementById('pretest-notice').style.display='block';
+  const tasks=[
+    '🩸 抽血檢查（總膽固醇、血糖、三酸甘油酯、GOT/GPT、腎絲球過濾率、尿酸、HbA1C）',
+    '📸 拍身形照（正面、側面、背面，穿貼身衣服）',
+    '📏 量腰圍',
+    '⚖️ 記錄體組成（體重、體脂、骨骼肌、基礎代謝、內臟脂肪、體年齡、BMI）',
+  ];
+  document.getElementById('pretest-checklist').innerHTML=tasks.map((t,i)=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:${i<tasks.length-1?'1px solid var(--gray-100)':'none'}">
+      <input type="checkbox" id="pre${i}" style="width:18px;height:18px;margin-top:2px;accent-color:var(--purple)"
+        ${(state.checks||{})['pretest'+i]?'checked':''} onchange="savePretestCheck(${i},this.checked)"/>
+      <label for="pre${i}" style="font-size:14px;line-height:1.6;color:var(--gray-700)">${t}</label>
+    </div>`).join('');
+  document.getElementById('checklist').innerHTML='';
+  showScreen('screen-day',null);
+}
+function savePretestCheck(i,val){
+  if(!state.checks) state.checks={};
+  state.checks['pretest'+i]=val;
+  saveState();
 }
 
-function renderChecklist(dayIdx) {
-  const schedule = buildSchedule(dayIdx, state.doses||{}, state.useSlim, state.useProbio);
-  const checks = state.checks || {};
-  const amounts = state.amounts || {};
+// ══════════════════════════════════════
+// DAY VIEW
+// ══════════════════════════════════════
+let currentDayIdx=null;
+function openDay(dayIdx){
+  currentDayIdx=dayIdx;
+  const type=DAY_TYPES[dayIdx];
+  const ti=TYPE_INFO[type];
+  const isoDate=addDays(state.startDate,dayIdx);
+  document.getElementById('day-hero').style.background=`linear-gradient(135deg,#1e293b,${ti.heroBg})`;
+  document.getElementById('day-badge').innerHTML=`${ti.emoji} ${ti.label}`;
+  document.getElementById('day-title').textContent=`第 ${dayIdx+1} 天`;
+  document.getElementById('day-date').textContent=formatDateLabel(isoDate);
+  document.getElementById('pretest-notice').style.display='none';
+  renderChecklist(dayIdx);
+  showScreen('screen-day',null);
+}
 
-  let done = 0;
-  schedule.forEach((_, bi) => { if (checks[`day${dayIdx}b${bi}`]) done++; });
-  updateProgress(done, schedule.length);
+function renderChecklist(dayIdx){
+  const schedule=buildSchedule(dayIdx,state.doses||{},state.useSlim,state.useProbio);
+  const checks=state.checks||{};
+  const amounts=state.amounts||{};
+  let done=0;
+  schedule.forEach((_,bi)=>{ if(checks[`day${dayIdx}b${bi}`]) done++; });
+  updateProgress(done,schedule.length);
 
-  let html = '';
-  schedule.forEach((block, bi) => {
-    const bKey = `day${dayIdx}b${bi}`;
-    const isChecked = !!checks[bKey];
-
-    html += `<div class="time-block">
+  let html='';
+  schedule.forEach((block,bi)=>{
+    const bKey=`day${dayIdx}b${bi}`;
+    const isChecked=!!checks[bKey];
+    html+=`<div class="time-block">
       <div class="time-block-header">
         <div class="time-tag">${block.time}</div>
         <div class="time-block-title">${block.title}</div>
         <div class="time-block-check ${isChecked?'checked':''}" onclick="toggleBlock(${dayIdx},${bi})">
-          ${isChecked ? '✓' : ''}
+          ${isChecked?'✓':''}
         </div>
       </div>
       <div class="item-list">`;
-
-    block.items.forEach((item, ii) => {
-      if (item.unit === '') {
-        html += `<div class="item-row">
-          <div class="item-icon">${item.icon}</div>
-          <div class="item-text">${item.text}</div>
-        </div>`;
+    block.items.forEach((item,ii)=>{
+      if(item.unit===''){
+        html+=`<div class="item-row"><div class="item-icon">${item.icon}</div><div class="item-text">${item.text}</div></div>`;
       } else {
-        const aKey = `day${dayIdx}b${bi}i${ii}`;
-        const val = amounts[aKey] !== undefined ? amounts[aKey] : (item.defaultVal || '');
-        html += `<div class="item-row">
+        const aKey=`day${dayIdx}b${bi}i${ii}`;
+        const val=amounts[aKey]!==undefined?amounts[aKey]:(item.defaultVal||'');
+        html+=`<div class="item-row">
           <div class="item-icon">${item.icon}</div>
           <div class="item-text">${item.text}</div>
-          <input class="item-amount-input" type="${typeof item.defaultVal === 'number' ? 'number' : 'text'}"
+          <input class="item-amount-input" type="${typeof item.defaultVal==='number'?'number':'text'}"
             value="${val}" min="0" step="0.5"
-            onchange="saveAmount('${aKey}', this.value)"
-            placeholder="${item.defaultVal || ''}" />
-          <div class="field-unit" style="font-size:12px;min-width:20px">${item.unit}</div>
+            onchange="saveAmount('${aKey}',this.value,'${item.productId||''}')"
+            placeholder="${item.defaultVal||''}"/>
+          <div class="field-unit" style="font-size:12px;min-width:18px">${item.unit}</div>
         </div>`;
       }
     });
-
-    html += `</div></div>`;
+    html+='</div></div>';
   });
-
-  document.getElementById('checklist').innerHTML = html;
+  document.getElementById('checklist').innerHTML=html;
 }
 
-function toggleBlock(dayIdx, bi) {
-  const bKey = `day${dayIdx}b${bi}`;
-  if (!state.checks) state.checks = {};
-  state.checks[bKey] = !state.checks[bKey];
+function toggleBlock(dayIdx,bi){
+  const bKey=`day${dayIdx}b${bi}`;
+  if(!state.checks) state.checks={};
+  const wasChecked=!!state.checks[bKey];
+  state.checks[bKey]=!wasChecked;
+
+  // Auto-deduct stock when checking (not when unchecking)
+  if(!wasChecked){
+    const schedule=buildSchedule(dayIdx,state.doses||{},state.useSlim,state.useProbio);
+    const block=schedule[bi];
+    if(block){
+      block.items.forEach((item,ii)=>{
+        if(item.productId&&item.unit!==''){
+          const aKey=`day${dayIdx}b${bi}i${ii}`;
+          const used=parseFloat((state.amounts||{})[aKey]||item.defaultVal||0);
+          if(used>0 && !isNaN(used)){
+            if(!state.stock) state.stock={};
+            if(state.stock[item.productId]!==undefined){
+              state.stock[item.productId]=Math.max(0, (state.stock[item.productId]||0)-used);
+            }
+          }
+        }
+      });
+    }
+  }
   saveState();
   renderChecklist(dayIdx);
-  // Update calendar if open
 }
 
-function saveAmount(key, val) {
-  if (!state.amounts) state.amounts = {};
-  state.amounts[key] = val;
+function saveAmount(key,val,productId){
+  if(!state.amounts) state.amounts={};
+  state.amounts[key]=val;
   saveState();
 }
 
-function updateProgress(done, total) {
-  const circ = document.getElementById('progress-circle');
-  const label = document.getElementById('progress-label');
-  const circumference = 150.8;
-  const offset = total > 0 ? circumference * (1 - done / total) : circumference;
-  circ.style.strokeDashoffset = offset;
-  label.textContent = `${done}/${total}`;
+function updateProgress(done,total){
+  const circ=document.getElementById('progress-circle');
+  const label=document.getElementById('progress-label');
+  const circumference=150.8;
+  circ.style.strokeDashoffset=total>0?circumference*(1-done/total):circumference;
+  label.textContent=`${done}/${total}`;
 }
 
-// ════════════════════════════════════════
+// ══════════════════════════════════════
 // STATS
-// ════════════════════════════════════════
-function renderStats() {
-  const today = dateToISO(new Date());
-  const start = state.startDate;
-
-  // Overall
-  let totalDone = 0, totalPossible = 0;
-  const weekStats = [];
-
-  for (let w = 0; w < 7; w++) {
-    let wDone = 0, wTotal = 0;
-    for (let d = 0; d < 7; d++) {
-      const dayIdx = w * 7 + d;
-      if (dayIdx >= 45) break;
-      const isoDate = addDays(start, dayIdx);
-      if (isoDate <= today) {
-        const { done, total } = getDayProgress(dayIdx);
-        wDone += done; wTotal += total;
-        totalDone += done; totalPossible += total;
+// ══════════════════════════════════════
+function renderStats(){
+  const today=todayISO();
+  const start=state.startDate;
+  let totalDone=0,totalPossible=0;
+  const weekStats=[];
+  for(let w=0;w<7;w++){
+    let wDone=0,wTotal=0;
+    for(let d=0;d<7;d++){
+      const dayIdx=w*7+d; if(dayIdx>=45) break;
+      const iso=addDays(start,dayIdx);
+      if(iso<=today){
+        const {done,total}=getDayProgress(dayIdx);
+        wDone+=done; wTotal+=total; totalDone+=done; totalPossible+=total;
       }
     }
-    weekStats.push({ wDone, wTotal, pct: wTotal > 0 ? Math.round(wDone/wTotal*100) : null });
+    weekStats.push({wDone,wTotal,pct:wTotal>0?Math.round(wDone/wTotal*100):null});
   }
-
-  const overallPct = totalPossible > 0 ? Math.round(totalDone / totalPossible * 100) : 0;
-
-  // Day cells
-  let dayCellsHtml = '';
-  for (let i = 0; i < 45; i++) {
-    const isoDate = addDays(start, i);
-    if (isoDate > today) {
-      dayCellsHtml += `<div class="week-cell future">${i+1}</div>`;
-    } else {
-      const { done, total } = getDayProgress(i);
-      const cls = done === total ? 'done' : done > 0 ? 'partial' : 'missed';
-      dayCellsHtml += `<div class="week-cell ${cls}">${i+1}</div>`;
-    }
+  const overallPct=totalPossible>0?Math.round(totalDone/totalPossible*100):0;
+  let dayCells='';
+  for(let i=0;i<45;i++){
+    const iso=addDays(start,i);
+    if(iso>today){ dayCells+=`<div class="week-cell future">${i+1}</div>`; }
+    else{ const {done,total}=getDayProgress(i); const cls=done===total&&total>0?'done':done>0?'partial':'missed'; dayCells+=`<div class="week-cell ${cls}">${i+1}</div>`; }
   }
-  // Fill to multiple of 7
-  const rem = 45 % 7;
-  if (rem > 0) for (let i = 0; i < 7 - rem; i++) dayCellsHtml += `<div class="week-cell" style="background:transparent"></div>`;
-
-  let barsHtml = weekStats.map((w, i) => w.wTotal > 0 ? `
-    <div class="bar-row">
-      <div class="bar-label">第 ${i+1} 週</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${w.pct||0}%"></div></div>
-      <div class="bar-val">${w.pct !== null ? w.pct + '%' : '—'}</div>
-    </div>` : '').join('');
-
-  document.getElementById('stats-body').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-card-title">整體完成率</div>
-      <div><span class="big-stat">${overallPct}</span><span class="big-stat-unit">%</span></div>
-      <div style="font-size:13px;color:var(--gray-500);margin-top:6px">${totalDone} / ${totalPossible} 個時間點完成</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-title">每週完成率</div>
-      ${barsHtml}
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-title">45 天總覽</div>
-      <div class="week-grid">${dayCellsHtml}</div>
-      <div style="display:flex;gap:16px;margin-top:12px;font-size:12px;color:var(--gray-500)">
-        <span>✅ 全完成</span>
-        <span>🔶 部分完成</span>
-        <span>⬜ 未打卡</span>
-        <span style="color:var(--purple-mid)">· 未到</span>
-      </div>
-    </div>
+  const rem=45%7; if(rem>0) for(let i=0;i<7-rem;i++) dayCells+='<div class="week-cell" style="background:transparent"></div>';
+  const bars=weekStats.map((w,i)=>w.wTotal>0?`<div class="bar-row"><div class="bar-label">第${i+1}週</div><div class="bar-track"><div class="bar-fill" style="width:${w.pct||0}%"></div></div><div class="bar-val">${w.pct!==null?w.pct+'%':'—'}</div></div>`:'').join('');
+  document.getElementById('stats-body').innerHTML=`
+    <div class="stat-card"><div class="stat-card-title">整體完成率</div><div><span class="big-stat">${overallPct}</span><span class="big-stat-unit">%</span></div><div style="font-size:13px;color:var(--gray-500);margin-top:6px">${totalDone} / ${totalPossible} 個時間點完成</div></div>
+    <div class="stat-card"><div class="stat-card-title">每週完成率</div>${bars}</div>
+    <div class="stat-card"><div class="stat-card-title">45 天總覽</div><div class="week-grid">${dayCells}</div><div style="display:flex;gap:16px;margin-top:12px;font-size:12px;color:var(--gray-500)"><span>✅全完成</span><span>🔶部分</span><span>⬜未打卡</span><span style="color:var(--purple-mid)">·未到</span></div></div>
   `;
 }
 
-// ════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════
-function init() {
-  loadState();
-  if (state.startDate) {
-    document.getElementById('nav-bar').style.display = 'flex';
-    // Auto-open today if in plan
-    const today = dateToISO(new Date());
-    const dayIdx = daysBetween(state.startDate, today);
-    if (dayIdx >= 0 && dayIdx < 45) {
-      goToToday();
-    } else {
-      showCalendar();
-    }
+// ══════════════════════════════════════
+// SUPPLY (備品)
+// ══════════════════════════════════════
+function calcEstDaysLeft(product){
+  if(!state.stock||state.stock[product.id]===undefined) return null;
+  const today=todayISO();
+  const start=state.startDate;
+  const todayIdx=daysBetween(start,today);
+  let dailyAvg=0; let cnt=0;
+  for(let i=0;i<45;i++){
+    const use=product.dailyUse(DAY_TYPES[i]);
+    if(use>0){ dailyAvg+=use; cnt++; }
   }
-  // Default date to today
-  if (!document.getElementById('start-date').value) {
-    document.getElementById('start-date').value = dateToISO(new Date());
-  }
+  if(cnt===0) return null;
+  dailyAvg/=cnt;
+  const remaining=state.stock[product.id];
+  return dailyAvg>0?Math.floor(remaining/dailyAvg):null;
 }
 
-init();
-</script>
-</body>
-</html>
+function renderSupply(){
+  const stock=state.stock||{};
+  let totalCost=0;
+  PRODUCTS.forEach(p=>{ if(p.price&&p.recQty) totalCost+=p.price*p.recQty; });
+
+  let html=`
+    <div class="supply-total-card">
+      <div class="supply-total-label">45天建議採購總費用</div>
+      <div class="supply-total-num">NT$ ${totalCost.toLocaleString()}</div>
+      <div class="supply-total-sub">（不含選配易孅菌膠囊；搖搖杯另計）</div>
+    </div>
+    <div class="section-title" style="padding:0 4px">產品明細與庫存</div>
+  `;
+
+  PRODUCTS.forEach(p=>{
+    const currentStock=stock[p.id];
+    const daysLeft=calcEstDaysLeft(p);
+    let stockBadge='';
+    if(currentStock!==undefined){
+      if(daysLeft===null) stockBadge='';
+      else if(daysLeft>=7) stockBadge=`<span class="days-left-badge stock-ok">剩約 ${daysLeft} 天</span>`;
+      else if(daysLeft>3) stockBadge=`<span class="days-left-badge stock-low">⚠️ 剩約 ${daysLeft} 天</span>`;
+      else stockBadge=`<span class="days-left-badge stock-out">🚨 僅剩 ${daysLeft} 天</span>`;
+    }
+
+    html+=`<div class="supply-item">
+      <div class="supply-item-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:20px">${p.icon}</span>
+            <div>
+              <div class="
