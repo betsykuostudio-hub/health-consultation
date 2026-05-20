@@ -43,6 +43,8 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
@@ -1017,15 +1019,45 @@ function LifestyleConsultation({ onViewProducts }) {
                 </div>
               </div>
 
-              {/* 操作按鈕（列印時自動隱藏） */}
+              {/* 操作按鈕 */}
               <div id="report-action-btns">
-                <button onClick={() => window.print()} style={{
+                <button onClick={async () => {
+                  const btn = document.getElementById("report-action-btns");
+                  btn.style.display = "none";
+                  try {
+                    const el = document.getElementById("report-page");
+                    const canvas = await html2canvas(el, {
+                      scale: 2,
+                      useCORS: true,
+                      backgroundColor: "#ffffff",
+                      logging: false,
+                    });
+                    const { jsPDF } = window.jspdf;
+                    const imgData = canvas.toDataURL("image/jpeg", 0.95);
+                    const imgW = canvas.width;
+                    const imgH = canvas.height;
+                    const pdfW = 210;
+                    const pdfH = Math.round((imgH * pdfW) / imgW);
+                    const pdf = new jsPDF({
+                      orientation: pdfH > pdfW ? "portrait" : "landscape",
+                      unit: "mm",
+                      format: [pdfW, pdfH],
+                    });
+                    pdf.addImage(imgData, "JPEG", 0, 0, pdfW, pdfH);
+                    const date = new Date().toISOString().slice(0,10).replace(/-/g,"");
+                    pdf.save(`生活習慣分析報告_${profile.name}_${date}.pdf`);
+                  } catch(e) {
+                    alert("PDF 產生失敗，請截圖儲存。");
+                  } finally {
+                    btn.style.display = "block";
+                  }
+                }} style={{
                   width: "100%", padding: "16px", borderRadius: 14, border: "none", cursor: "pointer",
                   background: "linear-gradient(135deg,#0369a1,#0284c7)",
                   color: "#fff", fontWeight: 700, fontSize: 16, marginBottom: 10,
                   boxShadow: "0 4px 12px rgba(3,105,161,0.3)",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                }}>🖨️ 列印 / 儲存為 PDF</button>
+                }}>📥 下載 PDF 報告</button>
                 <button onClick={() => { setShowReport(false); window.scrollTo(0,0); }} style={{
                   width: "100%", padding: "15px", borderRadius: 14,
                   border: "2px solid #15803d", background: "#fff",
@@ -1529,7 +1561,7 @@ function HealthReport() {
               overflowX: "auto", paddingBottom: 4,
             }}>
               {GROUPS.map(g => (
-                <button key={g.id} onClick={() => setActiveGroup(g.id)} style={{
+                <button key={g.id} onClick={() => { setActiveGroup(g.id); window.scrollTo(0,0); }} style={{
                   flexShrink: 0, padding: "8px 14px", borderRadius: 24, cursor: "pointer",
                   border: activeGroup === g.id ? `2px solid ${g.color}` : "2px solid #e5e7eb",
                   background: activeGroup === g.id ? g.bgColor : "#fff",
@@ -1705,6 +1737,7 @@ function HealthReport() {
                 <button onClick={() => {
                   const idx = GROUPS.findIndex(g => g.id === activeGroup);
                   setActiveGroup(GROUPS[idx - 1].id);
+                  window.scrollTo(0, 0);
                 }} style={{
                   padding: "14px 20px", borderRadius: 14,
                   border: "2px solid #d1d5db", cursor: "pointer",
@@ -1716,6 +1749,7 @@ function HealthReport() {
                 <button onClick={() => {
                   const idx = GROUPS.findIndex(g => g.id === activeGroup);
                   setActiveGroup(GROUPS[idx + 1].id);
+                  window.scrollTo(0, 0);
                 }} style={{
                   flex: 1, padding: "14px", borderRadius: 14, border: "none", cursor: "pointer",
                   background: "linear-gradient(135deg,#0369a1,#0284c7)",
