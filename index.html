@@ -1,0 +1,3278 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#15803d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>🌿 健康管理 App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #f8fafc;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+    }
+    input, button, select, textarea {
+      font-family: inherit;
+    }
+    /* 隱藏滾動條但保留滾動功能 */
+    ::-webkit-scrollbar { width: 0; background: transparent; }
+
+    /* 列印模式：只顯示報告內容，隱藏所有 UI 元素 */
+    @media print {
+      body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+      @page { margin: 8mm 10mm; size: A4; }
+      /* 隱藏導覽列、按鈕、步驟條 */
+      #nav-bar { display: none !important; }
+      #report-action-btns { display: none !important; }
+      /* 隱藏非報告頁的所有模組 */
+      #root > div > div > div:not(#report-page) { display: none !important; }
+      /* 報告頁底部 padding 歸零 */
+      #root > div > div { padding-bottom: 0 !important; }
+      /* 確保背景色正確列印 */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React + Babel（透過 CDN 載入，讓瀏覽器直接執行 JSX） -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+
+const SYMPTOMS = [
+  { id: "stomach",       label: "胃易不舒服",   nutrients: ["P"],                                          special: [] },
+  { id: "medication",    label: "常吃藥",        nutrients: ["B", "C"],                                     special: [] },
+  { id: "fatigue",       label: "疲倦",          nutrients: ["P", "B", "Ca"],                               special: ["益生菌"] },
+  { id: "sneezing",      label: "過敏打噴嚏",    nutrients: ["P", "A", "C", "E"],                           special: [] },
+  { id: "constipation",  label: "便秘",          nutrients: ["Ca", "纖維"],                                 special: ["水", "益生菌"] },
+  { id: "coldHands",     label: "手腳冰冷",      nutrients: ["P", "卵"],                                    special: ["月見草"] },
+  { id: "stress",        label: "壓力熬夜",      nutrients: ["P", "B", "Ca"],                               special: [] },
+  { id: "coldOften",     label: "常感冒",        nutrients: ["P", "A", "C"],                                special: ["紫錐花"] },
+  { id: "acne",          label: "青春痘",        nutrients: ["A", "B", "P", "C"],                           special: [] },
+  { id: "skinAllergy",   label: "皮膚過敏發炎",  nutrients: ["P", "B", "C", "Ca"],                          special: [] },
+  { id: "irregular",     label: "經期不順",      nutrients: ["P"],                                          special: ["月見草"] },
+  { id: "anxiety",       label: "憂鬱沮喪",      nutrients: ["P", "B", "Ca", "魚油", "卵"],                 special: [] },
+  { id: "memory",        label: "記憶力減退",    nutrients: ["P", "鐵", "卵"],                              special: ["管花肉蓯蓉"] },
+  { id: "insomnia",      label: "失眠睡不好",    nutrients: ["B", "Ca", "P"],                               special: ["好甘萃"] },
+  { id: "osteo",         label: "骨質疏鬆",      nutrients: ["C", "Ca"],                                    special: [] },
+  { id: "cramp",         label: "抽筋",          nutrients: ["B", "Ca"],                                    special: [] },
+  { id: "gout",          label: "尿酸高(痛風)",  nutrients: ["P", "B", "C"],                                special: ["水"] },
+  { id: "obese",         label: "肥胖／水腫",    nutrients: ["P", "B", "卵", "纖維", "魚油"],               special: [] },
+  { id: "anemia",        label: "貧血",          nutrients: ["P", "B", "E", "鐵"],                          special: [] },
+  { id: "menopause",     label: "更年期",        nutrients: ["B", "C", "Ca", "E", "P", "鐵"],               special: [] },
+  { id: "smoking",       label: "抽菸喝酒檳榔",  nutrients: ["A", "B", "C", "E"],                           special: [] },
+  { id: "floaters",      label: "飛蚊症",        nutrients: ["A", "C"],                                     special: ["晶明+金盞花葉黃素"] },
+  { id: "metabolic",     label: "三C族",         nutrients: ["A", "B"],                                     special: ["晶明+金盞花葉黃素"] },
+  { id: "headache",      label: "偏頭痛",        nutrients: ["B", "C", "Ca", "卵", "鐵"],                   special: [] },
+  { id: "tired_morning", label: "上班沒精神",    nutrients: ["P", "B", "Ca"],                               special: ["益生菌"] },
+  { id: "tired_night",   label: "下班想睡覺",    nutrients: ["P", "B", "Ca"],                               special: [] },
+  { id: "threehigh",     label: "三高",          nutrients: ["P", "魚油", "卵"],                            special: ["綠茶素"] },
+  { id: "joint",         label: "肌肉關節酸痛",  nutrients: ["P", "B", "E", "Ca", "魚油"],                  special: ["關鍵行動力蛋白素"] },
+  { id: "hairloss",      label: "落髮分叉禿頭",  nutrients: ["P", "B", "卵"],                               special: [] },
+  { id: "libido",        label: "性事缺缺",      nutrients: ["A", "P"],                                     special: ["管花肉蓯蓉", "大蒜片"] },
+];
+
+const NUTRIENT_KEYS = ["P", "A", "B", "C", "E", "Ca", "鐵", "卵", "纖維", "魚油"];
+const NUTRIENT_LABELS = {
+  P: "蛋白質", A: "維生素A", B: "維生素B", C: "維生素C", E: "維生素E",
+  Ca: "鈣鎂", 鐵: "鐵", 卵: "卵磷脂", 纖維: "纖維", 魚油: "魚油"
+};
+const SPECIAL_KEYS = ["益生菌", "月見草", "紫錐花", "管花肉蓯蓉", "好甘萃", "晶明+金盞花葉黃素", "綠茶素", "關鍵行動力蛋白素", "大蒜片", "水"];
+const M1_STEPS = ["基本資料", "生活習慣", "症狀評估", "分析結果"];
+const M1_STEP_ICONS = ["👤", "🌙", "🩺", "📊"];
+
+const LEVEL_MAP = [
+  { label: "無需求",   color: "#9ca3af", fill: "#f9fafb", bar: 0 },
+  { label: "輕度需求", color: "#16a34a", fill: "#dcfce7", bar: 25 },
+  { label: "中度需求", color: "#2563eb", fill: "#dbeafe", bar: 55 },
+  { label: "較高需求", color: "#d97706", fill: "#fef3c7", bar: 75 },
+  { label: "強烈需求", color: "#dc2626", fill: "#fee2e2", bar: 100 },
+];
+
+function getLevel(count) {
+  if (count === 0) return LEVEL_MAP[0];
+  if (count === 1) return LEVEL_MAP[1];
+  if (count === 2) return LEVEL_MAP[2];
+  if (count === 3) return LEVEL_MAP[3];
+  return LEVEL_MAP[4];
+}
+
+function LifestyleConsultation({ onViewProducts }) {
+  const [step, setStep] = useState(0);
+  const [profile, setProfile] = useState({ name: "", gender: "", age: "", height: "", weight: "" });
+  const [habits, setHabits] = useState({
+    breakfast: "", bedtime: "", water: "", waterFilter: "",
+    supplement: "", supplementBrand: ""
+  });
+  const [selected, setSelected] = useState({});
+  const [exporting, setExporting] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+
+  const toggleSymptom = (id) => setSelected(prev => ({ ...prev, [id]: !prev[id] }));
+  const goStep = (n) => { setStep(n); window.scrollTo(0, 0); };
+
+  const calcNutrients = () => {
+    const counts = {};
+    NUTRIENT_KEYS.forEach(k => { counts[k] = 0; });
+    SYMPTOMS.forEach(s => {
+      if (selected[s.id]) {
+        s.nutrients.forEach(n => { if (counts[n] !== undefined) counts[n]++; });
+      }
+    });
+    return counts;
+  };
+
+  const nutrients = calcNutrients();
+  const selectedCount = Object.values(selected).filter(Boolean).length;
+
+  const topNutrients = NUTRIENT_KEYS
+    .map(k => ({ key: k, count: nutrients[k], label: NUTRIENT_LABELS[k] }))
+    .filter(n => n.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  const selectedSymptoms = SYMPTOMS.filter(s => selected[s.id]);
+
+  // 計算特殊成分需求
+  const specialCounts = {};
+  SPECIAL_KEYS.forEach(k => { specialCounts[k] = 0; });
+  selectedSymptoms.forEach(s => {
+    s.special.forEach(sp => { if (specialCounts[sp] !== undefined) specialCounts[sp]++; });
+  });
+  const topSpecials = SPECIAL_KEYS
+    .map(k => ({ key: k, count: specialCounts[k] }))
+    .filter(n => n.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  // 組合 M3 推薦 Keys（營養素代碼 + 特殊成分名稱，排除「水」）
+  const recommendedKeys = [
+    ...topNutrients.map(n => n.key),
+    ...topSpecials.map(s => s.key).filter(k => k !== "水"),
+  ];
+
+  const waterDisplay = habits.water === "家用淨水器" && habits.waterFilter
+    ? `家用淨水器（${habits.waterFilter}）`
+    : habits.water;
+  const suppDisplay = habits.supplement === "有" && habits.supplementBrand
+    ? `有（${habits.supplementBrand}）`
+    : habits.supplement;
+
+  const exportPDF = () => {
+    setExporting(true);
+    const date = new Date().toLocaleString("zh-TW");
+    const nutrientRows = NUTRIENT_KEYS.map(k => {
+      const lv = getLevel(nutrients[k]);
+      const pct = lv.bar;
+      return `
+        <tr>
+          <td style="padding:8px 12px;font-size:15px;font-weight:600;color:#374151;">${NUTRIENT_LABELS[k]}</td>
+          <td style="padding:8px 12px;">
+            <div style="background:#f3f4f6;border-radius:6px;height:12px;width:100%;">
+              <div style="background:${lv.color};height:12px;border-radius:6px;width:${pct}%;"></div>
+            </div>
+          </td>
+          <td style="padding:8px 12px;">
+            <span style="background:${lv.fill};color:${lv.color};border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700;white-space:nowrap;">
+              ${lv.label}${nutrients[k] > 0 ? ` ×${nutrients[k]}` : ""}
+            </span>
+          </td>
+        </tr>`;
+    }).join("");
+
+    const symptomTags = selectedSymptoms.length > 0
+      ? selectedSymptoms.map(s => `<span style="display:inline-block;background:#dcfce7;border:1px solid #86efac;border-radius:20px;padding:5px 14px;font-size:14px;color:#15803d;font-weight:600;margin:3px;">${s.label}</span>`).join("")
+      : '<span style="color:#9ca3af;">（無勾選症狀）</span>';
+
+    const topRows = topNutrients.length > 0
+      ? topNutrients.map((n, i) => {
+          const medals = ["🥇", "🥈", "🥉"];
+          return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;">
+            <span style="font-size:20px;width:28px;">${i < 3 ? medals[i] : `${i+1}.`}</span>
+            <span style="flex:1;font-size:15px;font-weight:600;color:#1f2937;">${n.label}</span>
+            <span style="background:#fef3c7;color:#92400e;border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700;">需求 ×${n.count}</span>
+          </div>`;
+        }).join("")
+      : '<p style="color:#9ca3af;">（無症狀資料）</p>';
+
+    const specialRows = topSpecials.length > 0
+      ? topSpecials.map((n, i) => `
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:6px;background:${i===0?"#f5f3ff":"#fafafa"};border:1px solid ${i===0?"#c4b5fd":"#e5e7eb"};border-radius:10px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:${i===0?"#7c3aed":"#e5e7eb"};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:${i===0?"#fff":"#6b7280"};flex-shrink:0;">${i+1}</div>
+            <span style="flex:1;font-size:15px;font-weight:600;color:#374151;">${n.key}</span>
+            <span style="background:${i===0?"#ede9fe":"#f3f4f6"};color:${i===0?"#7c3aed":"#6b7280"};border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700;">×${n.count} 症狀</span>
+          </div>`).join("")
+      : '<p style="color:#9ca3af;font-size:14px;">（無特殊成分建議）</p>';
+
+    const html = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>生活習慣分析報告 - ${profile.name}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans TC', 'PingFang TC', sans-serif; background: #f0fdf4; padding: 20px; color: #1a2e1a; }
+  .page { max-width: 680px; margin: 0 auto; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  .header { background: linear-gradient(135deg, #15803d, #166534); padding: 28px 32px; color: #fff; }
+  .header h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .header p { font-size: 13px; color: #86efac; letter-spacing: 2px; }
+  .profile-band { background: linear-gradient(135deg, #166534, #14532d); padding: 20px 32px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .profile-item { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 10px 18px; text-align: center; min-width: 80px; }
+  .profile-item .val { font-size: 20px; font-weight: 800; color: #fff; }
+  .profile-item .lbl { font-size: 12px; color: #86efac; margin-top: 2px; }
+  .section { padding: 22px 32px; border-bottom: 1px solid #f0fdf4; }
+  .section-title { font-size: 17px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+  .habits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .habit-item { background: #f0fdf4; border-radius: 10px; padding: 10px 14px; }
+  .habit-item .hl { font-size: 12px; color: #6b7280; margin-bottom: 3px; }
+  .habit-item .hv { font-size: 15px; font-weight: 600; color: #15803d; }
+  table { width: 100%; border-collapse: collapse; }
+  .footer { padding: 18px 32px; background: #fffbeb; border-top: 1px solid #fde68a; }
+  .footer p { font-size: 13px; color: #92400e; line-height: 1.7; }
+  @media print {
+    body { padding: 0; background: #fff; }
+    .page { box-shadow: none; border-radius: 0; }
+    @page { margin: 10mm; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>🌿 生活習慣諮詢 評估報告</h1>
+    <p>LIFESTYLE LIFESTYLE ANALYSIS REPORT</p>
+  </div>
+  <div class="profile-band">
+    <div class="profile-item"><div class="val">${profile.name}</div><div class="lbl">${profile.gender}性</div></div>
+    <div class="profile-item"><div class="val">${profile.age}<span style="font-size:13px;">歲</span></div><div class="lbl">年齡</div></div>
+    <div class="profile-item"><div class="val">${profile.height}<span style="font-size:13px;">cm</span></div><div class="lbl">身高</div></div>
+    <div class="profile-item"><div class="val">${profile.weight}<span style="font-size:13px;">kg</span></div><div class="lbl">體重</div></div>
+    <div class="profile-item"><div class="val">${selectedCount}<span style="font-size:13px;">項</span></div><div class="lbl">勾選症狀</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title" style="color:#15803d;">🌙 生活習慣</div>
+    <div class="habits-grid">
+      <div class="habit-item"><div class="hl">早餐時間</div><div class="hv">${habits.breakfast}</div></div>
+      <div class="habit-item"><div class="hl">就寢時間</div><div class="hv">${habits.bedtime}</div></div>
+      <div class="habit-item"><div class="hl">飲用水來源</div><div class="hv">${waterDisplay}</div></div>
+      <div class="habit-item"><div class="hl">營養補充品</div><div class="hv">${suppDisplay}</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title" style="color:#374151;">📋 勾選症狀（${selectedSymptoms.length} 項）</div>
+    <div>${symptomTags}</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title" style="color:#7c3aed;">🌿 建議特殊成分</div>
+    <p style="font-size:12px;color:#9ca3af;margin-bottom:10px;">依勾選症狀建議，非一般營養素另列供參考</p>
+    ${specialRows}
+  </div>
+
+  <div class="section">
+    <div class="section-title" style="color:#92400e;">⭐ 全部營養素需求排名</div>
+    ${topRows}
+  </div>
+
+  <div class="section">
+    <div class="section-title" style="color:#15803d;">🧬 營養素需求分析</div>
+    <table>${nutrientRows}</table>
+  </div>
+
+  <div class="footer">
+    <p>⚠️ 本報告僅供參考，不代表醫療診斷。如有健康疑慮，請諮詢專業醫師或營養師。</p>
+    <p style="margin-top:6px;color:#a16207;">報告產生時間：${date}</p>
+  </div>
+</div>
+<div style="text-align:center;padding:16px 32px 24px;background:#f0fdf4;">
+    <button onclick="window.print()" style="background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;border:none;border-radius:12px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">
+      🖨️ 列印 / 儲存為 PDF
+    </button>
+    <p style="font-size:12px;color:#6b7280;margin-top:8px;">點擊後選擇「另存為 PDF」</p>
+  </div>
+</body>
+</html>`;
+
+    const encoded = "data:text/html;charset=utf-8," + encodeURIComponent(html);
+    const a = document.createElement("a");
+    a.href = encoded;
+    a.download = `生活習慣分析報告_${profile.name}_${new Date().toISOString().slice(0,10)}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setExporting(false);
+  };
+
+  const resetAll = () => {
+    goStep(0);
+    setProfile({ name: "", gender: "", age: "", height: "", weight: "" });
+    setHabits({ breakfast: "", bedtime: "", water: "", waterFilter: "", supplement: "", supplementBrand: "" });
+    setSelected({});
+    setShowReport(false);
+  };
+
+  return (
+    <div style={{
+      minHeight: "100vh", background: "#f0fdf4",
+      fontFamily: "'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif",
+      color: "#1a2e1a", maxWidth: 480, margin: "0 auto",
+    }}>
+      {/* Sticky Header */}
+      <div style={{
+        background: "linear-gradient(135deg, #15803d, #166534)",
+        padding: "18px 20px 0",
+        position: "sticky", top: 0, zIndex: 100,
+        boxShadow: "0 2px 12px rgba(21,128,61,0.25)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 14,
+            background: "rgba(255,255,255,0.2)",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+          }}>🌿</div>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>生活習慣諮詢</div>
+            <div style={{ fontSize: 12, color: "#86efac", letterSpacing: 2 }}>健康評估問卷</div>
+          </div>
+        </div>
+        <div style={{ display: "flex" }}>
+          {M1_STEPS.map((s, i) => (
+            <div key={i} style={{
+              flex: 1, textAlign: "center", padding: "10px 4px 12px",
+              background: i === step ? "#fff" : "transparent",
+              borderRadius: i === step ? "8px 8px 0 0" : 0,
+              transition: "all 0.2s",
+            }}>
+              <div style={{ fontSize: 18, marginBottom: 2 }}>{M1_STEP_ICONS[i]}</div>
+              <div style={{
+                fontSize: 12, fontWeight: i === step ? 700 : 400,
+                color: i === step ? "#15803d" : i < step ? "#86efac" : "rgba(255,255,255,0.5)",
+              }}>{s}</div>
+              {i < step && <div style={{ fontSize: 10, color: "#86efac" }}>✓ 完成</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: "22px 16px 100px" }}>
+
+        {/* ── STEP 0 基本資料 ── */}
+        {step === 0 && (
+          <div>
+            <M1_PageTitle title="請填寫基本資料" desc="填寫後可產生個人化評估結果" />
+            <M1_Card>
+              <M1_FieldLabel>姓名</M1_FieldLabel>
+              <M1_LargeInput value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="請輸入您的姓名" />
+            </M1_Card>
+            <M1_Card>
+              <M1_FieldLabel>性別</M1_FieldLabel>
+              <div style={{ display: "flex", gap: 12 }}>
+                {[{ g: "男", icon: "👨" }, { g: "女", icon: "👩" }].map(({ g, icon }) => (
+                  <button key={g} onClick={() => setProfile(p => ({ ...p, gender: g }))} style={{
+                    flex: 1, padding: "16px 0", borderRadius: 14, cursor: "pointer",
+                    border: profile.gender === g ? "2px solid #15803d" : "2px solid #e5e7eb",
+                    background: profile.gender === g ? "linear-gradient(135deg,#15803d,#16a34a)" : "#f9fafb",
+                    color: profile.gender === g ? "#fff" : "#6b7280",
+                    fontSize: 17, fontWeight: 700,
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                    boxShadow: profile.gender === g ? "0 4px 12px rgba(21,128,61,0.25)" : "none",
+                    transition: "all 0.2s",
+                  }}>
+                    <span style={{ fontSize: 28 }}>{icon}</span>{g}
+                  </button>
+                ))}
+              </div>
+            </M1_Card>
+            <M1_Card>
+              <M1_FieldLabel>身體數值</M1_FieldLabel>
+              <div style={{ display: "flex", gap: 10 }}>
+                {[{ key: "age", label: "年齡", unit: "歲" }, { key: "height", label: "身高", unit: "cm" }, { key: "weight", label: "體重", unit: "kg" }].map(f => (
+                  <div key={f.key} style={{ flex: 1, textAlign: "center" }}>
+                    <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 6 }}>{f.label}</div>
+                    <input type="number" value={profile[f.key]} placeholder="—"
+                      onChange={e => setProfile(p => ({ ...p, [f.key]: e.target.value }))}
+                      style={{
+                        width: "100%", boxSizing: "border-box",
+                        border: "2px solid #d1fae5", borderRadius: 12,
+                        padding: "12px 6px", fontSize: 20, fontWeight: 700,
+                        textAlign: "center", color: "#15803d",
+                        background: "#f0fdf4", outline: "none", fontFamily: "inherit",
+                      }} />
+                    <div style={{ fontSize: 13, color: "#9ca3af", marginTop: 4 }}>{f.unit}</div>
+                  </div>
+                ))}
+              </div>
+            </M1_Card>
+            <M1_BigBtn onClick={() => goStep(1)} disabled={!profile.name || !profile.gender} label="下一步" icon="→" />
+          </div>
+        )}
+
+        {/* ── STEP 1 生活習慣 ── */}
+        {step === 1 && (
+          <div>
+            <M1_PageTitle title="生活習慣" desc="請選擇最符合您日常的選項" />
+            {[
+              { icon: "🌅", label: "早餐時間",        key: "breakfast", opts: ["06:00–07:00","07:00–08:00","08:00–09:00","09:00以後","經常沒吃"] },
+              { icon: "🛏️", label: "就寢時間",        key: "bedtime",   opts: ["22:00–23:00","23:00–00:00","00:00–01:00","01:00以後","常常宵夜"] },
+              { icon: "💧", label: "飲用水來源",      key: "water",     opts: ["自來水","買水","飲料","家用淨水器"] },
+              { icon: "💊", label: "是否食用營養補充品？", key: "supplement", opts: ["有","無","偶爾","曾經"] },
+            ].map(item => (
+              <M1_Card key={item.key}>
+                <M1_FieldLabel>{item.icon} {item.label}</M1_FieldLabel>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {item.opts.map(o => (
+                    <button key={o} onClick={() => setHabits(h => ({ ...h, [item.key]: o }))} style={{
+                      padding: "11px 18px", borderRadius: 24, cursor: "pointer",
+                      border: habits[item.key] === o ? "2px solid #15803d" : "2px solid #e5e7eb",
+                      background: habits[item.key] === o ? "#15803d" : "#f9fafb",
+                      color: habits[item.key] === o ? "#fff" : "#374151",
+                      fontSize: 15, fontWeight: habits[item.key] === o ? 700 : 500,
+                      transition: "all 0.15s",
+                    }}>{o}</button>
+                  ))}
+                </div>
+                {item.key === "water" && habits.water === "家用淨水器" && (
+                  <div style={{ marginTop: 14 }}>
+                    <div style={{ fontSize: 14, color: "#6b7280", marginBottom: 6 }}>淨水器類型（選填）</div>
+                    <M1_LargeInput value={habits.waterFilter}
+                      onChange={v => setHabits(h => ({ ...h, waterFilter: v }))}
+                      placeholder="請輸入類型／品牌" />
+                  </div>
+                )}
+                {item.key === "supplement" && habits.supplement === "有" && (
+                  <div style={{ marginTop: 14 }}>
+                    <div style={{ fontSize: 14, color: "#6b7280", marginBottom: 6 }}>品牌名稱（選填）</div>
+                    <M1_LargeInput value={habits.supplementBrand}
+                      onChange={v => setHabits(h => ({ ...h, supplementBrand: v }))}
+                      placeholder="請輸入品牌" />
+                  </div>
+                )}
+              </M1_Card>
+            ))}
+            <div style={{ display: "flex", gap: 10 }}>
+              <M1_BackBtn onClick={() => goStep(0)} />
+              <M1_BigBtn flex onClick={() => goStep(2)}
+                disabled={!habits.breakfast || !habits.bedtime || !habits.water || !habits.supplement}
+                label="下一步" icon="→" />
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 2 症狀 ── */}
+        {step === 2 && (
+          <div>
+            <M1_PageTitle title="症狀評估" desc="請勾選近期有感受到的症狀（可複選）" />
+            <div style={{
+              background: "#fff", border: "2px solid #d1fae5", borderRadius: 14,
+              padding: "14px 16px", marginBottom: 18,
+              display: "flex", alignItems: "center", gap: 12,
+            }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 12,
+                background: selectedCount > 0 ? "#dcfce7" : "#f3f4f6",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26,
+              }}>✅</div>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: "#15803d" }}>已選 {selectedCount} 項</div>
+                <div style={{ fontSize: 14, color: "#6b7280" }}>點選症狀即可勾選／取消</div>
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+              {SYMPTOMS.map(s => (
+                <button key={s.id} onClick={() => toggleSymptom(s.id)} style={{
+                  display: "flex", alignItems: "center", gap: 14,
+                  padding: "16px", borderRadius: 14, cursor: "pointer",
+                  background: selected[s.id] ? "#dcfce7" : "#fff",
+                  border: selected[s.id] ? "2px solid #16a34a" : "2px solid #e5e7eb",
+                  boxShadow: selected[s.id] ? "0 2px 10px rgba(21,128,61,0.15)" : "0 1px 3px rgba(0,0,0,0.06)",
+                  transition: "all 0.15s", textAlign: "left",
+                }}>
+                  <div style={{
+                    width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                    background: selected[s.id] ? "#16a34a" : "#f3f4f6",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 16, color: "#fff", fontWeight: 800,
+                  }}>{selected[s.id] ? "✓" : ""}</div>
+                  <span style={{
+                    fontSize: 17, fontWeight: selected[s.id] ? 700 : 500,
+                    color: selected[s.id] ? "#15803d" : "#374151",
+                  }}>{s.label}</span>
+                </button>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <M1_BackBtn onClick={() => goStep(1)} />
+              <M1_BigBtn flex onClick={() => goStep(3)} label="查看分析結果" icon="📊" />
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 3 結果 ── */}
+        {step === 3 && !showReport && (
+          <div>
+            <M1_PageTitle title="分析結果" desc={`${profile.name} 的個人生活習慣分析報告`} />
+
+            {/* Profile card */}
+            <div style={{
+              background: "linear-gradient(135deg,#15803d,#166534)",
+              borderRadius: 20, padding: "20px", marginBottom: 20, color: "#fff",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: "50%",
+                  background: "rgba(255,255,255,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30,
+                }}>{profile.gender === "女" ? "👩" : "👨"}</div>
+                <div>
+                  <div style={{ fontSize: 24, fontWeight: 800 }}>{profile.name}</div>
+                  <div style={{ fontSize: 15, color: "#86efac" }}>{profile.gender}性・{profile.age} 歲</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                {[{ label: "身高", val: profile.height, unit: "cm" }, { label: "體重", val: profile.weight, unit: "kg" }, { label: "已選症狀", val: selectedCount, unit: "項" }].map((item, i) => (
+                  <div key={i} style={{
+                    flex: 1, background: "rgba(255,255,255,0.15)",
+                    borderRadius: 12, padding: "12px 0", textAlign: "center",
+                  }}>
+                    <div style={{ fontSize: 22, fontWeight: 800 }}>{item.val}<span style={{ fontSize: 13 }}>{item.unit}</span></div>
+                    <div style={{ fontSize: 13, color: "#86efac" }}>{item.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* All nutrients ranked */}
+            {topNutrients.length > 0 && (
+              <div style={{
+                background: "#fff", borderRadius: 18, padding: "18px 20px", marginBottom: 16,
+                border: "2px solid #fde68a", boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+              }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "#92400e", marginBottom: 14 }}>
+                  ⭐ 缺乏營養素排名（全部）
+                </div>
+                {topNutrients.map((n, i) => {
+                  const medals = ["🥇", "🥈", "🥉"];
+                  return (
+                    <div key={n.key} style={{
+                      display: "flex", alignItems: "center", gap: 12, padding: "12px 0",
+                      borderBottom: i < topNutrients.length - 1 ? "1px solid #f3f4f6" : "none",
+                    }}>
+                      <span style={{ fontSize: i < 3 ? 24 : 16, width: 28, textAlign: "center", flexShrink: 0, color: "#374151", fontWeight: 700 }}>
+                        {i < 3 ? medals[i] : `${i + 1}.`}
+                      </span>
+                      <span style={{ flex: 1, fontSize: 17, fontWeight: 600, color: "#1f2937" }}>{n.label}</span>
+                      <div style={{
+                        background: i === 0 ? "#fef3c7" : "#f3f4f6",
+                        color: i === 0 ? "#92400e" : "#6b7280",
+                        borderRadius: 20, padding: "5px 14px", fontSize: 14, fontWeight: 700,
+                      }}>×{n.count}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Nutrient bars */}
+            <div style={{
+              background: "#fff", borderRadius: 18, padding: "18px 20px", marginBottom: 16,
+              border: "2px solid #d1fae5", boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+            }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "#15803d", marginBottom: 16 }}>
+                🧬 營養素需求分析
+              </div>
+              {[
+                  ...topNutrients,
+                  ...NUTRIENT_KEYS
+                    .filter(k => nutrients[k] === 0)
+                    .map(k => ({ key: k, count: 0, label: NUTRIENT_LABELS[k] }))
+                ].map(n => {
+                const k = n.key;
+                const lv = getLevel(nutrients[k]);
+                return (
+                  <div key={k} style={{ marginBottom: 14 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: "#374151" }}>{NUTRIENT_LABELS[k]}</span>
+                      <span style={{
+                        fontSize: 13, fontWeight: 700, color: lv.color,
+                        background: lv.fill, borderRadius: 20, padding: "3px 12px",
+                      }}>{lv.label}{nutrients[k] > 0 ? ` ×${nutrients[k]}` : ""}</span>
+                    </div>
+                    <div style={{ height: 12, background: "#f3f4f6", borderRadius: 6 }}>
+                      <div style={{
+                        height: "100%", borderRadius: 6, background: lv.color,
+                        width: `${lv.bar}%`, transition: "width 1s ease",
+                      }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Special components */}
+            <div style={{
+              background: "#fff", borderRadius: 18, padding: "18px 20px", marginBottom: 16,
+              border: "2px solid #e9d5ff", boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+            }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "#7c3aed", marginBottom: 6 }}>
+                🌿 建議特殊成分
+              </div>
+              <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 14 }}>
+                依勾選症狀建議，非一般營養素另列供參考
+              </div>
+              {topSpecials.length > 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {topSpecials.map((n, i) => (
+                    <div key={n.key} style={{
+                      display: "flex", alignItems: "center", gap: 12,
+                      background: i === 0 ? "#f5f3ff" : "#fafafa",
+                      border: i === 0 ? "1px solid #c4b5fd" : "1px solid #f3f4f6",
+                      borderRadius: 12, padding: "12px 14px",
+                    }}>
+                      <div style={{
+                        width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
+                        background: i === 0 ? "#7c3aed" : "#e5e7eb",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 14, color: i === 0 ? "#fff" : "#6b7280", fontWeight: 800,
+                      }}>{i + 1}</div>
+                      <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: "#374151" }}>{n.key}</span>
+                      <span style={{
+                        background: i === 0 ? "#ede9fe" : "#f3f4f6",
+                        color: i === 0 ? "#7c3aed" : "#6b7280",
+                        borderRadius: 20, padding: "4px 12px", fontSize: 13, fontWeight: 700,
+                      }}>×{n.count} 症狀</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{
+                  textAlign: "center", padding: "20px 0",
+                  color: "#9ca3af", fontSize: 15,
+                }}>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>🌱</div>
+                  暫無特殊成分建議
+                </div>
+              )}
+              {/* Show all special keys not triggered */}
+              {SPECIAL_KEYS.filter(k => specialCounts[k] === 0).length > 0 && (
+                <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #f3f4f6" }}>
+                  <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 8 }}>目前無需求：</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {SPECIAL_KEYS.filter(k => specialCounts[k] === 0).map(k => (
+                      <span key={k} style={{
+                        background: "#f9fafb", border: "1px solid #e5e7eb",
+                        borderRadius: 20, padding: "5px 12px",
+                        fontSize: 13, color: "#9ca3af",
+                      }}>{k}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Symptoms summary */}
+            {selectedSymptoms.length > 0 && (
+              <div style={{
+                background: "#fff", borderRadius: 18, padding: "18px 20px", marginBottom: 16,
+                border: "2px solid #e5e7eb", boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+              }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "#374151", marginBottom: 12 }}>
+                  📋 已勾選症狀（{selectedSymptoms.length} 項）
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {selectedSymptoms.map(s => (
+                    <span key={s.id} style={{
+                      background: "#dcfce7", border: "1px solid #86efac",
+                      borderRadius: 20, padding: "7px 16px",
+                      fontSize: 15, color: "#15803d", fontWeight: 600,
+                    }}>{s.label}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 查看推薦營養品 → M3 入口 */}
+            {onViewProducts && recommendedKeys.length > 0 && (
+              <button onClick={() => onViewProducts(recommendedKeys)} style={{
+                width: "100%", padding: "17px", borderRadius: 14, border: "none", cursor: "pointer",
+                background: "linear-gradient(135deg,#c2410c,#ea580c)",
+                color: "#fff", fontWeight: 700, fontSize: 17, marginBottom: 12,
+                boxShadow: "0 4px 12px rgba(194,65,12,0.35)",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}>
+                🛒 查看推薦營養品
+                <span style={{
+                  background: "rgba(255,255,255,0.25)", borderRadius: 20,
+                  padding: "2px 10px", fontSize: 13, fontWeight: 600,
+                }}>
+                  {recommendedKeys.length} 項需求
+                </span>
+              </button>
+            )}
+
+            {/* 查看完整報告 */}
+            <button onClick={() => { setShowReport(true); window.scrollTo(0,0); }} style={{
+              width: "100%", padding: "17px", borderRadius: 14, border: "none", cursor: "pointer",
+              background: "linear-gradient(135deg,#0369a1,#0284c7)",
+              color: "#fff", fontWeight: 700, fontSize: 17, marginBottom: 12,
+              boxShadow: "0 4px 12px rgba(3,105,161,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            }}>
+              📄 查看完整報告 / 儲存 PDF
+            </button>
+
+            {/* Disclaimer */}
+            <div style={{
+              background: "#fffbeb", border: "1px solid #fde68a",
+              borderRadius: 12, padding: "14px 16px", marginBottom: 18,
+            }}>
+              <div style={{ fontSize: 14, color: "#92400e", lineHeight: 1.8, display: "flex", gap: 8 }}>
+                <span style={{ flexShrink: 0 }}>⚠️</span>
+                <span>本評估結果僅供參考，不代表醫療診斷。如有健康疑慮，請諮詢專業醫師或營養師。</span>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <M1_BackBtn onClick={() => goStep(2)} />
+              <button onClick={resetAll} style={{
+                flex: 1, padding: "16px", borderRadius: 14, border: "none", cursor: "pointer",
+                background: "linear-gradient(135deg,#15803d,#16a34a)",
+                color: "#fff", fontWeight: 700, fontSize: 17,
+                boxShadow: "0 4px 12px rgba(21,128,61,0.3)",
+              }}>🔄 重新填寫</button>
+            </div>
+          </div>
+        )}
+
+        {/* ── 報告模式 ── */}
+        {step === 3 && showReport && (
+          <div id="report-page" style={{
+            background: "#fff", minHeight: "100vh",
+            fontFamily: "'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif",
+          }}>
+
+
+            {/* Header */}
+            <div style={{
+              background: "linear-gradient(135deg,#15803d,#166534)",
+              padding: "28px 24px 22px",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12,
+                  background: "rgba(255,255,255,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+                }}>🌿</div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>
+                    生活習慣分析報告
+                  </div>
+                  <div style={{ fontSize: 11, color: "#86efac", letterSpacing: 3, marginTop: 2 }}>
+                    LIFESTYLE ANALYSIS REPORT
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 個人資料卡 */}
+            <div style={{
+              background: "linear-gradient(135deg,#166534,#14532d)",
+              padding: "16px 24px 20px",
+            }}>
+              <div style={{
+                display: "grid", gridTemplateColumns: "1fr 1fr",
+                gap: 8, marginBottom: 8,
+              }}>
+                <div style={{
+                  background: "rgba(255,255,255,0.18)", borderRadius: 12,
+                  padding: "12px 16px", gridColumn: "1 / -1",
+                  display: "flex", alignItems: "center", gap: 12,
+                }}>
+                  <div style={{ fontSize: 32 }}>{profile.gender === "女" ? "👩" : "👨"}</div>
+                  <div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>{profile.name}</div>
+                    <div style={{ fontSize: 13, color: "#86efac", marginTop: 2 }}>
+                      {profile.gender}性
+                      {profile.age ? `・${profile.age} 歲` : ""}
+                      {profile.height ? `・${profile.height} cm` : ""}
+                      {profile.weight ? `・${profile.weight} kg` : ""}
+                    </div>
+                  </div>
+                  <div style={{
+                    marginLeft: "auto",
+                    background: "rgba(255,255,255,0.15)", borderRadius: 10,
+                    padding: "8px 14px", textAlign: "center",
+                  }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: "#fff" }}>{selectedCount}</div>
+                    <div style={{ fontSize: 11, color: "#86efac" }}>症狀</div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8 }}>
+                {[
+                  { lbl: "早餐時間", val: habits.breakfast, icon: "🌅" },
+                  { lbl: "就寢時間", val: habits.bedtime, icon: "🌙" },
+                  { lbl: "飲水來源", val: waterDisplay, icon: "💧" },
+                  { lbl: "營養補充品", val: suppDisplay, icon: "💊" },
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    background: "rgba(255,255,255,0.12)", borderRadius: 10,
+                    padding: "10px 14px", display: "flex", gap: 8, alignItems: "center",
+                  }}>
+                    <span style={{ fontSize: 16 }}>{item.icon}</span>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#86efac", marginBottom: 1 }}>{item.lbl}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{item.val || "—"}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 報告內容 */}
+            <div style={{ padding: "20px 24px 24px" }}>
+
+              {/* 勾選症狀 */}
+              <div style={{
+                marginBottom: 20, paddingBottom: 20,
+                borderBottom: "1px solid #f0fdf4",
+              }}>
+                <div style={{
+                  fontSize: 14, fontWeight: 800, color: "#15803d",
+                  marginBottom: 12, display: "flex", alignItems: "center", gap: 6,
+                  textTransform: "uppercase", letterSpacing: 1,
+                }}>
+                  <span style={{
+                    width: 4, height: 16, background: "#15803d", borderRadius: 2, display: "inline-block",
+                  }}/>
+                  勾選症狀（{selectedSymptoms.length} 項）
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {selectedSymptoms.length > 0
+                    ? selectedSymptoms.map(s => (
+                        <span key={s.id} style={{
+                          background: "#f0fdf4", border: "1px solid #86efac",
+                          borderRadius: 6, padding: "4px 12px",
+                          fontSize: 13, color: "#166534", fontWeight: 600,
+                        }}>{s.label}</span>
+                      ))
+                    : <span style={{ color: "#9ca3af", fontSize: 14 }}>（無勾選症狀）</span>
+                  }
+                </div>
+              </div>
+
+              {/* 建議特殊成分 */}
+              {topSpecials.length > 0 && (
+                <div style={{
+                  marginBottom: 20, paddingBottom: 20,
+                  borderBottom: "1px solid #f5f3ff",
+                }}>
+                  <div style={{
+                    fontSize: 14, fontWeight: 800, color: "#7c3aed",
+                    marginBottom: 12, display: "flex", alignItems: "center", gap: 6,
+                    textTransform: "uppercase", letterSpacing: 1,
+                  }}>
+                    <span style={{
+                      width: 4, height: 16, background: "#7c3aed", borderRadius: 2, display: "inline-block",
+                    }}/>
+                    建議特殊成分
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8 }}>
+                    {topSpecials.map((n, i) => (
+                      <div key={n.key} style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "10px 12px",
+                        background: i === 0 ? "#f5f3ff" : "#fafafa",
+                        border: `1px solid ${i === 0 ? "#c4b5fd" : "#e5e7eb"}`,
+                        borderRadius: 10,
+                      }}>
+                        <div style={{
+                          width: 26, height: 26, borderRadius: "50%",
+                          background: i === 0 ? "#7c3aed" : "#e5e7eb",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 12, fontWeight: 800,
+                          color: i === 0 ? "#fff" : "#9ca3af", flexShrink: 0,
+                        }}>{i + 1}</div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>{n.key}</div>
+                          <div style={{ fontSize: 11, color: "#9ca3af" }}>×{n.count} 症狀</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 營養素需求排名 */}
+              <div style={{
+                marginBottom: 20, paddingBottom: 20,
+                borderBottom: "1px solid #fffbeb",
+              }}>
+                <div style={{
+                  fontSize: 14, fontWeight: 800, color: "#92400e",
+                  marginBottom: 12, display: "flex", alignItems: "center", gap: 6,
+                  textTransform: "uppercase", letterSpacing: 1,
+                }}>
+                  <span style={{
+                    width: 4, height: 16, background: "#d97706", borderRadius: 2, display: "inline-block",
+                  }}/>
+                  營養素需求排名
+                </div>
+                {topNutrients.length > 0 ? (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 6 }}>
+                    {topNutrients.map((n, i) => {
+                      const medals = ["🥇","🥈","🥉"];
+                      return (
+                        <div key={n.key} style={{
+                          display: "flex", alignItems: "center", gap: 8,
+                          padding: "8px 12px",
+                          background: i < 3 ? "#fffbeb" : "#fafafa",
+                          borderRadius: 8,
+                          border: i < 3 ? "1px solid #fde68a" : "1px solid #f3f4f6",
+                        }}>
+                          <span style={{ fontSize: 18, flexShrink: 0 }}>{i < 3 ? medals[i] : ""}</span>
+                          <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: "#1f2937" }}>{n.label}</span>
+                          <span style={{
+                            fontSize: 12, fontWeight: 700, color: "#92400e",
+                            background: "#fef3c7", borderRadius: 20, padding: "2px 8px",
+                          }}>×{n.count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : <p style={{ color: "#9ca3af", fontSize: 14 }}>（無症狀資料）</p>}
+              </div>
+
+              {/* 營養素分析 */}
+              <div style={{ marginBottom: 20 }}>
+                <div style={{
+                  fontSize: 14, fontWeight: 800, color: "#15803d",
+                  marginBottom: 12, display: "flex", alignItems: "center", gap: 6,
+                  textTransform: "uppercase", letterSpacing: 1,
+                }}>
+                  <span style={{
+                    width: 4, height: 16, background: "#15803d", borderRadius: 2, display: "inline-block",
+                  }}/>
+                  營養素需求分析
+                </div>
+                <div style={{
+                  background: "#fafafa", borderRadius: 12, padding: "12px 16px",
+                  border: "1px solid #f0fdf4",
+                }}>
+                  {[
+                      ...topNutrients,
+                      ...NUTRIENT_KEYS
+                        .filter(k => nutrients[k] === 0)
+                        .map(k => ({ key: k, count: 0, label: NUTRIENT_LABELS[k] }))
+                    ].map((n, idx, arr) => {
+                    const k = n.key;
+                    const lv = getLevel(nutrients[k]);
+                    return (
+                      <div key={k} style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "7px 0",
+                        borderBottom: idx < arr.length - 1 ? "1px solid #f3f4f6" : "none",
+                      }}>
+                        <div style={{
+                          width: 52, fontSize: 12, fontWeight: 700,
+                          color: "#374151", flexShrink: 0,
+                        }}>{NUTRIENT_LABELS[k]}</div>
+                        <div style={{ flex: 1, background: "#e5e7eb", borderRadius: 99, height: 8 }}>
+                          <div style={{
+                            background: lv.color, height: 8,
+                            borderRadius: 99, width: lv.bar + "%",
+                          }} />
+                        </div>
+                        <span style={{
+                          background: lv.fill, color: lv.color,
+                          borderRadius: 99, padding: "2px 10px",
+                          fontSize: 11, fontWeight: 800,
+                          flexShrink: 0, minWidth: 60, textAlign: "center",
+                        }}>{lv.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 免責聲明 */}
+              <div style={{
+                background: "#fffbeb", border: "1px solid #fde68a",
+                borderRadius: 10, padding: "12px 16px", marginBottom: 20,
+              }}>
+                <div style={{ fontSize: 12, color: "#92400e", lineHeight: 1.8 }}>
+                  ⚠️ 本報告僅供參考，不代表醫療診斷。如有健康疑慮，請諮詢專業醫師或營養師。
+                </div>
+                <div style={{ fontSize: 11, color: "#a16207", marginTop: 4 }}>
+                  產生時間：{new Date().toLocaleString("zh-TW")}
+                </div>
+              </div>
+
+              {/* 操作按鈕（列印時自動隱藏） */}
+              <div id="report-action-btns">
+                <button onClick={() => window.print()} style={{
+                  width: "100%", padding: "16px", borderRadius: 14, border: "none", cursor: "pointer",
+                  background: "linear-gradient(135deg,#0369a1,#0284c7)",
+                  color: "#fff", fontWeight: 700, fontSize: 16, marginBottom: 10,
+                  boxShadow: "0 4px 12px rgba(3,105,161,0.3)",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                }}>🖨️ 列印 / 儲存為 PDF</button>
+                <button onClick={() => { setShowReport(false); window.scrollTo(0,0); }} style={{
+                  width: "100%", padding: "15px", borderRadius: 14,
+                  border: "2px solid #15803d", background: "#fff",
+                  color: "#15803d", fontWeight: 700, fontSize: 16, cursor: "pointer",
+                }}>← 返回分析結果</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function M1_PageTitle({ title, desc }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <h2 style={{ fontSize: 24, fontWeight: 800, color: "#14532d", margin: "0 0 4px" }}>{title}</h2>
+      <p style={{ fontSize: 15, color: "#6b7280", margin: 0 }}>{desc}</p>
+    </div>
+  );
+}
+function M1_Card({ children }) {
+  return (
+    <div style={{
+      background: "#fff", borderRadius: 16, padding: "18px 16px", marginBottom: 14,
+      boxShadow: "0 1px 6px rgba(0,0,0,0.07)", border: "1px solid #e5e7eb",
+    }}>{children}</div>
+  );
+}
+function M1_FieldLabel({ children }) {
+  return <div style={{ fontSize: 16, fontWeight: 700, color: "#374151", marginBottom: 12 }}>{children}</div>;
+}
+function M1_LargeInput({ value, onChange, placeholder }) {
+  return (
+    <input value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)}
+      style={{
+        width: "100%", boxSizing: "border-box",
+        border: "2px solid #d1fae5", borderRadius: 12,
+        padding: "14px 16px", fontSize: 18, color: "#1f2937",
+        background: "#f0fdf4", outline: "none", fontFamily: "inherit",
+      }} />
+  );
+}
+function M1_BigBtn({ onClick, disabled, label, icon, flex }) {
+  return (
+    <button onClick={onClick} disabled={disabled} style={{
+      flex: flex ? 1 : "none", width: flex ? undefined : "100%",
+      padding: "16px", borderRadius: 14, border: "none",
+      cursor: disabled ? "not-allowed" : "pointer",
+      background: disabled ? "#e5e7eb" : "linear-gradient(135deg,#15803d,#16a34a)",
+      color: disabled ? "#9ca3af" : "#fff",
+      fontWeight: 700, fontSize: 17,
+      boxShadow: disabled ? "none" : "0 4px 12px rgba(21,128,61,0.3)",
+      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+      transition: "all 0.2s",
+    }}>{label} <span style={{ fontSize: 18 }}>{icon}</span></button>
+  );
+}
+function M1_BackBtn({ onClick }) {
+  return (
+    <button onClick={onClick} style={{
+      padding: "16px 20px", borderRadius: 14,
+      border: "2px solid #d1d5db", cursor: "pointer",
+      background: "#fff", color: "#6b7280",
+      fontWeight: 700, fontSize: 17,
+    }}>← 返回</button>
+  );
+}
+
+
+// ── 欄位定義 ────────────────────────────────────────────────
+const GROUPS = [
+  {
+    id: "blood_sugar",
+    label: "血糖代謝",
+    icon: "🩸",
+    color: "#dc2626",
+    bgColor: "#fff1f2",
+    borderColor: "#fecaca",
+    fields: ["ac_glu", "hba1c"],
+  },
+  {
+    id: "cardiovascular",
+    label: "心血管",
+    icon: "🫀",
+    color: "#2563eb",
+    bgColor: "#eff6ff",
+    borderColor: "#bfdbfe",
+    fields: ["tc", "tg", "hdl", "ldl", "sbp", "dbp"],
+  },
+  {
+    id: "kidney_liver",
+    label: "腎臟肝臟",
+    icon: "🫘",
+    color: "#7c3aed",
+    bgColor: "#f5f3ff",
+    borderColor: "#c4b5fd",
+    fields: ["ua", "cr", "egfr", "got", "gpt"],
+  },
+  {
+    id: "body_blood",
+    label: "體態貧血",
+    icon: "⚖️",
+    color: "#15803d",
+    bgColor: "#f0fdf4",
+    borderColor: "#d1fae5",
+    fields: ["height", "weight", "hb"],
+  },
+];
+
+// gender: null = 不分性別, "男" = 男, "女" = 女
+const FIELDS = {
+  ac_glu: {
+    label: "飯前血糖", abbr: "AC-Glu", unit: "mg/dL",
+    placeholder: "70–100",
+    ranges: [
+      { gender: null, label: "正常", min: 70, max: 100, level: "normal" },
+      { gender: null, label: "留意", min: 100, max: 126, level: "warn" },
+      { gender: null, label: "異常", min: 126, max: Infinity, level: "danger" },
+      { gender: null, label: "偏低", min: -Infinity, max: 70, level: "warn" },
+    ],
+    hint: "空腹 8 小時後測量",
+    warnMsg: "血糖偏高可能與糖尿病前期或飲食習慣有關，建議控制精緻糖攝取。",
+    dangerMsg: "血糖數值超標，建議諮詢醫師，確認是否需進一步檢查。",
+    lowMsg: "血糖偏低，可能與進食不規律有關，建議諮詢醫師。",
+  },
+  hba1c: {
+    label: "醣化血色素", abbr: "HbA1c", unit: "%",
+    placeholder: "< 5.7",
+    ranges: [
+      { gender: null, label: "正常", min: -Infinity, max: 5.7, level: "normal" },
+      { gender: null, label: "留意", min: 5.7, max: 6.5, level: "warn" },
+      { gender: null, label: "異常", min: 6.5, max: Infinity, level: "danger" },
+    ],
+    hint: "反映近 2–3 個月的血糖平均值",
+    warnMsg: "醣化血色素偏高，屬糖尿病前期範圍，建議調整飲食與運動習慣。",
+    dangerMsg: "醣化血色素超標，建議諮詢醫師進行進一步評估。",
+  },
+  tc: {
+    label: "總膽固醇", abbr: "TC", unit: "mg/dL",
+    placeholder: "< 200",
+    ranges: [
+      { gender: null, label: "正常", min: -Infinity, max: 200, level: "normal" },
+      { gender: null, label: "留意", min: 200, max: 240, level: "warn" },
+      { gender: null, label: "異常", min: 240, max: Infinity, level: "danger" },
+    ],
+    hint: "建議空腹 9–12 小時後採血",
+    warnMsg: "總膽固醇偏高，建議減少飽和脂肪攝取，增加蔬果與運動。",
+    dangerMsg: "總膽固醇明顯偏高，心血管風險上升，建議諮詢醫師。",
+  },
+  tg: {
+    label: "三酸甘油脂", abbr: "TG", unit: "mg/dL",
+    placeholder: "< 150",
+    ranges: [
+      { gender: null, label: "正常", min: -Infinity, max: 150, level: "normal" },
+      { gender: null, label: "留意", min: 150, max: 200, level: "warn" },
+      { gender: null, label: "異常", min: 200, max: Infinity, level: "danger" },
+    ],
+    hint: "與飲食關係密切，需空腹採血",
+    warnMsg: "三酸甘油脂偏高，建議減少精緻碳水與酒精攝取。",
+    dangerMsg: "三酸甘油脂明顯超標，建議諮詢醫師並調整飲食。",
+  },
+  hdl: {
+    label: "高密度膽固醇", abbr: "HDL-C", unit: "mg/dL",
+    placeholder: "≥ 40（男）/ ≥ 50（女）",
+    ranges: [
+      { gender: "男", label: "正常", min: 40, max: Infinity, level: "normal" },
+      { gender: "男", label: "留意", min: 35, max: 40, level: "warn" },
+      { gender: "男", label: "異常", min: -Infinity, max: 35, level: "danger" },
+      { gender: "女", label: "正常", min: 50, max: Infinity, level: "normal" },
+      { gender: "女", label: "留意", min: 40, max: 50, level: "warn" },
+      { gender: "女", label: "異常", min: -Infinity, max: 40, level: "danger" },
+    ],
+    hint: "HDL 越高越好，有助清除血管壁膽固醇",
+    warnMsg: "HDL 偏低，好的膽固醇不足，建議增加有氧運動。",
+    dangerMsg: "HDL 明顯偏低，心血管保護力不足，建議諮詢醫師。",
+  },
+  ldl: {
+    label: "低密度膽固醇", abbr: "LDL-C", unit: "mg/dL",
+    placeholder: "< 130",
+    ranges: [
+      { gender: null, label: "正常", min: -Infinity, max: 130, level: "normal" },
+      { gender: null, label: "留意", min: 130, max: 160, level: "warn" },
+      { gender: null, label: "異常", min: 160, max: Infinity, level: "danger" },
+    ],
+    hint: "LDL 越低越好，過高易堆積在血管壁",
+    warnMsg: "LDL 偏高，建議減少動物性脂肪與加工食品攝取。",
+    dangerMsg: "LDL 明顯超標，動脈硬化風險上升，建議諮詢醫師。",
+  },
+  sbp: {
+    label: "收縮壓", abbr: "SBP", unit: "mmHg",
+    placeholder: "< 120",
+    ranges: [
+      { gender: null, label: "正常", min: -Infinity, max: 120, level: "normal" },
+      { gender: null, label: "留意", min: 120, max: 140, level: "warn" },
+      { gender: null, label: "異常", min: 140, max: Infinity, level: "danger" },
+      { gender: null, label: "偏低", min: -Infinity, max: 90, level: "warn" },
+    ],
+    hint: "心臟收縮時的血壓",
+    warnMsg: "收縮壓偏高，建議減少鹽分攝取並規律運動。",
+    dangerMsg: "收縮壓超標，高血壓需積極管理，建議諮詢醫師。",
+    lowMsg: "血壓偏低，可能有頭暈風險，建議諮詢醫師。",
+  },
+  dbp: {
+    label: "舒張壓", abbr: "DBP", unit: "mmHg",
+    placeholder: "< 80",
+    ranges: [
+      { gender: null, label: "正常", min: -Infinity, max: 80, level: "normal" },
+      { gender: null, label: "留意", min: 80, max: 90, level: "warn" },
+      { gender: null, label: "異常", min: 90, max: Infinity, level: "danger" },
+    ],
+    hint: "心臟舒張時的血壓",
+    warnMsg: "舒張壓偏高，建議調整生活習慣並持續監測。",
+    dangerMsg: "舒張壓超標，建議諮詢醫師評估是否需要治療。",
+  },
+  ua: {
+    label: "尿酸", abbr: "UA", unit: "mg/dL",
+    placeholder: "3.4–7.0（男）/ 2.4–6.0（女）",
+    ranges: [
+      { gender: "男", label: "正常", min: 3.4, max: 7.0, level: "normal" },
+      { gender: "男", label: "異常", min: 7.0, max: Infinity, level: "danger" },
+      { gender: "男", label: "偏低", min: -Infinity, max: 3.4, level: "warn" },
+      { gender: "女", label: "正常", min: 2.4, max: 6.0, level: "normal" },
+      { gender: "女", label: "異常", min: 6.0, max: Infinity, level: "danger" },
+      { gender: "女", label: "偏低", min: -Infinity, max: 2.4, level: "warn" },
+    ],
+    hint: "與痛風、腎結石風險有關",
+    warnMsg: "尿酸偏高，建議多喝水、減少高普林食物（內臟、海鮮）攝取。",
+    dangerMsg: "尿酸超標，痛風風險升高，建議諮詢醫師。",
+    lowMsg: "尿酸偏低，通常無需特別處理，建議持續追蹤。",
+  },
+  cr: {
+    label: "肌酸酐", abbr: "Cr", unit: "mg/dL",
+    placeholder: "0.6–1.2（男）/ 0.5–1.1（女）",
+    ranges: [
+      { gender: "男", label: "正常", min: 0.6, max: 1.2, level: "normal" },
+      { gender: "男", label: "留意", min: 1.2, max: 1.5, level: "warn" },
+      { gender: "男", label: "異常", min: 1.5, max: Infinity, level: "danger" },
+      { gender: "女", label: "正常", min: 0.5, max: 1.1, level: "normal" },
+      { gender: "女", label: "留意", min: 1.1, max: 1.4, level: "warn" },
+      { gender: "女", label: "異常", min: 1.4, max: Infinity, level: "danger" },
+    ],
+    hint: "反映腎臟過濾功能，建議搭配 eGFR 一起看",
+    warnMsg: "肌酸酐偏高，腎功能可能輕度下降，建議多喝水並追蹤。",
+    dangerMsg: "肌酸酐明顯超標，腎功能異常，建議諮詢腎臟科醫師。",
+  },
+  egfr: {
+    label: "腎絲球過濾率", abbr: "eGFR", unit: "mL/min/1.73m²",
+    placeholder: "≥ 90",
+    ranges: [
+      { gender: null, label: "正常", min: 90, max: Infinity, level: "normal" },
+      { gender: null, label: "建議追蹤", min: 60, max: 90, level: "warn" },
+      { gender: null, label: "建議就醫", min: -Infinity, max: 60, level: "danger" },
+    ],
+    hint: "評估腎臟每分鐘過濾血液的能力",
+    warnMsg: "eGFR 輕度下降，建議定期複查腎功能、多喝水、避免過度使用止痛藥。",
+    dangerMsg: "eGFR 明顯下降，腎功能異常，建議盡快諮詢腎臟科醫師。",
+  },
+  got: {
+    label: "肝指數 GOT", abbr: "GOT", unit: "U/L",
+    placeholder: "10–40",
+    ranges: [
+      { gender: null, label: "正常", min: 10, max: 40, level: "normal" },
+      { gender: null, label: "留意", min: 40, max: 80, level: "warn" },
+      { gender: null, label: "異常", min: 80, max: Infinity, level: "danger" },
+    ],
+    hint: "GOT 偏高可能與肝臟或肌肉損傷有關",
+    warnMsg: "GOT 偏高，建議減少飲酒、避免服用不必要的藥物並追蹤。",
+    dangerMsg: "GOT 明顯超標，肝臟可能有損傷，建議諮詢醫師。",
+  },
+  gpt: {
+    label: "肝指數 GPT", abbr: "GPT", unit: "U/L",
+    placeholder: "7–40",
+    ranges: [
+      { gender: null, label: "正常", min: 7, max: 40, level: "normal" },
+      { gender: null, label: "留意", min: 40, max: 80, level: "warn" },
+      { gender: null, label: "異常", min: 80, max: Infinity, level: "danger" },
+    ],
+    hint: "GPT 是更具肝臟特異性的指標",
+    warnMsg: "GPT 偏高，建議減少飲酒、評估脂肪肝可能性。",
+    dangerMsg: "GPT 明顯超標，建議諮詢肝膽腸胃科醫師進行進一步檢查。",
+  },
+  height: {
+    label: "身高", abbr: "Height", unit: "cm",
+    placeholder: "例：165",
+    ranges: [],
+    hint: "用於計算 BMI",
+    isBMI: true,
+  },
+  weight: {
+    label: "體重", abbr: "Weight", unit: "kg",
+    placeholder: "例：60",
+    ranges: [],
+    hint: "用於計算 BMI",
+    isBMI: true,
+  },
+  hb: {
+    label: "血紅素", abbr: "Hb", unit: "g/dL",
+    placeholder: "13.5–17.5（男）/ 12.0–15.5（女）",
+    ranges: [
+      { gender: "男", label: "正常", min: 13.5, max: 17.5, level: "normal" },
+      { gender: "男", label: "留意", min: 12.0, max: 13.5, level: "warn" },
+      { gender: "男", label: "異常", min: -Infinity, max: 12.0, level: "danger" },
+      { gender: "女", label: "正常", min: 12.0, max: 15.5, level: "normal" },
+      { gender: "女", label: "留意", min: 10.0, max: 12.0, level: "warn" },
+      { gender: "女", label: "異常", min: -Infinity, max: 10.0, level: "danger" },
+    ],
+    hint: "反映是否有貧血",
+    warnMsg: "血紅素偏低，可能有輕度貧血，建議補充含鐵食物並追蹤。",
+    dangerMsg: "血紅素明顯偏低，貧血需積極處理，建議諮詢醫師。",
+  },
+};
+
+const LEVEL_CONFIG = {
+  normal: { label: "正常", color: "#15803d", bg: "#dcfce7", border: "#86efac", icon: "✓" },
+  warn:   { label: "留意", color: "#d97706", bg: "#fef3c7", border: "#fcd34d", icon: "!" },
+  danger: { label: "異常", color: "#dc2626", bg: "#fee2e2", border: "#fca5a5", icon: "✕" },
+  empty:  { label: "未填",  color: "#9ca3af", bg: "#f9fafb", border: "#e5e7eb", icon: "–" },
+};
+
+// ── 判斷等級 ─────────────────────────────────────────────────
+function evaluateField(fieldKey, value, gender) {
+  const field = FIELDS[fieldKey];
+  if (field.isBMI) return null;
+  if (!value || value === "") return "empty";
+  const num = parseFloat(value);
+  if (isNaN(num)) return "empty";
+
+  const applicableRanges = field.ranges.filter(r => r.gender === null || r.gender === gender);
+
+  // 特殊處理低值 warn
+  const lowRange = applicableRanges.find(r => r.label === "偏低" || r.label === "建議就醫" && r.min === -Infinity);
+
+  // 找第一個符合的 range（priority: danger > warn > normal）
+  const priorityOrder = ["danger", "warn", "normal"];
+  for (const level of priorityOrder) {
+    const match = applicableRanges.find(r => r.level === level && num >= r.min && num < r.max);
+    if (match) return level;
+  }
+  return "normal";
+}
+
+function evaluateBMI(height, weight) {
+  if (!height || !weight) return null;
+  const h = parseFloat(height) / 100;
+  const w = parseFloat(weight);
+  if (isNaN(h) || isNaN(w) || h <= 0) return null;
+  const bmi = w / (h * h);
+  return { value: bmi.toFixed(1), level: bmi < 18.5 ? "warn" : bmi < 24.9 ? "normal" : bmi < 27 ? "warn" : "danger" };
+}
+
+const M2_STEPS = ["基本資料", "健檢數值", "分析結果"];
+const M2_STEP_ICONS = ["👤", "📋", "📊"];
+
+// ── 主元件 ───────────────────────────────────────────────────
+function HealthReport() {
+  const [step, setStep] = useState(0);
+  const goStep = (n) => { setStep(n); window.scrollTo(0, 0); };
+  const [gender, setGender] = useState("");
+  const [name, setName] = useState("");
+  const [examDate, setExamDate] = useState("");
+  const [values, setValues] = useState({});
+  const [activeGroup, setActiveGroup] = useState("blood_sugar");
+
+  const setValue = (key, val) => setValues(prev => ({ ...prev, [key]: val }));
+
+  const bmi = evaluateBMI(values.height, values.weight);
+
+  const getStatus = (key) => {
+    if (key === "height" || key === "weight") return null;
+    return evaluateField(key, values[key], gender);
+  };
+
+  // 統計
+  const allFieldKeys = GROUPS.flatMap(g => g.fields).filter(k => k !== "height" && k !== "weight");
+  const filledCount = allFieldKeys.filter(k => values[k] && values[k] !== "").length + (bmi ? 1 : 0);
+  const abnormalFields = allFieldKeys.filter(k => {
+    const s = getStatus(k);
+    return s === "danger" || s === "warn";
+  });
+  const dangerFields = allFieldKeys.filter(k => getStatus(k) === "danger");
+
+  const canProceed = filledCount > 0;
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#f0fdf4",
+      fontFamily: "'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif",
+      color: "#1a2e1a",
+      maxWidth: 480,
+      margin: "0 auto",
+    }}>
+      {/* ── Sticky Header ── */}
+      <div style={{
+        background: "linear-gradient(135deg, #0369a1, #0284c7)",
+        padding: "18px 20px 0",
+        position: "sticky", top: 0, zIndex: 100,
+        boxShadow: "0 2px 12px rgba(3,105,161,0.3)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 14,
+            background: "rgba(255,255,255,0.2)",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+          }}>🏥</div>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>健檢報告確認</div>
+            <div style={{ fontSize: 12, color: "#bae6fd", letterSpacing: 2 }}>健康數值對照分析</div>
+          </div>
+        </div>
+        <div style={{ display: "flex" }}>
+          {M2_STEPS.map((s, i) => (
+            <div key={i} style={{
+              flex: 1, textAlign: "center", padding: "10px 4px 12px",
+              background: i === step ? "#fff" : "transparent",
+              borderRadius: i === step ? "8px 8px 0 0" : 0,
+              transition: "all 0.2s",
+            }}>
+              <div style={{ fontSize: 18, marginBottom: 2 }}>{M2_STEP_ICONS[i]}</div>
+              <div style={{
+                fontSize: 12, fontWeight: i === step ? 700 : 400,
+                color: i === step ? "#0369a1" : i < step ? "#bae6fd" : "rgba(255,255,255,0.5)",
+              }}>{s}</div>
+              {i < step && <div style={{ fontSize: 10, color: "#bae6fd" }}>✓ 完成</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: "22px 16px 100px" }}>
+
+        {/* ── STEP 0 基本資料 ── */}
+        {step === 0 && (
+          <div>
+            <M2_PageTitle title="基本資料" desc="填寫後可提供個人化的數值對照範圍" />
+
+            <M2_Card>
+              <M2_FieldLabel>姓名（選填）</M2_FieldLabel>
+              <M2_LargeInput value={name} onChange={setName} placeholder="請輸入姓名" />
+            </M2_Card>
+
+            <M2_Card>
+              <M2_FieldLabel>性別 <span style={{ color: "#dc2626" }}>*</span></M2_FieldLabel>
+              <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 10 }}>
+                部分數值（HDL、尿酸、肌酸酐、血紅素）的正常範圍因性別而異
+              </div>
+              <div style={{ display: "flex", gap: 12 }}>
+                {[{ g: "男", icon: "👨" }, { g: "女", icon: "👩" }].map(({ g, icon }) => (
+                  <button key={g} onClick={() => setGender(g)} style={{
+                    flex: 1, padding: "16px 0", borderRadius: 14, cursor: "pointer",
+                    border: gender === g ? "2px solid #0369a1" : "2px solid #e5e7eb",
+                    background: gender === g ? "linear-gradient(135deg,#0369a1,#0284c7)" : "#f9fafb",
+                    color: gender === g ? "#fff" : "#6b7280",
+                    fontSize: 17, fontWeight: 700,
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                    boxShadow: gender === g ? "0 4px 12px rgba(3,105,161,0.25)" : "none",
+                    transition: "all 0.2s",
+                  }}>
+                    <span style={{ fontSize: 28 }}>{icon}</span>{g}
+                  </button>
+                ))}
+              </div>
+            </M2_Card>
+
+            <M2_Card>
+              <M2_FieldLabel>健檢日期（選填）</M2_FieldLabel>
+              <input
+                type="date"
+                value={examDate}
+                onChange={e => setExamDate(e.target.value)}
+                style={{
+                  width: "100%", boxSizing: "border-box",
+                  border: "2px solid #bae6fd", borderRadius: 12,
+                  padding: "14px 16px", fontSize: 17, color: "#1f2937",
+                  background: "#f0f9ff", outline: "none", fontFamily: "inherit",
+                }}
+              />
+            </M2_Card>
+
+            <M2_BigBtn
+              onClick={() => goStep(1)}
+              disabled={!gender}
+              label="開始填寫數值"
+              icon="→"
+              color="#0369a1"
+              shadowColor="rgba(3,105,161,0.3)"
+            />
+          </div>
+        )}
+
+        {/* ── STEP 1 健檢數值 ── */}
+        {step === 1 && (
+          <div>
+            <M2_PageTitle title="健檢數值" desc="可跳過不確定的項目，只填有數值的欄位" />
+
+            {/* 分組 Tab */}
+            <div style={{
+              display: "flex", gap: 8, marginBottom: 20,
+              overflowX: "auto", paddingBottom: 4,
+            }}>
+              {GROUPS.map(g => (
+                <button key={g.id} onClick={() => setActiveGroup(g.id)} style={{
+                  flexShrink: 0, padding: "8px 14px", borderRadius: 24, cursor: "pointer",
+                  border: activeGroup === g.id ? `2px solid ${g.color}` : "2px solid #e5e7eb",
+                  background: activeGroup === g.id ? g.bgColor : "#fff",
+                  color: activeGroup === g.id ? g.color : "#6b7280",
+                  fontSize: 14, fontWeight: activeGroup === g.id ? 700 : 500,
+                  transition: "all 0.15s",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}>
+                  <span>{g.icon}</span>{g.label}
+                  {/* 已填數量 badge */}
+                  {(() => {
+                    const filled = g.fields.filter(k => {
+                      if (k === "height" || k === "weight") return values.height && values.weight;
+                      return values[k] && values[k] !== "";
+                    });
+                    const uniqueFilled = g.fields.includes("height") ? (bmi ? 1 : 0) : 0;
+                    const count = g.fields.filter(k => k !== "height" && k !== "weight" && values[k] && values[k] !== "").length + uniqueFilled;
+                    return count > 0 ? (
+                      <span style={{
+                        background: g.color, color: "#fff",
+                        borderRadius: "50%", width: 18, height: 18,
+                        fontSize: 11, fontWeight: 800,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>{count}</span>
+                    ) : null;
+                  })()}
+                </button>
+              ))}
+            </div>
+
+            {/* 當前分組的欄位 */}
+            {GROUPS.filter(g => g.id === activeGroup).map(group => (
+              <div key={group.id}>
+                <div style={{
+                  background: group.bgColor,
+                  border: `2px solid ${group.borderColor}`,
+                  borderRadius: 16, padding: "16px",
+                  marginBottom: 16,
+                }}>
+                  <div style={{ fontSize: 17, fontWeight: 800, color: group.color, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>{group.icon}</span>{group.label}
+                  </div>
+
+                  {/* BMI 特殊處理 */}
+                  {group.id === "body_blood" && (
+                    <div style={{ marginBottom: 16, background: "#fff", borderRadius: 12, padding: "14px" }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#374151", marginBottom: 10 }}>
+                        ⚖️ BMI 計算
+                        <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 400, marginLeft: 8 }}>
+                          填入身高體重自動換算
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+                        {["height", "weight"].map(key => {
+                          const f = FIELDS[key];
+                          return (
+                            <div key={key} style={{ flex: 1 }}>
+                              <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 6 }}>
+                                {f.label} ({f.unit})
+                              </div>
+                              <input
+                                type="number"
+                                inputMode="decimal"
+                                value={values[key] || ""}
+                                placeholder={f.placeholder}
+                                onChange={e => setValue(key, e.target.value)}
+                                style={{
+                                  width: "100%", boxSizing: "border-box",
+                                  border: "2px solid #d1fae5", borderRadius: 10,
+                                  padding: "12px 10px", fontSize: 18, fontWeight: 700,
+                                  textAlign: "center", color: "#15803d",
+                                  background: "#f0fdf4", outline: "none", fontFamily: "inherit",
+                                }}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {bmi && (
+                        <div style={{
+                          display: "flex", alignItems: "center", gap: 12,
+                          background: LEVEL_CONFIG[bmi.level].bg,
+                          border: `1px solid ${LEVEL_CONFIG[bmi.level].border}`,
+                          borderRadius: 10, padding: "10px 14px",
+                        }}>
+                          <div style={{
+                            width: 36, height: 36, borderRadius: "50%",
+                            background: LEVEL_CONFIG[bmi.level].color,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "#fff", fontSize: 16, fontWeight: 800, flexShrink: 0,
+                          }}>{LEVEL_CONFIG[bmi.level].icon}</div>
+                          <div>
+                            <div style={{ fontSize: 22, fontWeight: 800, color: LEVEL_CONFIG[bmi.level].color }}>
+                              BMI {bmi.value}
+                            </div>
+                            <div style={{ fontSize: 13, color: "#6b7280" }}>
+                              {bmi.level === "normal" ? "體重正常範圍（18.5–24.9）" :
+                               parseFloat(bmi.value) < 18.5 ? "體重偏輕（< 18.5）" :
+                               parseFloat(bmi.value) < 27 ? "體重過重（24.9–27）" : "肥胖（≥ 27）"}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 一般欄位 */}
+                  {group.fields.filter(k => k !== "height" && k !== "weight").map(key => {
+                    const f = FIELDS[key];
+                    const status = getStatus(key);
+                    const cfg = status ? LEVEL_CONFIG[status] : null;
+                    return (
+                      <div key={key} style={{
+                        background: "#fff", borderRadius: 12, padding: "14px",
+                        marginBottom: 10,
+                        border: cfg && status !== "empty" ? `1px solid ${cfg.border}` : "1px solid #f3f4f6",
+                      }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                          <div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: "#374151" }}>
+                              {f.label}
+                              <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 6 }}>{f.abbr}</span>
+                            </div>
+                            <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 2 }}>{f.hint}</div>
+                          </div>
+                          {cfg && status !== "empty" && (
+                            <span style={{
+                              background: cfg.bg, color: cfg.color,
+                              border: `1px solid ${cfg.border}`,
+                              borderRadius: 20, padding: "3px 10px",
+                              fontSize: 12, fontWeight: 700, flexShrink: 0,
+                            }}>{cfg.label}</span>
+                          )}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            value={values[key] || ""}
+                            placeholder={f.placeholder}
+                            onChange={e => setValue(key, e.target.value)}
+                            style={{
+                              flex: 1, boxSizing: "border-box",
+                              border: cfg && status === "danger" ? "2px solid #fca5a5"
+                                    : cfg && status === "warn" ? "2px solid #fcd34d"
+                                    : "2px solid #e5e7eb",
+                              borderRadius: 10,
+                              padding: "12px 14px", fontSize: 19, fontWeight: 700,
+                              color: cfg && status !== "empty" ? cfg.color : "#374151",
+                              background: cfg && status !== "empty" ? cfg.bg : "#f9fafb",
+                              outline: "none", fontFamily: "inherit",
+                              transition: "all 0.2s",
+                            }}
+                          />
+                          <div style={{ fontSize: 13, color: "#6b7280", flexShrink: 0 }}>{f.unit}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* 分頁切換按鈕 */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              {GROUPS.map((g, i) => {
+                const current = GROUPS.findIndex(x => x.id === activeGroup);
+                return null;
+              })}
+            </div>
+            <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+              {GROUPS.findIndex(g => g.id === activeGroup) > 0 && (
+                <button onClick={() => {
+                  const idx = GROUPS.findIndex(g => g.id === activeGroup);
+                  setActiveGroup(GROUPS[idx - 1].id);
+                }} style={{
+                  padding: "14px 20px", borderRadius: 14,
+                  border: "2px solid #d1d5db", cursor: "pointer",
+                  background: "#fff", color: "#6b7280",
+                  fontWeight: 700, fontSize: 16,
+                }}>← 上一組</button>
+              )}
+              {GROUPS.findIndex(g => g.id === activeGroup) < GROUPS.length - 1 ? (
+                <button onClick={() => {
+                  const idx = GROUPS.findIndex(g => g.id === activeGroup);
+                  setActiveGroup(GROUPS[idx + 1].id);
+                }} style={{
+                  flex: 1, padding: "14px", borderRadius: 14, border: "none", cursor: "pointer",
+                  background: "linear-gradient(135deg,#0369a1,#0284c7)",
+                  color: "#fff", fontWeight: 700, fontSize: 16,
+                  boxShadow: "0 4px 12px rgba(3,105,161,0.3)",
+                }}>下一組 →</button>
+              ) : (
+                <button onClick={() => goStep(2)} disabled={!canProceed} style={{
+                  flex: 1, padding: "14px", borderRadius: 14, border: "none",
+                  cursor: canProceed ? "pointer" : "not-allowed",
+                  background: canProceed ? "linear-gradient(135deg,#0369a1,#0284c7)" : "#e5e7eb",
+                  color: canProceed ? "#fff" : "#9ca3af",
+                  fontWeight: 700, fontSize: 16,
+                  boxShadow: canProceed ? "0 4px 12px rgba(3,105,161,0.3)" : "none",
+                }}>查看分析結果 📊</button>
+              )}
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <M2_BackBtn onClick={() => goStep(0)} />
+              {GROUPS.findIndex(g => g.id === activeGroup) < GROUPS.length - 1 && canProceed && (
+                <button onClick={() => goStep(2)} style={{
+                  flex: 1, padding: "14px", borderRadius: 14, border: "2px solid #0284c7", cursor: "pointer",
+                  background: "#fff", color: "#0284c7",
+                  fontWeight: 700, fontSize: 15,
+                }}>直接查看結果 📊</button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 2 分析結果 ── */}
+        {step === 2 && (
+          <div>
+            <M2_PageTitle title="分析結果" desc={`${name || "您"}的健檢數值對照報告`} />
+
+            {/* 個人資料卡 */}
+            <div style={{
+              background: "linear-gradient(135deg,#0369a1,#075985)",
+              borderRadius: 20, padding: "20px", marginBottom: 20, color: "#fff",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 12 }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: "50%",
+                  background: "rgba(255,255,255,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28,
+                }}>{gender === "女" ? "👩" : "👨"}</div>
+                <div>
+                  <div style={{ fontSize: 22, fontWeight: 800 }}>{name || "匿名"}</div>
+                  <div style={{ fontSize: 14, color: "#bae6fd" }}>
+                    {gender}性{examDate ? `・${examDate}` : ""}
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                {[
+                  { label: "填寫項目", val: filledCount, unit: "項" },
+                  { label: "需留意", val: abnormalFields.filter(k => getStatus(k) === "warn").length, unit: "項", warn: true },
+                  { label: "需就醫", val: dangerFields.length, unit: "項", danger: true },
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    flex: 1, background: item.danger && item.val > 0 ? "rgba(220,38,38,0.25)" : item.warn && item.val > 0 ? "rgba(217,119,6,0.25)" : "rgba(255,255,255,0.15)",
+                    borderRadius: 12, padding: "12px 0", textAlign: "center",
+                    border: item.danger && item.val > 0 ? "1px solid rgba(252,165,165,0.5)" : "none",
+                  }}>
+                    <div style={{ fontSize: 22, fontWeight: 800 }}>{item.val}<span style={{ fontSize: 13 }}>{item.unit}</span></div>
+                    <div style={{ fontSize: 13, color: "#bae6fd" }}>{item.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 異常摘要 */}
+            {abnormalFields.length > 0 && (
+              <div style={{
+                background: "#fff", borderRadius: 18, padding: "18px 20px", marginBottom: 16,
+                border: "2px solid #fca5a5", boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+              }}>
+                <div style={{ fontSize: 17, fontWeight: 800, color: "#dc2626", marginBottom: 14 }}>
+                  ⚠️ 需要注意的項目
+                </div>
+                {abnormalFields.map(key => {
+                  const f = FIELDS[key];
+                  const status = getStatus(key);
+                  const cfg = LEVEL_CONFIG[status];
+                  const msg = status === "danger" ? f.dangerMsg : f.warnMsg;
+                  return (
+                    <div key={key} style={{
+                      background: cfg.bg, border: `1px solid ${cfg.border}`,
+                      borderRadius: 12, padding: "12px 14px", marginBottom: 10,
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                        <div style={{
+                          width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
+                          background: cfg.color,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          color: "#fff", fontSize: 14, fontWeight: 800,
+                        }}>{cfg.icon}</div>
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: 15, fontWeight: 700, color: "#1f2937" }}>{f.label}</span>
+                          <span style={{ fontSize: 13, color: "#6b7280", marginLeft: 6 }}>{f.abbr}</span>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: cfg.color }}>{values[key]}</div>
+                          <div style={{ fontSize: 12, color: "#6b7280" }}>{f.unit}</div>
+                        </div>
+                      </div>
+                      {msg && (
+                        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, paddingLeft: 42 }}>
+                          {msg}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* 分組完整結果 */}
+            {GROUPS.map(group => {
+              const hasData = group.fields.some(k => {
+                if (k === "height" || k === "weight") return !!bmi;
+                return values[k] && values[k] !== "";
+              });
+              if (!hasData) return null;
+
+              return (
+                <div key={group.id} style={{
+                  background: "#fff", borderRadius: 18, padding: "18px 20px", marginBottom: 16,
+                  border: `2px solid ${group.borderColor}`,
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+                }}>
+                  <div style={{ fontSize: 17, fontWeight: 800, color: group.color, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>{group.icon}</span>{group.label}
+                  </div>
+
+                  {/* BMI 行 */}
+                  {group.id === "body_blood" && bmi && (
+                    <M2_ResultRow
+                      label="BMI"
+                      abbr="BMI"
+                      value={bmi.value}
+                      unit="—"
+                      status={bmi.level}
+                    />
+                  )}
+
+                  {group.fields.filter(k => k !== "height" && k !== "weight").map(key => {
+                    if (!values[key] || values[key] === "") return null;
+                    const f = FIELDS[key];
+                    const status = getStatus(key);
+                    return (
+                      <M2_ResultRow
+                        key={key}
+                        label={f.label}
+                        abbr={f.abbr}
+                        value={values[key]}
+                        unit={f.unit}
+                        status={status}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+
+            {/* 未填提醒 */}
+            {filledCount === 0 && (
+              <div style={{
+                background: "#f9fafb", border: "2px dashed #d1d5db",
+                borderRadius: 16, padding: "32px", textAlign: "center",
+                marginBottom: 16,
+              }}>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>📋</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#6b7280" }}>尚未填寫任何數值</div>
+                <div style={{ fontSize: 14, color: "#9ca3af", marginTop: 6 }}>請返回填寫健檢數值</div>
+              </div>
+            )}
+
+            {/* 趨勢圖預留區 */}
+            <div style={{
+              background: "#f8fafc",
+              border: "2px dashed #cbd5e1",
+              borderRadius: 18, padding: "24px 20px", marginBottom: 16,
+              textAlign: "center",
+            }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>📈</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#64748b" }}>歷史趨勢圖</div>
+              <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 6, lineHeight: 1.6 }}>
+                儲存多筆健檢記錄後<br />可在此顯示各項數值的變化趨勢
+              </div>
+              <div style={{
+                display: "inline-block", marginTop: 12,
+                background: "#e2e8f0", borderRadius: 20,
+                padding: "6px 16px", fontSize: 12, color: "#64748b", fontWeight: 600,
+              }}>即將推出 — 待後端串接</div>
+            </div>
+
+            {/* 免責聲明 */}
+            <div style={{
+              background: "#fffbeb", border: "1px solid #fde68a",
+              borderRadius: 12, padding: "14px 16px", marginBottom: 18,
+            }}>
+              <div style={{ fontSize: 14, color: "#92400e", lineHeight: 1.8, display: "flex", gap: 8 }}>
+                <span style={{ flexShrink: 0 }}>⚠️</span>
+                <span>本評估結果僅供參考，不代表醫療診斷。如有健康疑慮，請諮詢專業醫師或營養師。</span>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <M2_BackBtn onClick={() => goStep(1)} />
+              <button onClick={() => {
+                goStep(0);
+                setValues({});
+                setName("");
+                setGender("");
+                setExamDate("");
+                setActiveGroup("blood_sugar");
+              }} style={{
+                flex: 1, padding: "16px", borderRadius: 14, border: "none", cursor: "pointer",
+                background: "linear-gradient(135deg,#0369a1,#0284c7)",
+                color: "#fff", fontWeight: 700, fontSize: 17,
+                boxShadow: "0 4px 12px rgba(3,105,161,0.3)",
+              }}>🔄 重新填寫</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── 結果列元件 ───────────────────────────────────────────────
+function M2_ResultRow({ label, abbr, value, unit, status }) {
+  const cfg = LEVEL_CONFIG[status] || LEVEL_CONFIG.empty;
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 12,
+      padding: "10px 0",
+      borderBottom: "1px solid #f3f4f6",
+    }}>
+      <div style={{
+        width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+        background: cfg.color,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        color: "#fff", fontSize: 13, fontWeight: 800,
+      }}>{cfg.icon}</div>
+      <div style={{ flex: 1 }}>
+        <span style={{ fontSize: 15, fontWeight: 600, color: "#1f2937" }}>{label}</span>
+        <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 6 }}>{abbr}</span>
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <span style={{ fontSize: 18, fontWeight: 800, color: cfg.color }}>{value}</span>
+        <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 4 }}>{unit}</span>
+      </div>
+      <span style={{
+        background: cfg.bg, color: cfg.color,
+        border: `1px solid ${cfg.border}`,
+        borderRadius: 20, padding: "3px 10px",
+        fontSize: 12, fontWeight: 700, flexShrink: 0,
+      }}>{cfg.label}</span>
+    </div>
+  );
+}
+
+// ── 共用元件 ─────────────────────────────────────────────────
+function M2_PageTitle({ title, desc }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <h2 style={{ fontSize: 24, fontWeight: 800, color: "#0c4a6e", margin: "0 0 4px" }}>{title}</h2>
+      <p style={{ fontSize: 15, color: "#6b7280", margin: 0 }}>{desc}</p>
+    </div>
+  );
+}
+function M2_Card({ children }) {
+  return (
+    <div style={{
+      background: "#fff", borderRadius: 16, padding: "18px 16px", marginBottom: 14,
+      boxShadow: "0 1px 6px rgba(0,0,0,0.07)", border: "1px solid #e5e7eb",
+    }}>{children}</div>
+  );
+}
+function M2_FieldLabel({ children }) {
+  return <div style={{ fontSize: 16, fontWeight: 700, color: "#374151", marginBottom: 12 }}>{children}</div>;
+}
+function M2_LargeInput({ value, onChange, placeholder }) {
+  return (
+    <input value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)}
+      style={{
+        width: "100%", boxSizing: "border-box",
+        border: "2px solid #bae6fd", borderRadius: 12,
+        padding: "14px 16px", fontSize: 18, color: "#1f2937",
+        background: "#f0f9ff", outline: "none", fontFamily: "inherit",
+      }} />
+  );
+}
+function M2_BigBtn({ onClick, disabled, label, icon, color = "#15803d", shadowColor = "rgba(21,128,61,0.3)" }) {
+  return (
+    <button onClick={onClick} disabled={disabled} style={{
+      width: "100%", padding: "16px", borderRadius: 14, border: "none",
+      cursor: disabled ? "not-allowed" : "pointer",
+      background: disabled ? "#e5e7eb" : `linear-gradient(135deg,${color},${color}dd)`,
+      color: disabled ? "#9ca3af" : "#fff",
+      fontWeight: 700, fontSize: 17,
+      boxShadow: disabled ? "none" : `0 4px 12px ${shadowColor}`,
+      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+      transition: "all 0.2s",
+    }}>{label} <span style={{ fontSize: 18 }}>{icon}</span></button>
+  );
+}
+function M2_BackBtn({ onClick }) {
+  return (
+    <button onClick={onClick} style={{
+      padding: "16px 20px", borderRadius: 14,
+      border: "2px solid #d1d5db", cursor: "pointer",
+      background: "#fff", color: "#6b7280",
+      fontWeight: 700, fontSize: 17,
+    }}>← 返回</button>
+  );
+}
+
+
+// ── M1 特殊成分 → 產品 ID mapping ─────────────────────────
+const SPECIAL_MAPPING = {
+  "益生菌":           ["p12"],
+  "月見草":           ["p13"],
+  "紫錐花":           ["p14"],
+  "管花肉蓯蓉":       ["p15"],
+  "好甘萃":           ["p16"],
+  "晶明+金盞花葉黃素": ["p17"],
+  "綠茶素":           ["p18"],
+  "關鍵行動力蛋白素":  ["p19"],
+  "大蒜片":           ["p20"],
+};
+
+const NUTRIENT_MAPPING = {
+  "P":  ["p01"],
+  "A":  ["p02"],
+  "B":  ["p03"],
+  "C":  ["p04"],
+  "E":  ["p05"],
+  "Ca": ["p06"],
+  "鐵": ["p07"],
+  "卵": ["p08"],
+  "纖維": ["p09", "p10"],
+  "魚油": ["p11"],
+};
+
+// ── 產品資料庫（27個）────────────────────────────────────
+const PRODUCTS = [
+  {
+    id: "p01",
+    name: "優質蛋白素-全植物配方",
+    subtitle: "All Plant Protein Powder",
+    price: 1890,
+    category: "基礎營養",
+    form: "粉末",
+    volume: "900g",
+    tags: ["PDCAAS=1", "完整9種必需胺基酸", "零膽固醇", "零乳糖", "肌肉生長"],
+    symptoms: ["疲倦", "肥胖／水腫", "落髮分叉禿頭", "壓力熬夜", "三高", "肌肉關節酸痛", "貧血", "更年期", "記憶力減退", "上班沒精神", "下班想睡覺"],
+    nutrients: ["P"],
+    special: [],
+    icon: "🌱",
+    color: "#15803d",
+    bgColor: "#f0fdf4",
+    description: "品質達國際公認最高標準（PDCAAS=1），提供9種必需胺基酸，來自大豆、豌豆、小麥三種植物來源，零膽固醇、零乳糖，每份僅38大卡。有助肌肉生長、增強體力，不含人工色素、香料及防腐劑。",
+    usage: "每天1–2平匙，每平匙含8公克蛋白質，加入225ml水或飲料攪勻飲用。亦可撒於麥片、沙拉或加入烘焙食品。",
+    notes: "不含人工色素、香料及防腐劑。本產品含有麩質之穀類、大豆或其製品，麩質過敏者請注意。1歲以下嬰兒請勿食用。",
+  },
+  {
+    id: "p02",
+    name: "倍欣營養片",
+    subtitle: "Bet-A-Zinc",
+    price: 730,
+    category: "基礎營養",
+    form: "錠劑",
+    volume: "110錠",
+    tags: ["β-胡蘿蔔素", "維生素A", "鋅", "黏膜健康", "肌膚保健"],
+    symptoms: ["青春痘", "皮膚過敏發炎", "常感冒", "過敏打噴嚏", "飛蚊症", "三C族", "抽菸喝酒檳榔", "性事缺缺"],
+    nutrients: ["A"],
+    special: [],
+    icon: "🥕",
+    color: "#ea580c",
+    bgColor: "#fff7ed",
+    description: "β-胡蘿蔔素、維生素A與鋅三強聯手，增進肌膚與黏膜健康。添加紐崔萊紫花苜蓿提供豐富植物營養素，安全有效補充維生素A。不含人工色素、香料及防腐劑。",
+    usage: "每天1錠。一日請勿超過1錠。",
+    notes: "不含人工色素、人工香料及防腐劑。請置於冰箱冷藏較佳。",
+  },
+  {
+    id: "p03",
+    name: "雙效B群能量錠",
+    subtitle: "Vitamin B Plus",
+    price: 990,
+    category: "基礎營養",
+    form: "錠劑",
+    volume: "120錠",
+    tags: ["8種維生素B群", "螺旋藻", "速效緩釋", "活力8小時", "能量代謝"],
+    symptoms: ["疲倦", "壓力熬夜", "失眠睡不好", "上班沒精神", "下班想睡覺", "偏頭痛", "憂鬱沮喪", "貧血", "更年期", "抽筋", "常吃藥", "尿酸高(痛風)", "肥胖／水腫", "落髮分叉禿頭", "三C族", "抽菸喝酒檳榔"],
+    nutrients: ["B"],
+    special: [],
+    icon: "⚡",
+    color: "#d97706",
+    bgColor: "#fffbeb",
+    description: "結合8種完整維生素B群與天然螺旋藻粉，速效緩釋雙層錠片設計，淺綠色緩釋層含B1、B6、生物素等，深綠色速效層含B2及B12，活力續航8小時。不含人工色素、香料及防腐劑。",
+    usage: "每天1錠。一日請勿超過1錠。",
+    notes: "不含人工色素、人工香料及防腐劑。本產品含有牛奶及其製品。甲狀腺亢進者請諮詢醫師。乳糖不耐症者請注意（每片含約70毫克乳糖）。",
+  },
+  {
+    id: "p04",
+    name: "強效C營養片",
+    subtitle: "Bio C Plus",
+    price: 925,
+    category: "基礎營養",
+    form: "錠劑",
+    volume: "60錠",
+    tags: ["維生素C", "針葉櫻桃", "柑橘生物類黃酮", "緩釋8小時", "素食可食"],
+    symptoms: ["常感冒", "過敏打噴嚏", "青春痘", "皮膚過敏發炎", "骨質疏鬆", "貧血", "更年期", "偏頭痛", "尿酸高(痛風)", "常吃藥", "抽菸喝酒檳榔", "飛蚊症"],
+    nutrients: ["C"],
+    special: [],
+    icon: "🍋",
+    color: "#ca8a04",
+    bgColor: "#fefce8",
+    description: "每錠含500毫克維生素C，結合天然針葉櫻桃濃縮素與柑橘生物類黃酮，獨特緩釋技術續航8小時。100%植物來源，素食可食，不含人工色素、香料及防腐劑。",
+    usage: "每天1錠。一日請勿超過1錠。開封後置於冰箱冷藏較佳。",
+    notes: "不含人工色素、人工香料及防腐劑。錠片顏色可能因天然針葉櫻桃採收季節略有差異，屬正常現象。",
+  },
+  {
+    id: "p05",
+    name: "歐芹硒E營養片",
+    subtitle: "Parselenium E",
+    price: 1380,
+    category: "基礎營養",
+    form: "錠劑",
+    volume: "60錠",
+    tags: ["維生素E", "天然酵母硒", "抗氧化", "歐芹蔬果菁華", "素食可食"],
+    symptoms: ["更年期", "貧血", "過敏打噴嚏", "皮膚過敏發炎", "肌肉關節酸痛", "抽菸喝酒檳榔"],
+    nutrients: ["E"],
+    special: [],
+    icon: "🌿",
+    color: "#16a34a",
+    bgColor: "#f0fdf4",
+    description: "每錠含267毫克α-TE維生素E與10微克天然酵母硒，獨特抗氧化配方有助減少自由基產生。添加紐崔萊農場歐芹蔬果菁華提供植物營養素，素食可食。不含人工色素、香料及防腐劑。",
+    usage: "每天1錠。一日請勿超過1錠。",
+    notes: "不含人工色素、人工香料及防腐劑。本產品含有大豆及其製品。請置於冰箱冷藏較佳。",
+  },
+  {
+    id: "p06",
+    name: "加美D鈣片",
+    subtitle: "Cal Mag D Advanced",
+    price: 660,
+    category: "基礎營養",
+    form: "錠劑",
+    volume: "180錠",
+    tags: ["海藻鈣", "鎂", "維生素D3", "骨骼牙齒", "鈣吸收"],
+    symptoms: ["骨質疏鬆", "抽筋", "疲倦", "壓力熬夜", "失眠睡不好", "更年期", "皮膚過敏發炎"],
+    nutrients: ["Ca"],
+    special: [],
+    icon: "🦴",
+    color: "#0369a1",
+    bgColor: "#f0f9ff",
+    description: "嚴選冰島純淨峽灣天然植物來源海藻鈣，每錠含200毫克鈣、83.3毫克鎂、3.33微克維生素D3，三效互助強化骨骼與牙齒。維生素D3增進鈣吸收，維持血鈣平衡與神經肌肉正常生理作用。不含人工色素、香料及防腐劑。",
+    usage: "每天4次，每次1錠。一日請勿超過4錠。",
+    notes: "不含人工色素、人工香料及防腐劑。一次補充超過600毫克鈣時，建議與鐵劑間隔1–2小時服用。",
+  },
+  {
+    id: "p07",
+    name: "葉酸鐵營養片",
+    subtitle: "Iron-Folic Plus",
+    price: 650,
+    category: "基礎營養",
+    form: "錠劑",
+    volume: "120錠",
+    tags: ["有機鐵", "葉酸", "菠菜菁華", "紅血球形成", "女性保健"],
+    symptoms: ["貧血", "疲倦", "偏頭痛", "更年期", "憂鬱沮喪", "記憶力減退"],
+    nutrients: ["鐵"],
+    special: [],
+    icon: "🩸",
+    color: "#dc2626",
+    bgColor: "#fff1f2",
+    description: "富含兩種好吸收的有機鐵與紐崔萊獨特菠菜蔬果菁華，葉酸和鐵有助紅血球形成，女性各時期必備好氣色補充品。不含人工色素、香料及防腐劑。",
+    usage: "每天2錠。一日請勿超過2錠。",
+    notes: "不含人工色素、人工香料及防腐劑。本產品含有甲殼類及其製品。如生理期有身體不適請諮詢醫師。一次補充超過600毫克鈣時，建議與鐵劑間隔1–2小時服用。",
+  },
+  {
+    id: "p08",
+    name: "蜂蜜卵磷脂粉",
+    subtitle: "Honey E Lecithin Powder",
+    price: 2150,
+    category: "基礎營養",
+    form: "粉末",
+    volume: "325g",
+    tags: ["卵磷脂", "維生素E", "大豆萃取", "抗氧化", "體內好循環"],
+    symptoms: ["記憶力減退", "憂鬱沮喪", "三高", "肥胖／水腫", "手腳冰冷", "疲倦"],
+    nutrients: ["卵"],
+    special: [],
+    icon: "🧠",
+    color: "#7c3aed",
+    bgColor: "#f5f3ff",
+    description: "由大豆提煉，每平匙含870毫克卵磷脂及14毫克維生素E，維持體內好循環。維生素E抗氧化與卵磷脂相輔相成，以蜂蜜、稻子豆及核桃香料調味，粉狀形式可添加於日常餐點或飲品，方便食用。不含人工色素及防腐劑。",
+    usage: "每天1平匙（2.4公克），可直接食用或添加於常溫飲料中混合飲用。開罐前請上下搖動使內容物均勻。",
+    notes: "不含人工色素及防腐劑。本產品含大豆成分，大豆過敏者請注意。",
+  },
+  {
+    id: "p09",
+    name: "纖維嚼片",
+    subtitle: "Chewable Fiber Blend ★主推",
+    price: 670,
+    category: "腸胃保健",
+    form: "嚼錠",
+    volume: "30錠",
+    tags: ["水溶性纖維", "非水溶性纖維", "益菌生", "促進蠕動", "零脂肪"],
+    symptoms: ["便秘", "肥胖／水腫", "三高"],
+    nutrients: ["纖維"],
+    special: [],
+    icon: "🥦",
+    color: "#15803d",
+    bgColor: "#f0fdf4",
+    description: "源自紐崔萊認證農場甘蔗與甜菜等13種天然植物纖維，含果寡糖、水溶性及非水溶性纖維，零脂肪。非水溶性纖維促進消化道蠕動、幫助排除廢物；水溶性纖維作為益菌生，滋養好菌，維持消化道機能。",
+    usage: "每天1–3錠，請搭配至少240ml水或飲料。",
+    notes: "不含人工色素及防腐劑。因顆粒較大，請嚼碎食用。請置於25℃以下乾燥陰涼處。",
+    fiberPrimary: true,
+  },
+  {
+    id: "p10",
+    name: "高纖隨身包",
+    subtitle: "Fiber Powder",
+    price: 1025,
+    category: "腸胃保健",
+    form: "粉末",
+    volume: "30包",
+    tags: ["水溶性纖維", "益菌生", "增加飽足", "零脂肪", "菊苣萃取"],
+    symptoms: ["便秘", "肥胖／水腫", "三高"],
+    nutrients: ["纖維"],
+    special: [],
+    icon: "📦",
+    color: "#15803d",
+    bgColor: "#f0fdf4",
+    description: "源自紐崔萊認證農場菊苣萃取菁華，純植物來源水溶性纖維，每日份滿足成人所需32%膳食纖維。可作為益菌生滋養好菌，零脂肪配方吸水成凝膠狀，延長飽足感。",
+    usage: "每天1–2包，添加於240–360ml水或飲料，與餐一起食用較佳。",
+    notes: "不添加人工色素、人工香料及防腐劑。請置於25℃以下乾燥陰涼處。",
+  },
+  {
+    id: "p11",
+    name: "三倍強效魚油膠囊",
+    subtitle: "Advanced Triple Omega-3",
+    price: 1590,
+    category: "心血管",
+    form: "軟膠囊",
+    volume: "60粒",
+    tags: ["EPA+DHA", "Omega-3", "SEDDS吸收科技", "促進代謝", "國際認證"],
+    symptoms: ["三高", "肥胖／水腫", "憂鬱沮喪", "肌肉關節酸痛", "記憶力減退"],
+    nutrients: ["魚油"],
+    special: [],
+    icon: "🐟",
+    color: "#0284c7",
+    bgColor: "#f0f9ff",
+    description: "每日份提供572毫克EPA與428毫克DHA，採用SEDDS吸收提升科技，研究支持吸收力提升3倍，有效減少魚腥味。獨家動物性+植物性Omega-3三重組合（EPA+DHA+ALA），通過NSF、GOED、FOS國際認證，品質嚴格把關。",
+    usage: "每天2粒。一日請勿超過4粒。",
+    notes: "不含人工色素、人工香料及防腐劑。服用抗凝血劑者、嬰幼兒、孕婦或糖尿病患者食用前請先諮詢醫師。",
+  },
+  {
+    id: "p12",
+    name: "強效複合益生菌",
+    subtitle: "Balance Within Probiotic",
+    price: 1650,
+    category: "腸胃保健",
+    form: "粉末",
+    volume: "30包",
+    tags: ["益生菌", "益菌生", "消化道健康", "調節生理機能", "增強體力"],
+    symptoms: ["疲倦", "便秘", "上班沒精神"],
+    nutrients: [],
+    special: ["益生菌"],
+    icon: "🦠",
+    color: "#16a34a",
+    bgColor: "#f0fdf4",
+    description: "每包63億菁英5菌株，免包覆可抵抗胃酸直達消化道，超過百篇研究支持，具高存活率。添加1克菊糖益菌生提供益生菌充足養分，獨立密封粉末包裝，攜帶方便。",
+    usage: "每天1包，加入150ml常溫水攪拌均勻，於5分鐘內飲用完畢。避免與熱食或熱飲一起食用。",
+    notes: "不含人工色素及防腐劑。請置於25℃以下陰涼乾燥處，冰箱冷藏更佳。",
+  },
+  {
+    id: "p13",
+    name: "月見草琉璃苣膠囊",
+    subtitle: "Women's GLA Blend",
+    price: 1925,
+    category: "專項保健",
+    form: "膠囊",
+    volume: "120粒",
+    tags: ["GLA必需脂肪酸", "月見草", "琉璃苣", "當歸生薑", "女性保健"],
+    symptoms: ["手腳冰冷", "經期不順", "皮膚過敏發炎"],
+    nutrients: [],
+    special: ["月見草"],
+    icon: "🌸",
+    color: "#db2777",
+    bgColor: "#fdf2f8",
+    description: "來自月見草與琉璃苣的GLA（γ-次亞麻油酸），結合中國傳統滋補聖品當歸與生薑，中西合璧草本配方。添加柑橘生物類黃酮及β-胡蘿蔔素強化吸收，無防腐劑。",
+    usage: "每天1–4粒，與餐一起食用較佳。一日請勿超過8粒。",
+    notes: "無防腐劑。孕婦、哺乳婦請先諮詢醫師或營養師。子宮、卵巢或乳房有相關疾病者不建議補充。",
+  },
+  {
+    id: "p14",
+    name: "紫錐花錠",
+    subtitle: "Triple Guard Echinacea",
+    price: 1200,
+    category: "免疫活力",
+    form: "錠劑",
+    volume: "120錠",
+    tags: ["紫錐花", "菊苣酸", "烷基胺", "柑橘生物類黃酮", "季節交替保健"],
+    symptoms: ["常感冒"],
+    nutrients: [],
+    special: ["紫錐花"],
+    icon: "🌺",
+    color: "#7c3aed",
+    bgColor: "#f5f3ff",
+    description: "以專利技術萃取2種紫錐花根、莖葉及花朵，把握最佳時機採收，保留菊苣酸、烷基胺與多醣體等重要成分。添加柑橘生物類黃酮強化吸收，季節交替時維持健康力。不含人工色素及防腐劑。",
+    usage: "每次3錠，每天1–2次。建議間歇性使用，連續使用兩週後停用兩週。",
+    notes: "不含人工色素及防腐劑。2歲以下幼童、糖尿病患者、免疫相關疾病者、孕婦及哺乳婦使用前請先諮詢醫療人員。",
+  },
+  {
+    id: "p15",
+    name: "管花肉蓯蓉錠",
+    subtitle: "M-Plus",
+    price: 1800,
+    category: "免疫活力",
+    form: "錠劑",
+    volume: "60錠",
+    tags: ["管花肉蓯蓉", "蓯蓉總苷", "記憶力養護", "沙漠人蔘", "天然萃取"],
+    symptoms: ["記憶力減退", "性事缺缺"],
+    nutrients: [],
+    special: ["管花肉蓯蓉"],
+    icon: "🧬",
+    color: "#92400e",
+    bgColor: "#fffbeb",
+    description: "被譽為「沙漠人蔘」，每2錠含300毫克優質管花肉蓯蓉萃取菁華，富含蓯蓉總苷、生物鹼、胺基酸與微量元素，為其他草本植物所沒有的關鍵營養成分。日本研究支持有益養護記憶。不含人工色素及防腐劑。",
+    usage: "每天2錠，與餐一起食用較佳。",
+    notes: "不含人工色素及防腐劑。嬰幼兒、孕婦、哺乳期婦女及服用抗凝血功能藥物者不宜食用。",
+  },
+  {
+    id: "p16",
+    name: "好甘萃錠",
+    subtitle: "Proleber",
+    price: 1620,
+    category: "專項保健",
+    form: "錠劑",
+    volume: "90錠",
+    tags: ["白芍甘草", "促進代謝", "增強體力", "內養外護", "中西草本配方"],
+    symptoms: ["失眠睡不好"],
+    nutrients: [],
+    special: ["好甘萃"],
+    icon: "🌙",
+    color: "#4338ca",
+    bgColor: "#eef2ff",
+    description: "歷時8年研究，借鑒草本經方「芍藥甘草湯」，結合白芍、甘草與西方葡萄籽、花椰菜菁華，中西合璧配方促進新陳代謝、增強體力。不含人工色素及防腐劑。",
+    usage: "每日3次，每次1錠，隨餐食用。",
+    notes: "不含人工色素及防腐劑。不建議12歲以下兒童、孕乳婦、高血壓患者、低血鉀患者使用。特殊疾病者食用前請諮詢醫師或營養師。",
+  },
+  {
+    id: "p17",
+    name: "晶明+金盞花葉黃素膠囊",
+    subtitle: "I-Wellness",
+    price: 2900,
+    category: "專項保健",
+    form: "膠囊",
+    volume: "60粒",
+    tags: ["葉黃素", "玉米黃素", "番茄紅素", "β-胡蘿蔔素", "護眼"],
+    symptoms: ["飛蚊症", "三C族"],
+    nutrients: [],
+    special: ["晶明+金盞花葉黃素"],
+    icon: "👁️",
+    color: "#0369a1",
+    bgColor: "#f0f9ff",
+    description: "精選紐崔萊認證農場金盞花來源葉黃素與玉米黃素，科學實證黃金比例5:1，每粒含15毫克葉黃素與3毫克玉米黃素。搭配杜沙藻β-胡蘿蔔素維持暗處視覺，沙漠番茄茄紅素舒適護眼，多重守護全面晶明。",
+    usage: "每天1粒，隨餐食用。一日請勿超過1粒。",
+    notes: "不含防腐劑。外膠囊含動物性成分，素食者建議剪開膠囊食用。",
+  },
+  {
+    id: "p18",
+    name: "綠茶素膠囊",
+    subtitle: "Green Tea Plus",
+    price: 1855,
+    category: "體態代謝",
+    form: "膠囊",
+    volume: "60粒",
+    tags: ["兒茶素", "茶黃質", "茶多酚", "促進代謝", "低咖啡因"],
+    symptoms: ["三高"],
+    nutrients: [],
+    special: ["綠茶素"],
+    icon: "🍵",
+    color: "#15803d",
+    bgColor: "#f0fdf4",
+    description: "獨家雙效組合，同時含兒茶素與茶黃質，輕鬆攝取綠茶優質菁華，促進新陳代謝。採專利油脂包覆技術穩定茶多酚，深色軟膠囊抵擋光線危害，成分更穩定。不含人工香料及防腐劑。",
+    usage: "每天2粒，與餐一起食用較佳。",
+    notes: "不含防腐劑。請置於25℃以下陰涼乾燥處。",
+  },
+  {
+    id: "p19",
+    name: "優質蛋白素-關鍵行動力配方",
+    subtitle: "All Plant Protein Booster",
+    price: 1800,
+    category: "專項保健",
+    form: "粉末",
+    volume: "450g",
+    tags: ["植物蛋白", "植物胜肽", "玻尿酸來源", "關節行動力", "100%植物來源"],
+    symptoms: ["肌肉關節酸痛"],
+    nutrients: [],
+    special: ["關鍵行動力蛋白素"],
+    icon: "💪",
+    color: "#0369a1",
+    bgColor: "#eff6ff",
+    description: "3種植物蛋白配方搭配2種植物雙胜肽（大豆胜肽、豌豆胜肽）與玻尿酸來源（透明質酸鈉），幫助肌肉生長、掌握靈活關鍵。100%植物來源，素食可食，原料全程追溯。不含人工色素、香料及防腐劑。",
+    usage: "每天1–2平匙，加入200ml水搖勻飲用。亦可加入牛奶、果汁或穀物一同使用。開封前請先反轉搖晃。",
+    notes: "不含人工色素、香料及防腐劑。本產品含有麩質之穀類、大豆或其製品，麩質過敏者請注意。不適用14歲以下兒童及孕哺乳婦。",
+  },
+  {
+    id: "p20",
+    name: "薄荷大蒜片",
+    subtitle: "Garlic and Peppermint",
+    price: 1210,
+    category: "免疫活力",
+    form: "錠劑",
+    volume: "120粒",
+    tags: ["大蒜素", "降膽固醇", "心血管", "國家健康食品認證", "口氣清新"],
+    symptoms: ["性事缺缺"],
+    nutrients: [],
+    special: ["大蒜片"],
+    icon: "🧄",
+    color: "#65a30d",
+    bgColor: "#f7fee7",
+    description: "每2錠含6.2毫克大蒜素，榮獲國家健康食品認證，經實驗證明有效降低膽固醇。獨特腸溶錠覆膜技術幫助在腸道溶解，添加薄荷萃取物以低溫乾燥製作，抑制大蒜氣味，無人工色素及防腐劑。",
+    usage: "每次2錠，每天2次，與餐一起食用較佳。",
+    notes: "不含人工色素及防腐劑。請旋緊瓶蓋，置於冰箱冷藏較佳。",
+  },
+  {
+    id: "p21",
+    name: "DOUBLE X蔬果綜合營養片－補充包",
+    subtitle: "DOUBLE X Refill",
+    price: 2200,
+    category: "基礎營養",
+    form: "錠劑",
+    volume: "62份",
+    tags: ["12種維生素", "10種礦物質", "100種植物營養素", "PhytoProtect™", "全方位營養"],
+    symptoms: [],
+    nutrients: [],
+    special: [],
+    forAll: true,
+    icon: "⭐",
+    color: "#ea580c",
+    bgColor: "#fff7ed",
+    description: "專為國人設計，含12種維生素、10種礦物質、21種植物蔬果菁華，輕鬆攝取完整五色蔬果菁華。獨家PhytoProtect™植萃強化配方，以薑黃、迷迭香、洋蔥三種萃取物協同強化保護力，不含化學色素、人工香料及防腐劑。",
+    usage: "每次各1錠（維生素營養片、礦物質營養片、蔬果菁華錠），共3錠，每天2次，隨餐食用。",
+    notes: "不含化學色素、人工香料及防腐劑。本產品含有大豆及其製品。每種錠片一日請勿超過2錠。",
+  },
+  {
+    id: "p22",
+    name: "易孅菌膠囊",
+    subtitle: "Nutrislim Postbiotic",
+    price: 1820,
+    category: "體態代謝",
+    form: "膠囊",
+    volume: "60粒",
+    tags: ["後生元", "代謝", "益菌生", "維生素B群", "體態管理"],
+    symptoms: ["肥胖／水腫"],
+    nutrients: [],
+    special: [],
+    icon: "⚖️",
+    color: "#ea580c",
+    bgColor: "#fff7ed",
+    description: "歷時9年研發，明星成分後生元CECT8145自消化道傳遞代謝訊號，搭配黃金奇異果×紐崔萊農場紫蘿蔔益菌生，提供好菌充足養分。維生素B2×B5維持能量正常代謝，從根本調整體質。",
+    usage: "每天2粒，早上食用較佳。空腹或與餐一同食用皆可，請吞服整粒膠囊。",
+    notes: "不含人工香料及防腐劑。本產品含有奇異果製品。建議18歲以上成人使用。孕婦、哺乳婦或有特殊疾病狀況者請先諮詢醫師。",
+  },
+  {
+    id: "p23",
+    name: "活悅益生菌膠囊",
+    subtitle: "Joy & Wellbeing Probiotic",
+    price: 1820,
+    category: "腸胃保健",
+    form: "膠囊",
+    volume: "30粒",
+    tags: ["益生菌", "SOD酵素", "身心平衡", "腸道健康", "抗氧化"],
+    symptoms: ["疲倦", "便秘", "上班沒精神"],
+    nutrients: [],
+    special: [],
+    icon: "🫐",
+    color: "#7c3aed",
+    bgColor: "#f5f3ff",
+    description: "每顆含180億益生菌，科研支持兩大菌株Lpc-37及B420，搭配來自南法洋香瓜濃縮素SOD酵素，攝取五週後有感，食用心情輕鬆愉快，養足精神達到身心平衡。",
+    usage: "每天1粒，餐前或餐後皆可，吞服整粒膠囊，建議搭配冷水或常溫水。",
+    notes: "不含人工色素、人工香料及防腐劑。18歲以下兒童、孕哺乳婦及特殊體質或疾病者，食用前請先諮詢醫療專業人員。",
+  },
+  {
+    id: "p24",
+    name: "葡萄糖胺膠囊",
+    subtitle: "Glucosamine",
+    price: 1150,
+    category: "專項保健",
+    form: "膠囊",
+    volume: "120粒",
+    tags: ["葡萄糖胺", "關節保健", "柑橘生物類黃酮", "天然萃取", "維持生理機能"],
+    symptoms: ["肌肉關節酸痛"],
+    nutrients: [],
+    special: [],
+    icon: "🦵",
+    color: "#b45309",
+    bgColor: "#fef3c7",
+    description: "每4粒含1,500毫克高純度葡萄糖胺鹽酸鹽，萃取自南太平洋天然野生蝦殼。添加獨家柑橘生物類黃酮及針葉櫻桃維生素C，補充天然植物營養素，維持生理機能。不添加人工色素及防腐劑。",
+    usage: "每次2粒，每天2次。",
+    notes: "不添加人工色素及防腐劑。內容物及外膠囊皆含動物性成分，非素食可食。對蝦類過敏者請注意。",
+  },
+  {
+    id: "p25",
+    name: "綜合消化酵素膠囊",
+    subtitle: "Digestive Enzyme Complex",
+    price: 1640,
+    category: "腸胃保健",
+    form: "膠囊",
+    volume: "60粒",
+    tags: ["消化酵素", "促進消化", "維持消化道機能", "天然酵素", "排便順暢"],
+    symptoms: ["胃易不舒服", "常吃藥"],
+    nutrients: [],
+    special: [],
+    icon: "🫁",
+    color: "#0891b2",
+    bgColor: "#ecfeff",
+    description: "獨特9種天然酵素配方，涵蓋蛋白質分解、醣解、脂解三大類酵素，一次完整補充。獨特生化科技有效保留酵素活性，添加螺旋藻與歐芹蔬果菁華，幫助維持消化道機能，使排便順暢。不含化學色素及防腐劑。",
+    usage: "每餐餐前以開水吞食1粒，或將膠囊打開灑在低溫食物中。若食量較大或餐點含較高脂肪與蛋白質，可於餐後再加1粒。",
+    notes: "不含化學色素及防腐劑。開封後置於冰箱冷藏較佳。",
+  },
+];
+
+// ── 分類與篩選設定 ──────────────────────────────────────
+const CATEGORIES = ["全部", "基礎營養", "心血管", "腸胃保健", "體態代謝", "免疫活力", "專項保健"];
+
+const CAT_ICONS = {
+  "全部": "🌿", "基礎營養": "💊", "心血管": "🫀", "腸胃保健": "🦠",
+  "體態代謝": "⚖️", "免疫活力": "🛡️", "專項保健": "✨",
+};
+
+const CAT_MAP = {
+  "基礎營養": "基礎營養", "全方位補充": "基礎營養",
+  "心血管保健": "心血管",
+  "腸道保健": "腸胃保健", "腸胃保健": "腸胃保健",
+  "體態管理": "體態代謝", "代謝保健": "體態代謝",
+  "免疫保健": "免疫活力", "活力保健": "免疫活力",
+  "護眼保健": "專項保健", "睡眠保健": "專項保健",
+  "關節保健": "專項保健", "女性保健": "專項保健",
+};
+
+// ── 主元件 ───────────────────────────────────────────────
+function NutritionProducts({ recommendedKeys = [], onBackToM1 }) {
+  const [activeCategory, setActiveCategory] = useState("全部");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showRecommendedOnly, setShowRecommendedOnly] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
+  // 當 recommendedKeys 從外部更新時（M1 跳轉），自動切換到推薦模式
+  useEffect(() => {
+    if (recommendedKeys.length > 0) {
+      setShowRecommendedOnly(true);
+      setActiveCategory("全部");
+      setSearchText("");
+    }
+  }, [recommendedKeys]);
+
+  // 計算推薦產品 IDs
+  const recommendedIds = new Set();
+  recommendedKeys.forEach(key => {
+    (SPECIAL_MAPPING[key] || []).forEach(id => recommendedIds.add(id));
+    (NUTRIENT_MAPPING[key] || []).forEach(id => recommendedIds.add(id));
+  });
+  // 全方位產品永遠推薦
+  PRODUCTS.filter(p => p.forAll).forEach(p => recommendedIds.add(p.id));
+
+  const filteredProducts = PRODUCTS.filter(p => {
+    if (showRecommendedOnly && recommendedIds.size > 0 && !recommendedIds.has(p.id)) return false;
+    if (activeCategory !== "全部" && CAT_MAP[p.category] !== activeCategory) return false;
+    if (searchText && !p.name.includes(searchText) && !p.subtitle.includes(searchText) &&
+        !p.tags.some(t => t.includes(searchText))) return false;
+    return true;
+  }).sort((a, b) => {
+    // ── 推薦模式排序 ──────────────────────────────────────────
+    if (showRecommendedOnly && recommendedIds.size > 0) {
+      const aRec = recommendedIds.has(a.id);
+      const bRec = recommendedIds.has(b.id);
+
+      // 1. forAll 優先，forAll 之間依 id 排序（p21 DOUBLE X 先，p01 優質蛋白素後）
+      if (a.forAll && !b.forAll) return -1;
+      if (!a.forAll && b.forAll) return 1;
+      if (a.forAll && b.forAll) {
+        const forAllOrder = { "p21": 0 };
+        return (forAllOrder[a.id] ?? 99) - (forAllOrder[b.id] ?? 99);
+      }
+
+      // 2. 推薦 vs 非推薦
+      if (aRec && !bRec) return -1;
+      if (!aRec && bRec) return 1;
+
+      // 3. 推薦產品之間：依 recommendedKeys 的順序（缺乏營養素排名）
+      if (aRec && bRec) {
+        const getKeyIndex = (product) => {
+          let minIdx = Infinity;
+          recommendedKeys.forEach((key, idx) => {
+            const ids = [
+              ...(SPECIAL_MAPPING[key] || []),
+              ...(NUTRIENT_MAPPING[key] || [])
+            ];
+            if (ids.includes(product.id)) {
+              minIdx = Math.min(minIdx, idx);
+            }
+          });
+          return minIdx;
+        };
+        const aIdx = getKeyIndex(a);
+        const bIdx = getKeyIndex(b);
+        if (aIdx !== bIdx) return aIdx - bIdx;
+        // 同排名內 fiberPrimary 優先
+        if (a.fiberPrimary && !b.fiberPrimary) return -1;
+        if (!a.fiberPrimary && b.fiberPrimary) return 1;
+      }
+
+      return 0;
+    }
+
+    // ── 全部瀏覽排序：依分類 → 同分類內依價格低到高 ──────────
+    const catOrder = { "基礎營養": 0, "心血管": 1, "腸胃保健": 2, "體態代謝": 3, "免疫活力": 4, "專項保健": 5 };
+    const aCat = catOrder[CAT_MAP[a.category]] ?? 99;
+    const bCat = catOrder[CAT_MAP[b.category]] ?? 99;
+    if (aCat !== bCat) return aCat - bCat;
+    return a.price - b.price;
+  });
+
+  if (selectedProduct) {
+    return (
+      <ProductDetail
+        product={selectedProduct}
+        isRecommended={recommendedIds.has(selectedProduct.id)}
+        onBack={() => setSelectedProduct(null)}
+        onBackToM1={onBackToM1}
+      />
+    );
+  }
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#fffbf5",
+      fontFamily: "'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif",
+      maxWidth: 480, margin: "0 auto",
+      color: "#1c1917",
+    }}>
+      {/* Header */}
+      <div style={{
+        background: "linear-gradient(135deg, #c2410c, #ea580c)",
+        padding: "18px 20px 0",
+        position: "sticky", top: 0, zIndex: 100,
+        boxShadow: "0 2px 16px rgba(194,65,12,0.3)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          {onBackToM1 && (
+            <button onClick={onBackToM1} style={{
+              background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 12,
+              width: 42, height: 42, fontSize: 20, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
+            }}>←</button>
+          )}
+          <div style={{
+            width: 46, height: 46, borderRadius: 14,
+            background: "rgba(255,255,255,0.2)",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+            flexShrink: 0,
+          }}>🌿</div>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>營養品介紹</div>
+            <div style={{ fontSize: 12, color: "#fed7aa", letterSpacing: 2 }}>
+              共 {filteredProducts.length} / {PRODUCTS.length} 項產品
+            </div>
+          </div>
+          {recommendedIds.size > 0 && (
+            <button onClick={() => setShowRecommendedOnly(!showRecommendedOnly)} style={{
+              marginLeft: "auto",
+              background: showRecommendedOnly ? "#fff" : "rgba(255,255,255,0.2)",
+              color: showRecommendedOnly ? "#c2410c" : "#fff",
+              border: "none", borderRadius: 20,
+              padding: "8px 14px", fontSize: 13, fontWeight: 700,
+              cursor: "pointer",
+            }}>
+              {showRecommendedOnly ? "✨ 推薦中" : "全部"}
+            </button>
+          )}
+        </div>
+
+        {/* Search */}
+        <div style={{
+          background: "rgba(255,255,255,0.15)",
+          borderRadius: 12, padding: "10px 14px",
+          display: "flex", alignItems: "center", gap: 8,
+          marginBottom: 14,
+        }}>
+          <span style={{ fontSize: 16 }}>🔍</span>
+          <input
+            value={searchText}
+            onChange={e => setSearchText(e.target.value)}
+            placeholder="搜尋產品名稱或功效..."
+            style={{
+              flex: 1, background: "transparent", border: "none", outline: "none",
+              color: "#fff", fontSize: 15, fontFamily: "inherit",
+            }}
+          />
+          {searchText && (
+            <button onClick={() => setSearchText("")} style={{
+              background: "none", border: "none", color: "rgba(255,255,255,0.7)",
+              cursor: "pointer", fontSize: 16, padding: 0,
+            }}>✕</button>
+          )}
+        </div>
+
+        {/* Category Tabs */}
+        <div style={{
+          display: "flex", gap: 6, overflowX: "auto", paddingBottom: 14,
+          scrollbarWidth: "none",
+        }}>
+          {CATEGORIES.map(cat => (
+            <button key={cat} onClick={() => setActiveCategory(cat)} style={{
+              flexShrink: 0,
+              padding: "8px 12px", borderRadius: 20, cursor: "pointer",
+              border: activeCategory === cat ? "none" : "1px solid rgba(255,255,255,0.3)",
+              background: activeCategory === cat ? "#fff" : "transparent",
+              color: activeCategory === cat ? "#c2410c" : "rgba(255,255,255,0.85)",
+              fontSize: 13, fontWeight: activeCategory === cat ? 700 : 500,
+              display: "flex", alignItems: "center", gap: 4,
+            }}>
+              <span>{CAT_ICONS[cat]}</span>{cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Product List */}
+      <div style={{ padding: "16px 16px 100px" }}>
+        {recommendedIds.size > 0 && showRecommendedOnly && (
+          <div style={{
+            background: "linear-gradient(135deg, #fff7ed, #ffedd5)",
+            border: "1.5px solid #fed7aa",
+            borderRadius: 14, padding: "12px 16px", marginBottom: 16,
+            display: "flex", alignItems: "center", gap: 10,
+          }}>
+            <span style={{ fontSize: 24 }}>✨</span>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#c2410c" }}>
+                依您的評估結果推薦
+              </div>
+              <div style={{ fontSize: 13, color: "#9a3412" }}>
+                共 {[...recommendedIds].length} 項產品符合您的需求
+              </div>
+            </div>
+          </div>
+        )}
+
+        {filteredProducts.length === 0 ? (
+          <div style={{
+            textAlign: "center", padding: "48px 20px",
+            color: "#9ca3af",
+          }}>
+            <div style={{ fontSize: 40, marginBottom: 10 }}>🔍</div>
+            <div style={{ fontSize: 16, fontWeight: 700 }}>找不到相符產品</div>
+            <div style={{ fontSize: 14, marginTop: 6 }}>試試其他關鍵字或分類</div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {filteredProducts.map(product => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                isRecommended={recommendedIds.has(product.id)}
+                onSelect={() => setSelectedProduct(product)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── 產品卡片 ─────────────────────────────────────────────
+function ProductCard({ product, isRecommended, onSelect }) {
+  return (
+    <div onClick={onSelect} style={{
+      background: "#fff",
+      borderRadius: 18,
+      border: isRecommended ? `2px solid ${product.color}` : "1.5px solid #e7e5e4",
+      boxShadow: isRecommended
+        ? `0 4px 16px ${product.color}22`
+        : "0 2px 8px rgba(0,0,0,0.06)",
+      cursor: "pointer",
+      overflow: "hidden",
+      transition: "all 0.2s",
+    }}>
+      {/* Top color bar */}
+      <div style={{
+        height: 4,
+        background: `linear-gradient(90deg, ${product.color}, ${product.color}88)`,
+      }} />
+
+      <div style={{ padding: "14px 16px" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+          {/* Icon */}
+          <div style={{
+            width: 52, height: 52, borderRadius: 14, flexShrink: 0,
+            background: product.bgColor,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 26,
+          }}>{product.icon}</div>
+
+          {/* Info */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+              <span style={{ fontSize: 16, fontWeight: 800, color: "#1c1917" }}>
+                {product.name}
+              </span>
+              {isRecommended && (
+                <span style={{
+                  background: product.color, color: "#fff",
+                  borderRadius: 20, padding: "2px 8px",
+                  fontSize: 11, fontWeight: 700, flexShrink: 0,
+                }}>推薦</span>
+              )}
+              {product.recommended && (
+                <span style={{
+                  background: "#fef3c7", color: "#92400e",
+                  borderRadius: 20, padding: "2px 8px",
+                  fontSize: 11, fontWeight: 700, flexShrink: 0,
+                }}>★主推</span>
+              )}
+            </div>
+            <div style={{ fontSize: 13, color: "#78716c", marginBottom: 8 }}>
+              {product.subtitle}
+            </div>
+
+            {/* Tags - 全部顯示 */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 8 }}>
+              {product.tags.map(tag => (
+                <span key={tag} style={{
+                  background: product.bgColor,
+                  color: product.color,
+                  borderRadius: 20, padding: "3px 10px",
+                  fontSize: 12, fontWeight: 600,
+                }}>{tag}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Price + Arrow */}
+          <div style={{ textAlign: "right", flexShrink: 0 }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: product.color }}>
+              ${product.price.toLocaleString()}
+            </div>
+            <div style={{ fontSize: 12, color: "#a8a29e", marginTop: 2 }}>
+              {product.form}
+            </div>
+            <div style={{ fontSize: 12, color: "#a8a29e" }}>
+              {product.volume}
+            </div>
+            <div style={{
+              marginTop: 6, fontSize: 18, color: "#d6d3d1",
+            }}>›</div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  );
+}
+
+// ── 產品詳細頁 ────────────────────────────────────────────
+function ProductDetail({ product, isRecommended, onBack, onBackToM1 }) {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#fffbf5",
+      fontFamily: "'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif",
+      maxWidth: 480, margin: "0 auto",
+      color: "#1c1917",
+    }}>
+      {/* Header */}
+      <div style={{
+        background: `linear-gradient(135deg, ${product.color}dd, ${product.color})`,
+        padding: "18px 20px 24px",
+      }}>
+        <button onClick={onBack} style={{
+          background: "rgba(255,255,255,0.2)", border: "none",
+          borderRadius: 10, padding: "8px 14px",
+          color: "#fff", fontSize: 15, fontWeight: 600,
+          cursor: "pointer", marginBottom: 16,
+          display: "flex", alignItems: "center", gap: 6,
+        }}>← 返回</button>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: 20,
+            background: "rgba(255,255,255,0.25)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 38,
+          }}>{product.icon}</div>
+          <div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>
+              {product.name}
+            </div>
+            <div style={{ fontSize: 15, color: "rgba(255,255,255,0.8)", marginTop: 2 }}>
+              {product.subtitle}
+            </div>
+            <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+              {isRecommended && (
+                <span style={{
+                  background: "rgba(255,255,255,0.25)", color: "#fff",
+                  borderRadius: 20, padding: "4px 12px",
+                  fontSize: 12, fontWeight: 700,
+                }}>✨ 為您推薦</span>
+              )}
+              {product.recommended && (
+                <span style={{
+                  background: "rgba(255,255,255,0.25)", color: "#fff",
+                  borderRadius: 20, padding: "4px 12px",
+                  fontSize: 12, fontWeight: 700,
+                }}>★ 主推商品</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: "0 16px 100px" }}>
+        {/* Price & Form */}
+        <div style={{
+          background: "#fff", borderRadius: 16,
+          padding: "16px", marginTop: -12, marginBottom: 16,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+        }}>
+          <div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: product.color }}>
+              ${product.price.toLocaleString()}
+            </div>
+            <div style={{ fontSize: 13, color: "#78716c" }}>參考售價</div>
+          </div>
+          <div style={{
+            background: product.bgColor, color: product.color,
+            borderRadius: 12, padding: "10px 18px",
+            fontSize: 15, fontWeight: 700,
+            textAlign: "center",
+          }}>
+            <div>{product.form}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginTop: 2 }}>{product.volume}</div>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div style={{
+          background: "#fff", borderRadius: 16, padding: "16px", marginBottom: 16,
+          border: "1px solid #e7e5e4",
+        }}>
+          <SectionTitle icon="🏷️" title="功效標籤" color={product.color} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {product.tags.map(tag => (
+              <span key={tag} style={{
+                background: product.bgColor, color: product.color,
+                borderRadius: 20, padding: "7px 14px",
+                fontSize: 14, fontWeight: 600,
+              }}>{tag}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Symptoms */}
+        {product.symptoms.length > 0 && (
+          <div style={{
+            background: "#fff", borderRadius: 16, padding: "16px", marginBottom: 16,
+            border: "1px solid #e7e5e4",
+          }}>
+            <SectionTitle icon="🩺" title="適用症狀" color={product.color} />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {product.symptoms.map(s => (
+                <span key={s} style={{
+                  background: "#f5f5f4", color: "#57534e",
+                  borderRadius: 20, padding: "6px 12px",
+                  fontSize: 14, fontWeight: 500,
+                  border: "1px solid #e7e5e4",
+                }}>{s}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {product.forAll && (
+          <div style={{
+            background: "#fff7ed", border: "1.5px solid #fed7aa",
+            borderRadius: 16, padding: "16px", marginBottom: 16,
+            display: "flex", gap: 10, alignItems: "center",
+          }}>
+            <span style={{ fontSize: 24 }}>⭐</span>
+            <div style={{ fontSize: 14, color: "#92400e", fontWeight: 600 }}>
+              適合所有人補充的全方位旗艦營養品
+            </div>
+          </div>
+        )}
+
+        {/* Description */}
+        <div style={{
+          background: "#fff", borderRadius: 16, padding: "16px", marginBottom: 16,
+          border: "1px solid #e7e5e4",
+        }}>
+          <SectionTitle icon="📝" title="產品說明" color={product.color} />
+          <p style={{ fontSize: 15, color: "#44403c", lineHeight: 1.8, margin: 0 }}>
+            {product.description}
+          </p>
+        </div>
+
+        {/* Usage */}
+        <div style={{
+          background: product.bgColor, borderRadius: 16, padding: "16px", marginBottom: 16,
+          border: `1.5px solid ${product.color}33`,
+        }}>
+          <SectionTitle icon="💡" title="建議用法" color={product.color} />
+          <p style={{ fontSize: 15, color: "#44403c", lineHeight: 1.8, margin: 0 }}>
+            {product.usage}
+          </p>
+        </div>
+
+        {/* Notes */}
+        <div style={{
+          background: "#fffbeb", border: "1px solid #fde68a",
+          borderRadius: 16, padding: "16px", marginBottom: 16,
+        }}>
+          <SectionTitle icon="⚠️" title="注意事項" color="#92400e" />
+          <p style={{ fontSize: 14, color: "#78716c", lineHeight: 1.8, margin: 0 }}>
+            {product.notes}
+          </p>
+        </div>
+
+        {/* Disclaimer */}
+        <div style={{
+          background: "#f5f5f4", borderRadius: 12, padding: "14px 16px",
+          marginBottom: 16,
+        }}>
+          <p style={{ fontSize: 13, color: "#a8a29e", lineHeight: 1.7, margin: 0 }}>
+            ⚠️ 本產品介紹僅供參考，不代表醫療診斷或療效宣稱。如有健康疑慮，請諮詢專業醫師或營養師。
+          </p>
+        </div>
+
+        <button onClick={onBack} style={{
+          width: "100%", padding: "16px", borderRadius: 14, border: "none",
+          background: `linear-gradient(135deg, ${product.color}dd, ${product.color})`,
+          color: "#fff", fontWeight: 700, fontSize: 17,
+          cursor: "pointer",
+          boxShadow: `0 4px 12px ${product.color}44`,
+          marginBottom: onBackToM1 ? 10 : 0,
+        }}>← 返回產品列表</button>
+
+        {onBackToM1 && (
+          <button onClick={onBackToM1} style={{
+            width: "100%", padding: "15px", borderRadius: 14,
+            border: "2px solid #c2410c", background: "#fff",
+            color: "#c2410c", fontWeight: 700, fontSize: 16,
+            cursor: "pointer",
+          }}>🩺 返回諮詢結果</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SectionTitle({ icon, title, color }) {
+  return (
+    <div style={{
+      fontSize: 15, fontWeight: 800, color: color || "#1c1917",
+      marginBottom: 12, display: "flex", alignItems: "center", gap: 6,
+    }}>
+      <span>{icon}</span>{title}
+    </div>
+  );
+}
+function App() {
+  const { useState } = React;
+  const [activeTab, setActiveTab] = useState("m1");
+  const [recKeys, setRecKeys] = useState([]);
+
+  const handleViewProducts = (keys) => {
+    setRecKeys(keys);
+    setActiveTab("m3");
+    window.scrollTo(0, 0);
+  };
+
+  const handleBackToM1 = () => {
+    setActiveTab("m1");
+  };
+
+  const NAV = [
+    { id: "m1", icon: "🩺", label: "健康諮詢" },
+    { id: "m2", icon: "📋", label: "健檢報告" },
+    { id: "m3", icon: "🌿", label: "營養品" },
+    { id: "m4", icon: "🎯", label: "健康計畫" },
+  ];
+
+  return (
+    <div style={{
+      fontFamily: "'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif",
+      maxWidth: 480,
+      margin: "0 auto",
+      minHeight: "100vh",
+      position: "relative",
+      background: "#f8fafc",
+    }}>
+      {/* 模組內容區：用 display:none 隱藏而非卸載，保留各模組狀態 */}
+      <div style={{ paddingBottom: 72 }}>
+        <div style={{ display: activeTab === "m1" ? "block" : "none" }}>
+          <LifestyleConsultation onViewProducts={handleViewProducts} />
+        </div>
+        <div style={{ display: activeTab === "m2" ? "block" : "none" }}>
+          <HealthReport />
+        </div>
+        <div style={{ display: activeTab === "m3" ? "block" : "none" }}>
+          <NutritionProducts
+            recommendedKeys={recKeys}
+            onBackToM1={handleBackToM1}
+          />
+        </div>
+        <div style={{ display: activeTab === "m4" ? "block" : "none" }}>
+          <M4Placeholder />
+        </div>
+      </div>
+
+      {/* 底部導覽列 */}
+      <div id="nav-bar" style={{
+        position: "fixed",
+        bottom: 0,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "100%",
+        maxWidth: 480,
+        background: "#ffffff",
+        borderTop: "1px solid #e5e7eb",
+        display: "flex",
+        zIndex: 200,
+        boxShadow: "0 -2px 12px rgba(0,0,0,0.08)",
+      }}>
+        {NAV.map(tab => {
+          const isActive = activeTab === tab.id;
+          const colors = {
+            m1: "#15803d",
+            m2: "#0369a1",
+            m3: "#c2410c",
+            m4: "#7c3aed",
+          };
+          const color = colors[tab.id];
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                flex: 1,
+                padding: "10px 0 8px",
+                border: "none",
+                background: "transparent",
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 3,
+                transition: "all 0.15s",
+              }}
+            >
+              <div style={{
+                fontSize: 22,
+                lineHeight: 1,
+                filter: isActive ? "none" : "grayscale(1) opacity(0.5)",
+                transition: "all 0.15s",
+                transform: isActive ? "scale(1.15)" : "scale(1)",
+              }}>{tab.icon}</div>
+              <div style={{
+                fontSize: 11,
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? color : "#9ca3af",
+                transition: "all 0.15s",
+              }}>{tab.label}</div>
+              {isActive && (
+                <div style={{
+                  position: "absolute",
+                  bottom: 0,
+                  width: 32,
+                  height: 3,
+                  borderRadius: "3px 3px 0 0",
+                  background: color,
+                }} />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// M4 佔位元件（待開發）
+function M4Placeholder() {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#faf5ff",
+      fontFamily: "'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif",
+      maxWidth: 480,
+      margin: "0 auto",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "40px 24px",
+      textAlign: "center",
+    }}>
+      <div style={{ fontSize: 64, marginBottom: 20 }}>🎯</div>
+      <div style={{
+        fontSize: 22, fontWeight: 800, color: "#7c3aed", marginBottom: 10,
+      }}>健康管理計畫</div>
+      <div style={{
+        fontSize: 16, color: "#6b7280", lineHeight: 1.8, marginBottom: 32,
+      }}>
+        此功能正在開發中<br />
+        將提供個人健康追蹤與每日打卡功能
+      </div>
+      <div style={{
+        background: "#ede9fe", borderRadius: 16, padding: "20px 24px",
+        width: "100%", textAlign: "left",
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#7c3aed", marginBottom: 12 }}>
+          📌 規劃功能
+        </div>
+        {[
+          "個人營養補充計畫設定",
+          "每日服用打卡記錄",
+          "週期統計與進度追蹤",
+          "與營養品推薦連動",
+        ].map((item, i) => (
+          <div key={i} style={{
+            fontSize: 14, color: "#5b21b6", padding: "6px 0",
+            borderBottom: i < 3 ? "1px solid #ddd6fe" : "none",
+            display: "flex", gap: 8, alignItems: "center",
+          }}>
+            <span style={{ color: "#a78bfa" }}>•</span>{item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+    // ── 啟動 App ─────────────────────────────────────────────
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
