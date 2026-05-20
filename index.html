@@ -1526,18 +1526,21 @@ function HealthReport() {
 
             <M2_Card>
               <M2_FieldLabel>健檢日期（選填）</M2_FieldLabel>
-              <input
-                type="date"
-                value={examDate}
-                onChange={e => setExamDate(e.target.value)}
-                style={{
-                  width: "100%", maxWidth: "100%", boxSizing: "border-box",
-                  border: "2px solid #bae6fd", borderRadius: 12,
-                  padding: "14px 16px", fontSize: 16, color: "#1f2937",
-                  background: "#f0f9ff", outline: "none", fontFamily: "inherit",
-                  display: "block", overflow: "hidden",
-                }}
-              />
+              <div style={{ width: "100%", overflow: "hidden", boxSizing: "border-box" }}>
+                <input
+                  type="date"
+                  value={examDate}
+                  onChange={e => setExamDate(e.target.value)}
+                  style={{
+                    width: "100%", maxWidth: "100%", boxSizing: "border-box",
+                    border: "2px solid #bae6fd", borderRadius: 12,
+                    padding: "14px 16px", fontSize: 16, color: "#1f2937",
+                    background: "#f0f9ff", outline: "none", fontFamily: "inherit",
+                    display: "block",
+                    WebkitAppearance: "none", appearance: "none",
+                  }}
+                />
+              </div>
             </M2_Card>
 
             <M2_BigBtn
