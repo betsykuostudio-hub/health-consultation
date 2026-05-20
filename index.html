@@ -1531,10 +1531,11 @@ function HealthReport() {
                 value={examDate}
                 onChange={e => setExamDate(e.target.value)}
                 style={{
-                  width: "100%", boxSizing: "border-box",
+                  width: "100%", maxWidth: "100%", boxSizing: "border-box",
                   border: "2px solid #bae6fd", borderRadius: 12,
-                  padding: "14px 16px", fontSize: 17, color: "#1f2937",
+                  padding: "14px 16px", fontSize: 16, color: "#1f2937",
                   background: "#f0f9ff", outline: "none", fontFamily: "inherit",
+                  display: "block", overflow: "hidden",
                 }}
               />
             </M2_Card>
