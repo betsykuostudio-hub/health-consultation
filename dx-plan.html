@@ -190,6 +190,42 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .qa-a{padding:0 16px;font-size:var(--font-sm);line-height:1.85;color:var(--gray-700);max-height:0;overflow:hidden;transition:max-height .3s,padding .3s}
 .qa-a.open{max-height:800px;padding:0 16px 14px}
 .divider{height:8px;background:var(--gray-100)}
+.report-hero{background:linear-gradient(160deg,#5b21b6,#7c3aed);border-radius:20px;padding:28px 24px 32px;margin-bottom:14px;color:white;position:relative;overflow:hidden}
+.report-hero::before{content:'';position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)}
+.report-section{background:white;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.report-section-title{font-size:14px;font-weight:700;color:#111827;margin-bottom:14px}
+.report-compare-grid{display:grid;grid-template-columns:1fr 44px 1fr;gap:4px;align-items:center;font-size:13px}
+.report-compare-header{font-size:11px;font-weight:700;text-align:center;padding-bottom:8px;border-bottom:1px solid #f3f4f6}
+.report-cell{padding:7px 0;border-bottom:1px solid #f3f4f6}
+.report-cell.last{border-bottom:none}
+.report-cell-label{font-size:11px;color:#9ca3af;margin-bottom:2px}
+.report-cell-val{font-size:18px;font-weight:900}
+.report-cell-diff{text-align:center;font-weight:900;font-size:12px;line-height:1.6}
+.exam-item{padding:10px 0;border-bottom:1px solid #f3f4f6;display:grid;grid-template-columns:1fr 90px 90px;gap:8px;align-items:center}
+.exam-item:last-child{border-bottom:none}
+.exam-name{font-size:13px;font-weight:600;color:#111827}
+.exam-range{font-size:11px;color:#9ca3af;margin-top:1px}
+.exam-val{text-align:center}
+.exam-val-num{font-size:14px;font-weight:700}
+.exam-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;margin-top:3px}
+.badge-normal{background:#dcfce7;color:#15803d}
+.badge-warn{background:#fef3c7;color:#d97706}
+.badge-danger{background:#fee2e2;color:#dc2626}
+.exam-group-label{font-size:11px;font-weight:700;padding:8px 0 4px;display:flex;align-items:center;gap:4px}
+.report-msg{background:#f5f3ff;border:1px solid #ede9fe;border-radius:14px;padding:18px;margin-bottom:12px}
+.form-field{margin-bottom:14px}
+.form-label{font-size:var(--font-sm);font-weight:600;color:var(--gray-700);margin-bottom:6px;display:block}
+.form-input{width:100%;border:1.5px solid var(--purple-light);border-radius:10px;padding:10px 12px;font-size:var(--font-md);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);color:var(--purple-dark);font-weight:600}
+.form-input:focus{border-color:var(--purple);background:white}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-section{margin-bottom:20px}
+.form-section-title{font-size:var(--font-sm);font-weight:700;color:var(--purple-dark);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--purple-light)}
+/* 報告 bar */
+.r-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.r-bar-label{font-size:12px;color:#6b7280;width:42px;flex-shrink:0}
+.r-bar-track{flex:1;height:8px;background:#f3f4f6;border-radius:99px;overflow:hidden}
+.r-bar-fill{height:100%;background:#7c3aed;border-radius:99px}
+.r-bar-val{font-size:12px;font-weight:700;color:#7c3aed;width:34px;text-align:right}
 #nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--gray-100);display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:200}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;cursor:pointer;padding:5px 0;position:relative}
 .nav-icon{font-size:20px;transition:all .15s}
@@ -602,6 +638,31 @@ input[type=date].field-input{width:145px;overflow:hidden}
   </div>
 </div>
 
+<!-- REPORT MODAL -->
+<div id="report-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:500;overflow-y:auto">
+  <div style="max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column">
+    <div style="background:white;margin:20px 16px;border-radius:20px;overflow:hidden;flex:1">
+      <div style="background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;padding:20px 20px 16px;display:flex;align-items:center;gap:12px">
+        <button onclick="closeReportModal()" style="background:rgba(255,255,255,.2);border:none;color:white;width:36px;height:36px;border-radius:10px;font-size:18px;cursor:pointer;flex-shrink:0">←</button>
+        <span style="font-size:var(--font-lg);font-weight:700;flex:1">匯出完成報告</span>
+      </div>
+      <div style="padding:20px" id="report-form-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT PAGE -->
+<div id="report-page" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:white;z-index:600;overflow-y:auto">
+  <div style="max-width:480px;margin:0 auto">
+    <div style="background:var(--purple);color:white;padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+      <button onclick="closeReportPage()" style="background:rgba(255,255,255,.2);border:none;color:white;height:36px;border-radius:10px;padding:0 12px;font-size:var(--font-sm);font-weight:700;cursor:pointer;white-space:nowrap">← 返回</button>
+      <span style="font-size:var(--font-lg);font-weight:700;flex:1">完成報告</span>
+      <button onclick="downloadPDF()" style="background:rgba(255,255,255,.2);border:none;color:white;height:36px;border-radius:10px;padding:0 12px;font-size:var(--font-sm);font-weight:700;cursor:pointer;white-space:nowrap">📄 PDF</button>
+    </div>
+    <div id="report-content" style="padding:16px 16px 40px"></div>
+  </div>
+</div>
+
 <!-- NAV -->
 <div id="nav-bar" style="display:none">
   <button class="nav-btn" id="nav-calendar" onclick="showCalendar()"><div class="nav-icon">📅</div><div class="nav-label">行程</div><div class="nav-indicator"></div></button>
@@ -917,7 +978,16 @@ function renderStats(){
   for(let i=0;i<45;i++){const iso=addDays(start,i);if(iso>today){cells+=`<div class="week-cell future">${i+1}</div>`;}else{const{done,total}=getDayProgress(i);const isPast=iso<today;cells+=`<div class="week-cell ${done===total&&total>0?'done':isPast&&done<total?'missed-past':done>0?'partial':'missed'}">${i+1}</div>`;}}
   const rem=45%7;if(rem>0)for(let i=0;i<7-rem;i++)cells+='<div class="week-cell" style="background:transparent"></div>';
   const bars=ws.map((w,i)=>w.wt>0?`<div class="bar-row"><div class="bar-label">第${i+1}週</div><div class="bar-track"><div class="bar-fill" style="width:${w.pct||0}%"></div></div><div class="bar-val">${w.pct!==null?w.pct+'%':'—'}</div></div>`:'').join('');
-  document.getElementById('stats-body').innerHTML=`<div class="stat-card"><div class="stat-card-title">整體完成率</div><div><span class="big-stat">${pct}</span><span class="big-stat-unit">%</span></div><div style="font-size:var(--font-sm);color:var(--gray-500);margin-top:6px">${td}/${tp} 個時間點完成</div></div><div class="stat-card"><div class="stat-card-title">每週完成率</div>${bars}</div><div class="stat-card"><div class="stat-card-title">45 天總覽</div><div class="week-grid">${cells}</div><div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:var(--font-sm);color:var(--gray-500)"><span>✅全完成</span><span>🔶部分</span><span>⬜未打卡</span><span style="color:var(--red)">■未完成(過去)</span><span style="color:var(--purple-mid)">·未到</span></div></div>`;
+
+  // 計畫是否結束
+  const endDate=addDays(start,44);
+  const isEnded=today>endDate;
+  const daysLeft=isEnded?0:daysBetween(today,endDate)+1;
+  const exportBtn=isEnded
+    ?`<button onclick="showReportForm()" style="width:100%;background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border:none;border-radius:16px;padding:18px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:4px">🎉 匯出完成報告</button>`
+    :`<div style="background:var(--purple-light);border-radius:14px;padding:16px;text-align:center;margin-top:4px"><div style="font-size:var(--font-sm);color:var(--purple-dark);font-weight:700">完成報告將在計畫結束後開放</div><div style="font-size:26px;font-weight:900;color:var(--purple-dark);margin:8px 0">${daysLeft} 天</div><div style="font-size:var(--font-sm);color:var(--purple-mid)">距離計畫完成</div></div>`;
+
+  document.getElementById('stats-body').innerHTML=`<div class="stat-card"><div class="stat-card-title">整體完成率</div><div><span class="big-stat">${pct}</span><span class="big-stat-unit">%</span></div><div style="font-size:var(--font-sm);color:var(--gray-500);margin-top:6px">${td}/${tp} 個時間點完成</div></div><div class="stat-card"><div class="stat-card-title">每週完成率</div>${bars}</div><div class="stat-card"><div class="stat-card-title">45 天總覽</div><div class="week-grid">${cells}</div><div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:var(--font-sm);color:var(--gray-500)"><span>✅全完成</span><span>🔶部分</span><span>⬜未打卡</span><span style="color:var(--red)">■未完成(過去)</span><span style="color:var(--purple-mid)">·未到</span></div></div><div class="stat-card">${exportBtn}</div>`;
 }
 
 function getVisibleProducts(){return PRODUCTS.filter(p=>{if(p.optional===false)return true;if(p.optional==='slim')return state.useSlim;if(p.optional==='probio')return state.useProbio;return true;});}
@@ -968,6 +1038,219 @@ function addStockLog(pid){const pkgsEl=document.getElementById('add-pkgs-'+pid),
 function removeLog(pid,idx){if(!state.stockLogs||!state.stockLogs[pid])return;state.stockLogs[pid].splice(idx,1);saveState();renderSupply();}
 function toggleOptional(id,val){if(!state.optionalItems)state.optionalItems={};state.optionalItems[id]=val;saveState();renderSupply();}
 function toggleMenu(el){const body=el.nextElementSibling,toggle=el.querySelector('.full-menu-toggle'),isOpen=body.classList.contains('open');body.classList.toggle('open');toggle.textContent=isOpen?'展開 ▼':'收合 ▲';}
+// ── 報告表單 ──────────────────────────────────────────────
+const BODY_FIELDS=[
+  {id:'weight',label:'體重',unit:'kg'},{id:'bodyfat',label:'體脂率',unit:'%'},
+  {id:'muscle',label:'骨骼肌',unit:'%'},{id:'visceral',label:'內臟脂肪',unit:''},
+  {id:'waist',label:'腰圍',unit:'cm'},{id:'bmi',label:'BMI',unit:''},
+  {id:'bmr',label:'基礎代謝',unit:'kcal'},{id:'bodyage',label:'體年齡',unit:'歲'},
+];
+const EXAM_ITEMS=[
+  {id:'acglu',label:'飯前血糖',unit:'mg/dL',range:'70–100',
+    check:(v,g)=>v>=70&&v<=100?'normal':v>126?'danger':'warn'},
+  {id:'hba1c',label:'醣化血色素 HbA1C',unit:'%',range:'< 5.7',
+    check:(v,g)=>v<5.7?'normal':v>=6.5?'danger':'warn'},
+  {id:'tc',label:'總膽固醇',unit:'mg/dL',range:'< 200',
+    check:(v,g)=>v<200?'normal':v>=240?'danger':'warn'},
+  {id:'tg',label:'三酸甘油酯',unit:'mg/dL',range:'< 150',
+    check:(v,g)=>v<150?'normal':v>=200?'danger':'warn'},
+  {id:'hdl',label:'高密度膽固醇',unit:'mg/dL',range:'男≥40 / 女≥50',
+    check:(v,g)=>g==='女'?(v>=50?'normal':v>=40?'warn':'danger'):(v>=40?'normal':v>=35?'warn':'danger')},
+  {id:'ldl',label:'低密度膽固醇',unit:'mg/dL',range:'< 130',
+    check:(v,g)=>v<130?'normal':v>=160?'danger':'warn'},
+  {id:'got',label:'GOT',unit:'U/L',range:'10–40',
+    check:(v,g)=>v>=10&&v<=40?'normal':v>80?'danger':'warn'},
+  {id:'gpt',label:'GPT',unit:'U/L',range:'7–40',
+    check:(v,g)=>v>=7&&v<=40?'normal':v>80?'danger':'warn'},
+  {id:'egfr',label:'腎絲球過濾率',unit:'mL/min/1.73m²',range:'≥ 90',
+    check:(v,g)=>v>=90?'normal':v>=60?'warn':'danger'},
+  {id:'ua',label:'尿酸',unit:'mg/dL',range:'男3.4–7.0 / 女2.4–6.0',
+    check:(v,g)=>g==='女'?(v>=2.4&&v<=6.0?'normal':v>6.0?'danger':'warn'):(v>=3.4&&v<=7.0?'normal':v>7.0?'danger':'warn')},
+];
+const BADGE_TEXT={normal:'正常',warn:'留意',danger:'異常'};
+const BADGE_CLASS={normal:'badge-normal',warn:'badge-warn',danger:'badge-danger'};
+
+function showReportForm(){
+  const dm=state.doses||{};
+  const start=state.startDate,end=addDays(start,44);
+  let html=`
+    <div class="notice-box" style="margin-bottom:20px">
+      <strong>💡 注意事項</strong>
+      填入的前後測數據僅用於生成報告，不會儲存在系統內。請在匯出後自行保存報告。
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">基本資訊</div>
+      <div class="form-grid">
+        <div class="form-field"><label class="form-label">姓名</label><input class="form-input" id="rpt-name" placeholder="（選填）"/></div>
+        <div class="form-field"><label class="form-label">性別</label><select class="form-input" id="rpt-gender"><option value="">不填</option><option value="男">男</option><option value="女">女</option></select></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">體組成數據</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;font-size:12px;font-weight:700;text-align:center">
+        <div style="color:#6b7280">項目</div><div style="color:#7c3aed">前測</div><div style="color:#16a34a">後測</div>
+      </div>`;
+  BODY_FIELDS.forEach(f=>{
+    html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;align-items:center">
+      <div style="font-size:13px;font-weight:600;color:#374151">${f.label}<span style="font-size:11px;color:#9ca3af;margin-left:2px">${f.unit}</span></div>
+      <input class="form-input" id="rpt-pre-${f.id}" type="number" placeholder="前測" style="padding:8px;text-align:center;font-size:14px"/>
+      <input class="form-input" id="rpt-post-${f.id}" type="number" placeholder="後測" style="padding:8px;text-align:center;font-size:14px"/>
+    </div>`;
+  });
+  html+=`</div>
+    <div class="form-section">
+      <div class="form-section-title">體檢報告數據</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;font-size:12px;font-weight:700;text-align:center">
+        <div style="color:#6b7280">項目</div><div style="color:#7c3aed">前測</div><div style="color:#16a34a">後測</div>
+      </div>`;
+  EXAM_ITEMS.forEach(f=>{
+    html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;align-items:center">
+      <div><div style="font-size:13px;font-weight:600;color:#374151">${f.label}</div><div style="font-size:11px;color:#9ca3af">${f.unit}</div></div>
+      <input class="form-input" id="rpt-pre-${f.id}" type="number" placeholder="前測" style="padding:8px;text-align:center;font-size:14px"/>
+      <input class="form-input" id="rpt-post-${f.id}" type="number" placeholder="後測" style="padding:8px;text-align:center;font-size:14px"/>
+    </div>`;
+  });
+  html+=`</div>
+    <button onclick="generateReport()" style="width:100%;background:var(--purple);color:white;border:none;border-radius:14px;padding:16px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">生成報告 →</button>`;
+  document.getElementById('report-form-body').innerHTML=html;
+  document.getElementById('report-modal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+
+function closeReportModal(){document.getElementById('report-modal').style.display='none';document.body.style.overflow='';}
+function closeReportPage(){document.getElementById('report-page').style.display='none';document.body.style.overflow='';}
+
+function generateReport(){
+  const name=document.getElementById('rpt-name')?.value||'';
+  const gender=document.getElementById('rpt-gender')?.value||'';
+  const getVal=id=>{const el=document.getElementById(id);return el&&el.value?parseFloat(el.value):null;};
+
+  const start=state.startDate,end=addDays(start,44);
+  const today=todayISO();
+  let td=0,tp=0;const ws=[];
+  for(let w=0;w<7;w++){let wd=0,wt=0;for(let d=0;d<7;d++){const i=w*7+d;if(i>=45)break;if(addDays(start,i)<=today){const{done,total}=getDayProgress(i);wd+=done;wt+=total;td+=done;tp+=total;}}ws.push({wd,wt,pct:wt>0?Math.round(wd/wt*100):null});}
+  const pct=tp>0?Math.round(td/tp*100):0;
+
+  const motivate=pct>=90?{icon:'🏆',title:'完成率 90% 以上——你做到了！',text:'45 天，你用行動證明了健康是可以選擇的。每一次打卡、每一杯水、每一餐的堅持，都在悄悄改變你的身體。數據不會說謊——你的努力，寫在每一個下降的數字裡。'}
+    :pct>=75?{icon:'🌟',title:'完成率 75% 以上——非常棒的堅持！',text:'45 天並不容易，你已經做到了四分之三！身體的改變需要時間，每一步都算數。繼續保持這份意志力，健康的路上你走得很穩。'}
+    :pct>=50?{icon:'💪',title:'完成了一半——這是一個好的開始！',text:'每一天的堅持都是進步。健康的旅程不是一帆風順的，重要的是你沒有放棄。這次的經驗讓你更了解自己的身體，為下一次做好準備。'}
+    :{icon:'🌱',title:'開始是最難的一步',text:'能夠踏出第一步就已經很勇敢了。健康管理是一輩子的事，每一次的嘗試都在累積，不要氣餒，繼續前行。'};
+
+  // 體組成對比
+  let bodyHtml='';
+  let hasBodyData=false;
+  BODY_FIELDS.forEach(f=>{
+    const pre=getVal(`rpt-pre-${f.id}`),post=getVal(`rpt-post-${f.id}`);
+    if(pre!==null||post!==null){
+      hasBodyData=true;
+      const diff=pre!==null&&post!==null?Math.round((post-pre)*10)/10:null;
+      const isGoodDown=['weight','bodyfat','visceral','waist','bmi'].includes(f.id);
+      const diffColor=diff===null?'#9ca3af':diff===0?'#9ca3af':isGoodDown?(diff<0?'#16a34a':'#dc2626'):(diff>0?'#16a34a':'#dc2626');
+      const diffArrow=diff===null?'—':diff===0?'—':diff<0?`▼ ${Math.abs(diff)}`:`▲ ${Math.abs(diff)}`;
+      bodyHtml+=`<div class="report-cell${bodyHtml?'':''} "><div class="report-cell-label">${f.label}${f.unit?' ('+f.unit+')':''}</div><div class="report-cell-val" style="color:#111827">${pre!==null?pre:'—'}</div></div>
+      <div class="report-cell-diff" style="color:${diffColor}">${diffArrow}</div>
+      <div class="report-cell"><div class="report-cell-label">${f.label}${f.unit?' ('+f.unit+')':''}</div><div class="report-cell-val" style="color:${diff!==null&&diff!==0?diffColor:'#111827'}">${post!==null?post:'—'}</div></div>`;
+    }
+  });
+
+  // 體檢對比
+  const examGroups=[
+    {label:'🩸 血糖代謝',color:'#dc2626',ids:['acglu','hba1c']},
+    {label:'🫀 心血管',color:'#2563eb',ids:['tc','tg','hdl','ldl']},
+    {label:'🫘 腎臟肝臟',color:'#7c3aed',ids:['got','gpt','egfr','ua']},
+  ];
+  let examHtml='',hasExamData=false;
+  examGroups.forEach(grp=>{
+    let grpHtml='';
+    grp.ids.forEach(id=>{
+      const item=EXAM_ITEMS.find(x=>x.id===id);
+      const pre=getVal(`rpt-pre-${id}`),post=getVal(`rpt-post-${id}`);
+      if(pre!==null||post!==null){
+        hasExamData=true;
+        const preLevel=pre!==null?item.check(pre,gender):null;
+        const postLevel=post!==null?item.check(post,gender):null;
+        grpHtml+=`<div class="exam-item">
+          <div><div class="exam-name">${item.label}</div><div class="exam-range">${item.unit}　${item.range}</div></div>
+          <div class="exam-val">
+            ${pre!==null?`<div class="exam-val-num" style="color:#111827">${pre}</div><div><span class="exam-badge ${BADGE_CLASS[preLevel]}">${BADGE_TEXT[preLevel]}</span></div>`:'<div style="color:#9ca3af;font-size:13px">—</div>'}
+          </div>
+          <div class="exam-val">
+            ${post!==null?`<div class="exam-val-num" style="color:${postLevel==='normal'?'#16a34a':postLevel==='warn'?'#d97706':'#dc2626'}">${post}</div><div><span class="exam-badge ${BADGE_CLASS[postLevel]}">${BADGE_TEXT[postLevel]}</span></div>`:'<div style="color:#9ca3af;font-size:13px">—</div>'}
+          </div>
+        </div>`;
+      }
+    });
+    if(grpHtml) examHtml+=`<div class="exam-group-label" style="color:${grp.color}">${grp.label}</div>${grpHtml}`;
+  });
+
+  const bars=ws.map((w,i)=>w.wt>0?`<div class="r-bar-row"><div class="r-bar-label">第${i+1}週</div><div class="r-bar-track"><div class="r-bar-fill" style="width:${w.pct||0}%"></div></div><div class="r-bar-val">${w.pct}%</div></div>`:'').join('');
+
+  document.getElementById('report-content').innerHTML=`
+    <div class="report-hero">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;opacity:.7;text-transform:uppercase;margin-bottom:8px">DX 健康管理計畫${name?' · '+name:''}</div>
+      <div style="font-size:28px;font-weight:900;margin-bottom:6px">完成報告</div>
+      <div style="font-size:13px;opacity:.75;margin-bottom:20px">${start} — ${end}</div>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.18);border-radius:20px;padding:8px 16px;font-size:14px;font-weight:700">🎉 恭喜完成 45 天計畫！</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div class="report-section" style="padding:14px">
+        <div style="font-size:12px;color:#6b7280;margin-bottom:6px">整體完成率</div>
+        <div style="font-size:34px;font-weight:900;color:#7c3aed;line-height:1">${pct}<span style="font-size:16px;font-weight:500;color:#9ca3af">%</span></div>
+      </div>
+      <div class="report-section" style="padding:14px">
+        <div style="font-size:12px;color:#6b7280;margin-bottom:6px">完成時間點</div>
+        <div style="font-size:34px;font-weight:900;color:#7c3aed;line-height:1">${td}<span style="font-size:16px;font-weight:500;color:#9ca3af">/${tp}</span></div>
+      </div>
+    </div>
+
+    <div class="report-section" style="margin-bottom:12px">
+      <div class="report-section-title">每週完成率</div>${bars}
+    </div>
+
+    ${hasBodyData?`<div class="report-section" style="margin-bottom:12px">
+      <div class="report-section-title">體組成對比</div>
+      <div class="report-compare-grid">
+        <div class="report-compare-header" style="color:#7c3aed">前測</div><div></div>
+        <div class="report-compare-header" style="color:#16a34a">後測</div>
+        ${bodyHtml}
+      </div>
+    </div>`:''}
+
+    ${hasExamData?`<div class="report-section" style="margin-bottom:12px">
+      <div class="report-section-title">體檢報告對比</div>
+      <div style="display:grid;grid-template-columns:1fr 90px 90px;gap:8px;font-size:11px;font-weight:700;color:#6b7280;padding-bottom:6px;border-bottom:1px solid #f3f4f6;margin-bottom:4px">
+        <div>項目</div><div style="text-align:center;color:#7c3aed">前測</div><div style="text-align:center;color:#16a34a">後測</div>
+      </div>
+      ${examHtml}
+      <div style="margin-top:10px;font-size:11px;color:#9ca3af;line-height:1.6">⚠️ 以上為一般健管參考值，實際結果請以醫師診斷為準。</div>
+    </div>`:''}
+
+    <div class="report-msg">
+      <div style="font-size:24px;margin-bottom:10px">${motivate.icon}</div>
+      <div style="font-size:16px;font-weight:900;color:#5b21b6;margin-bottom:8px;line-height:1.4">${motivate.title}</div>
+      <div style="font-size:13px;color:#6d28d9;line-height:1.8">${motivate.text}</div>
+    </div>
+
+    <div style="background:#f9fafb;border-radius:12px;padding:14px;text-align:center;margin-bottom:12px">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:4px">📸 截圖方式</div>
+      <div style="font-size:13px;color:#374151">長按畫面或使用手機截圖功能，儲存完整報告至相簿</div>
+    </div>
+  `;
+
+  closeReportModal();
+  document.getElementById('report-page').style.display='block';
+  document.body.style.overflow='hidden';
+  document.getElementById('report-page').scrollTop=0;
+}
+
+function downloadPDF(){
+  const content=document.getElementById('report-content');
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>DX 完成報告</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Noto Sans TC',sans-serif;max-width:480px;margin:0 auto;padding:20px;background:white}${document.querySelector('style').textContent}</style></head><body>${content.innerHTML}<script>window.onload=function(){window.print();}<\/script></body></html>`);
+  win.document.close();
+}
+
 function toggleQA(el){const a=el.nextElementSibling,isOpen=a.classList.contains('open');document.querySelectorAll('.qa-a.open').forEach(x=>{x.classList.remove('open');x.previousElementSibling.querySelector('span').textContent='▼';});if(!isOpen){a.classList.add('open');el.querySelector('span').textContent='▲';}}
 
 function init(){
