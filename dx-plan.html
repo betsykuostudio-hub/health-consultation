@@ -249,6 +249,71 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .nav-btn.active .nav-icon{transform:scale(1.15)}
 .nav-indicator{position:absolute;bottom:0;width:28px;height:3px;border-radius:3px 3px 0 0;background:var(--purple);opacity:0}
 .nav-btn.active .nav-indicator{opacity:1}
+
+
+
+/* ── 體組成紀錄 Tab ───────────────────────────── */
+.blog-body{padding:16px 16px 100px}
+.blog-add-card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.blog-add-title{font-size:var(--font-sm);font-weight:700;color:var(--purple-dark);margin-bottom:12px}
+.blog-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.blog-field{display:flex;flex-direction:column;gap:4px}
+.blog-field-label{font-size:11px;font-weight:700;color:var(--gray-500)}
+.blog-field-input{border:1.5px solid var(--purple-light);border-radius:10px;padding:9px 10px;font-size:var(--font-md);font-weight:600;color:var(--purple-dark);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);text-align:center}
+.blog-field-input:focus{border-color:var(--purple);background:white}
+.blog-save-btn{width:100%;background:var(--purple);color:white;border:none;border-radius:12px;padding:13px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.blog-chart-card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.blog-chart-title{font-size:var(--font-sm);font-weight:700;color:#111827;margin-bottom:4px}
+.blog-chart-wrap{overflow-x:auto;padding-bottom:4px}
+.blog-chart-svg{display:block}
+.blog-metric-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.blog-metric-tab{padding:5px 12px;border-radius:20px;border:1.5px solid var(--purple-light);background:white;font-size:var(--font-sm);font-weight:600;color:var(--gray-500);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+.blog-metric-tab.active{background:var(--purple);border-color:var(--purple);color:white}
+.blog-log-card{background:white;border-radius:14px;padding:0;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
+.blog-log-header{display:flex;align-items:center;padding:12px 14px;gap:10px;border-bottom:1px solid var(--gray-100)}
+.blog-log-date{font-size:var(--font-sm);font-weight:700;color:var(--purple-dark);background:var(--purple-light);padding:3px 10px;border-radius:20px;flex-shrink:0}
+.blog-log-day{font-size:var(--font-sm);color:var(--gray-500);flex:1}
+.blog-log-del{background:var(--red-bg);color:var(--red);border:none;border-radius:8px;padding:4px 10px;font-size:var(--font-sm);cursor:pointer;font-family:'Noto Sans TC',sans-serif;flex-shrink:0}
+.blog-log-vals{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px}
+.blog-log-val{background:var(--gray-100);border-radius:8px;padding:4px 10px;font-size:var(--font-sm)}
+.blog-log-val-label{color:var(--gray-500);margin-right:4px}
+.blog-log-val-num{font-weight:700;color:#111827}
+/* ── 匯出匯入 ─────────────────────────────────── */
+.io-btn-row{display:flex;gap:10px;margin-bottom:16px}
+.io-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:14px;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s}
+.io-btn-icon{font-size:22px}
+.io-btn-label{font-size:var(--font-sm);font-weight:700}
+.io-btn-sub{font-size:11px;opacity:.8}
+.io-btn-export{background:var(--purple);color:white}
+.io-btn-import{background:var(--green-bg);color:var(--green)}
+.import-preview-card{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-bottom:16px;font-size:var(--font-sm);color:#166534;line-height:1.8}
+.import-preview-card strong{display:block;margin-bottom:4px;font-size:var(--font-md)}
+/* ── 歷史計畫頁 ───────────────────────────────── */
+.history-body{padding:16px 16px 100px}
+.history-plan-card{background:white;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.history-plan-header{padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.history-plan-badge{width:40px;height:40px;border-radius:12px;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.history-plan-info{flex:1;min-width:0}
+.history-plan-title{font-size:var(--font-md);font-weight:700;color:#111827}
+.history-plan-date{font-size:var(--font-xs);color:var(--gray-500);margin-top:2px}
+.history-plan-pct{font-size:var(--font-lg);font-weight:900;color:var(--purple-dark);flex-shrink:0}
+.history-plan-chevron{font-size:var(--font-sm);color:var(--gray-500);flex-shrink:0;transition:transform .2s}
+.history-plan-body{display:none;border-top:1px solid var(--gray-100)}
+.history-plan-body.open{display:block}
+.history-tab-row{display:flex;border-bottom:1px solid var(--gray-100)}
+.history-tab-btn{flex:1;padding:10px;border:none;background:transparent;font-size:var(--font-sm);font-weight:600;color:var(--gray-500);cursor:pointer;font-family:'Noto Sans TC',sans-serif;border-bottom:2px solid transparent;transition:all .15s}
+.history-tab-btn.active{color:var(--purple);border-bottom-color:var(--purple)}
+.history-panel{display:none;padding:16px}
+.history-panel.active{display:block}
+.history-stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:var(--font-sm)}
+.history-stat-row:last-child{border-bottom:none}
+.history-stat-label{color:var(--gray-500)}
+.history-stat-val{font-weight:700;color:#111827}
+/* 歷史打卡格子 */
+.history-day-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;margin-top:8px}
+.history-day-cell{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+/* 歷史體組成 & 體檢結果表格（複用 compare 樣式，不另加）*/
+.history-empty{text-align:center;padding:24px 0;color:var(--gray-500);font-size:var(--font-sm)}
 /* 測試日打勾樣式 */
 .test-check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100)}
 .test-check-item:last-child{border-bottom:none}
@@ -296,7 +361,10 @@ input[type=date].field-input{width:145px;overflow:hidden}
       <div class="field-row"><span class="field-label">使用易孅菌膠囊（瘦瘦菌）？</span><select class="field-input" id="use-slim" style="width:60px"><option value="yes">有</option><option value="no">無</option></select></div>
       <div class="field-row"><span class="field-label">使用活悅益生菌膠囊？</span><select class="field-input" id="use-probio" style="width:60px"><option value="yes">有</option><option value="no">無</option></select></div>
     </div>
-    <button class="big-btn" onclick="startPlan()">🚀 開始計畫</button>
+    <div id="setup-cancel-row" style="display:none;margin-bottom:10px">
+      <button onclick="cancelSettings()" style="width:100%;padding:14px;border:2px solid var(--gray-300);border-radius:16px;background:white;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:var(--gray-700)">← 取消，返回計畫</button>
+    </div>
+    <button class="big-btn" id="setup-submit-btn" onclick="startPlan()">🚀 開始計畫</button>
   </div>
 </div>
 
@@ -653,6 +721,78 @@ input[type=date].field-input{width:145px;overflow:hidden}
   </div>
 </div>
 
+<!-- BODY LOG -->
+<div id="screen-bodylog" class="screen">
+  <div class="header"><span style="font-size:22px">📈</span><span class="header-title">體組成紀錄</span></div>
+  <div class="blog-body" id="blog-body"></div>
+</div>
+
+<!-- HISTORY -->
+<div id="screen-history" class="screen">
+  <div class="header"><span style="font-size:22px">📖</span><span class="header-title">歷史計畫</span></div>
+  <div style="padding:16px 16px 0">
+    <div class="io-btn-row">
+      <button class="io-btn io-btn-export" onclick="exportPlans()">
+        <span class="io-btn-icon">📤</span>
+        <span class="io-btn-label">備份資料</span>
+        <span class="io-btn-sub">匯出 JSON</span>
+      </button>
+      <button class="io-btn io-btn-import" onclick="document.getElementById('import-file-input').click()">
+        <span class="io-btn-icon">📥</span>
+        <span class="io-btn-label">還原備份</span>
+        <span class="io-btn-sub">匯入 JSON</span>
+      </button>
+    </div>
+  </div>
+  <div class="history-body" id="history-body"></div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div id="import-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:510;align-items:center;justify-content:center;padding:24px">
+  <div style="max-width:440px;width:100%;background:white;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+    <div style="background:linear-gradient(135deg,#065f46,#16a34a);color:white;padding:20px 20px 16px">
+      <div style="font-size:22px;font-weight:900;margin-bottom:4px">📥 還原備份</div>
+      <div style="font-size:var(--font-sm);opacity:.85">匯入後將取代目前所有資料</div>
+    </div>
+    <div style="padding:20px">
+      <div id="import-preview"></div>
+      <div style="background:var(--red-bg);border:1px solid #fecaca;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:var(--font-sm);color:var(--red);line-height:1.7">
+        ⚠️ 匯入後目前裝置上的<strong>所有計畫資料將被取代</strong>，此操作無法復原。
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="closeImportModal()" style="flex:1;padding:14px;border:2px solid var(--gray-300);border-radius:12px;background:white;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:var(--gray-700)">取消</button>
+        <button onclick="confirmImport()" id="import-confirm-btn" style="flex:2;padding:14px;background:var(--green);color:white;border:none;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">確定匯入 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 隱藏 file input -->
+<input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(this)"/>
+
+<!-- NEW PLAN MODAL -->
+<div id="new-plan-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:24px">
+  <div style="max-width:440px;width:100%;background:white;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+    <div style="background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;padding:20px 20px 16px">
+      <div style="font-size:22px;font-weight:900;margin-bottom:4px">🔄 開始新一輪計畫</div>
+      <div style="font-size:var(--font-sm);opacity:.85">目前計畫將封存至歷史紀錄</div>
+    </div>
+    <div style="padding:20px">
+      <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:14px;margin-bottom:16px;font-size:var(--font-sm);color:#92400e;line-height:1.7">
+        <strong>📌 封存後可以：</strong><br/>
+        · 在歷史計畫中回顧完成報告與每日打卡<br/>
+        · 個人劑量設定預設沿用，可自行修改
+      </div>
+      <div style="font-size:var(--font-sm);color:var(--gray-700);margin-bottom:16px;line-height:1.7">
+        確定要封存目前計畫並開始新一輪嗎？
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="closeNewPlanModal()" style="flex:1;padding:14px;border:2px solid var(--gray-300);border-radius:12px;background:white;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:var(--gray-700)">取消</button>
+        <button onclick="confirmNewPlan()" style="flex:2;padding:14px;background:var(--purple);color:white;border:none;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">確定開始新計畫 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- REPORT MODAL -->
 <div id="report-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:500;overflow-y:auto">
   <div style="max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column">
@@ -683,21 +823,102 @@ input[type=date].field-input{width:145px;overflow:hidden}
   <button class="nav-btn" id="nav-calendar" onclick="showCalendar()"><div class="nav-icon">📅</div><div class="nav-label">行程</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-today" onclick="goToToday()"><div class="nav-icon">✅</div><div class="nav-label">今日</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-stats" onclick="showStats()"><div class="nav-icon">📊</div><div class="nav-label">統計</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-bodylog" onclick="showBodyLog()"><div class="nav-icon">📈</div><div class="nav-label">體組成</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-supply" onclick="showSupply()"><div class="nav-icon">📦</div><div class="nav-label">備品</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-menu" onclick="showScreen('screen-menu','nav-menu')"><div class="nav-icon">🍽️</div><div class="nav-label">菜單</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-notes" onclick="showScreen('screen-notes','nav-notes')"><div class="nav-icon">📋</div><div class="nav-label">須知</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-history" onclick="showHistory()"><div class="nav-icon">📖</div><div class="nav-label">歷史</div><div class="nav-indicator"></div></button>
 </div>
 
 <script>
-let state={startDate:null,pretestDate:null,posttestDate:null,doses:{},useSlim:true,useProbio:true,checks:{},amounts:{},stockLogs:{},optionalItems:{dx_box:false,shaker:false}};
-const STORAGE_KEY='dx_plan';
-function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
+// ── 多筆計畫架構 ──────────────────────────────────────────
+// localStorage 結構：
+//   dx_plans       : Array of PlanRecord
+//   dx_current_id  : number（目前計畫 id）
+//
+// PlanRecord: { id, createdAt, state, reportData }
+//   state      : 原本的完整 state 物件
+//   reportData : { body:{...}, exam:{...} }（前後測數據，不含日期，日期從 state 取）
+
+const PLANS_KEY='dx_plans';
+const CUR_KEY='dx_current_id';
+
+const DEFAULT_STATE={startDate:null,pretestDate:null,posttestDate:null,doses:{},useSlim:true,useProbio:true,checks:{},amounts:{},stockLogs:{},optionalItems:{dx_box:false,shaker:false},bodyLogs:[]};
+let state={...DEFAULT_STATE};
+
+function _loadPlans(){
+  try{return JSON.parse(localStorage.getItem(PLANS_KEY))||[];}catch(e){return[];}
+}
+function _savePlans(plans){localStorage.setItem(PLANS_KEY,JSON.stringify(plans));}
+function _getCurrentId(){
+  const v=localStorage.getItem(CUR_KEY);
+  return v!==null?parseInt(v):null;
+}
+function _setCurrentId(id){localStorage.setItem(CUR_KEY,String(id));}
+
+function saveState(){
+  const plans=_loadPlans();
+  const id=_getCurrentId();
+  if(id===null)return;
+  const idx=plans.findIndex(p=>p.id===id);
+  if(idx>=0){plans[idx].state=state;}
+  else{plans.push({id,createdAt:todayISO(),state,reportData:{}});}
+  _savePlans(plans);
+}
+
+function saveReportData(body,exam){
+  const plans=_loadPlans();
+  const id=_getCurrentId();
+  if(id===null)return;
+  const idx=plans.findIndex(p=>p.id===id);
+  if(idx>=0){
+    plans[idx].reportData=plans[idx].reportData||{};
+    if(body!==undefined)plans[idx].reportData.body=body;
+    if(exam!==undefined)plans[idx].reportData.exam=exam;
+    _savePlans(plans);
+  }
+}
+
+function getReportData(){
+  const plans=_loadPlans();
+  const id=_getCurrentId();
+  if(id===null)return{};
+  const plan=plans.find(p=>p.id===id);
+  return plan?.reportData||{};
+}
+
 function loadState(){
-  // 自動搬移舊版資料
-  const keys=['dx_plan_v1','dx_plan_v2','dx_plan_v3','dx_plan_v4'];
-  let raw=localStorage.getItem(STORAGE_KEY);
-  if(!raw){for(const k of keys){raw=localStorage.getItem(k);if(raw){localStorage.setItem(STORAGE_KEY,raw);keys.forEach(ok=>localStorage.removeItem(ok));break;}}}
-  if(raw){try{const s=JSON.parse(raw);state={...state,...s};}catch(e){}}
+  // ── 舊版資料搬移（單筆 → 多筆）──
+  const legacyKeys=['dx_plan','dx_plan_v1','dx_plan_v2','dx_plan_v3','dx_plan_v4'];
+  let plans=_loadPlans();
+  let currentId=_getCurrentId();
+
+  if(plans.length===0){
+    // 嘗試從舊版 key 搬移
+    let raw=null;
+    for(const k of legacyKeys){raw=localStorage.getItem(k);if(raw)break;}
+    if(raw){
+      try{
+        const oldState=JSON.parse(raw);
+        const newPlan={id:1,createdAt:oldState.startDate||todayISO(),state:{...DEFAULT_STATE,...oldState},reportData:{}};
+        plans=[newPlan];
+        _savePlans(plans);
+        _setCurrentId(1);
+        currentId=1;
+        legacyKeys.forEach(k=>localStorage.removeItem(k));
+      }catch(e){}
+    }
+  }
+
+  if(currentId===null&&plans.length>0){
+    currentId=plans[plans.length-1].id;
+    _setCurrentId(currentId);
+  }
+
+  if(currentId!==null){
+    const plan=plans.find(p=>p.id===currentId);
+    if(plan){state={...DEFAULT_STATE,...plan.state};}
+  }
 }
 function dateToISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function todayISO(){return dateToISO(new Date());}
@@ -786,6 +1007,48 @@ function showSettings(){
   if(d.c)document.getElementById('dose-c').value=d.c;
   document.getElementById('use-slim').value=state.useSlim===false?'no':'yes';
   document.getElementById('use-probio').value=state.useProbio===false?'no':'yes';
+  // 修改設定模式：顯示返回按鈕
+  const setupHero=document.querySelector('#screen-setup .setup-hero');
+  if(setupHero&&state.startDate){
+    setupHero.innerHTML='<div class="emoji">⚙️</div><h1>修改計畫設定</h1><p>修改後按下方按鈕儲存</p>';
+  }
+  document.getElementById('setup-cancel-row').style.display='block';
+  document.getElementById('setup-submit-btn').textContent='💾 儲存設定';
+  showScreen('screen-setup',null);
+}
+
+function cancelSettings(){
+  // 重設設定頁外觀
+  const setupHero=document.querySelector('#screen-setup .setup-hero');
+  if(setupHero) setupHero.innerHTML='<div class="emoji">🎯</div><h1>DX 健康管理計畫</h1><p>45 天完整計畫追蹤<br/>設定一次，每天跟著走</p>';
+  document.getElementById('setup-cancel-row').style.display='none';
+  document.getElementById('setup-submit-btn').textContent='🚀 開始計畫';
+  document.getElementById('nav-bar').style.display='flex';
+  showCalendar();
+}
+
+// 新計畫用的設定頁：沿用劑量，清空日期
+function showNewPlanSetup(){
+  // 沿用劑量
+  const d=state.doses||{};
+  document.getElementById('start-date').value='';
+  document.getElementById('pretest-date').value='';
+  document.getElementById('posttest-date').value='';
+  if(d.protein_snack)document.getElementById('dose-protein-snack').value=d.protein_snack;
+  if(d.lecithin_snack)document.getElementById('dose-lecithin-snack').value=d.lecithin_snack;
+  if(d.b)document.getElementById('dose-b').value=d.b;
+  if(d.ca)document.getElementById('dose-ca').value=d.ca;
+  if(d.c)document.getElementById('dose-c').value=d.c;
+  document.getElementById('use-slim').value=state.useSlim===false?'no':'yes';
+  document.getElementById('use-probio').value=state.useProbio===false?'no':'yes';
+  // 新計畫模式：更新標題
+  const setupHero=document.querySelector('#screen-setup .setup-hero');
+  if(setupHero){
+    setupHero.innerHTML='<div class="emoji">🆕</div><h1>新一輪計畫設定</h1><p>日期請重新填寫，劑量已沿用上次設定</p>';
+  }
+  document.getElementById('setup-cancel-row').style.display='none';
+  document.getElementById('setup-submit-btn').textContent='🚀 開始計畫';
+  document.getElementById('nav-bar').style.display='none';
   showScreen('screen-setup',null);
 }
 
@@ -798,6 +1061,14 @@ function startPlan(){
   state.doses={protein_snack:parseFloat(document.getElementById('dose-protein-snack').value)||null,lecithin_snack:parseFloat(document.getElementById('dose-lecithin-snack').value)||null,b:parseFloat(document.getElementById('dose-b').value)||null,ca:parseFloat(document.getElementById('dose-ca').value)||null,c:parseFloat(document.getElementById('dose-c').value)||null};
   state.useSlim=document.getElementById('use-slim').value==='yes';
   state.useProbio=document.getElementById('use-probio').value==='yes';
+  // 若尚無計畫 id，建立第一筆
+  if(_getCurrentId()===null){
+    const plans=_loadPlans();
+    const newId=plans.length>0?Math.max(...plans.map(p=>p.id))+1:1;
+    plans.push({id:newId,createdAt:todayISO(),state:{...state},reportData:{}});
+    _savePlans(plans);
+    _setCurrentId(newId);
+  }
   saveState();document.getElementById('nav-bar').style.display='flex';showCalendar();
 }
 
@@ -964,7 +1235,8 @@ function renderStats(){
   const isEnded=today>endDate;
   const daysLeft=isEnded?0:daysBetween(today,endDate)+1;
   const exportBtn=isEnded
-    ?`<button onclick="showReportForm()" style="width:100%;background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border:none;border-radius:16px;padding:18px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:4px">🎉 匯出完成報告</button>`
+    ?`<button onclick="showReportForm()" style="width:100%;background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border:none;border-radius:16px;padding:18px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:4px">🎉 匯出完成報告</button>
+      <button onclick="showNewPlanModal()" style="width:100%;background:white;color:var(--purple);border:2px solid var(--purple);border-radius:16px;padding:16px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:10px">🔄 開始新一輪計畫</button>`
     :`<div style="background:var(--purple-light);border-radius:14px;padding:16px;text-align:center;margin-top:4px"><div style="font-size:var(--font-sm);color:var(--purple-dark);font-weight:700">完成報告將在計畫結束後開放</div><div style="font-size:26px;font-weight:900;color:var(--purple-dark);margin:8px 0">${daysLeft} 天</div><div style="font-size:var(--font-sm);color:var(--purple-mid)">距離計畫完成</div></div>`;
 
   document.getElementById('stats-body').innerHTML=`<div class="stat-card"><div class="stat-card-title">整體完成率</div><div><span class="big-stat">${pct}</span><span class="big-stat-unit">%</span></div><div style="font-size:var(--font-sm);color:var(--gray-500);margin-top:6px">${td}/${tp} 個時間點完成</div></div><div class="stat-card"><div class="stat-card-title">每週完成率</div>${bars}</div><div class="stat-card"><div class="stat-card-title">45 天總覽</div><div class="week-grid">${cells}</div><div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:var(--font-sm);color:var(--gray-500)"><span>✅全完成</span><span>🔶部分</span><span>⬜未打卡</span><span style="color:var(--red)">■未完成(過去)</span><span style="color:var(--purple-mid)">·未到</span></div></div><div class="stat-card">${exportBtn}</div>`;
@@ -1244,43 +1516,51 @@ const BADGE_TEXT={normal:'正常',warn:'留意',danger:'異常'};
 const BADGE_CLASS={normal:'badge-normal',warn:'badge-warn',danger:'badge-danger'};
 
 function showReportForm(){
-  const dm=state.doses||{};
-  const start=state.startDate,end=addDays(start,44);
+  const saved=getReportData();
+  const sb=saved.body||{},se=saved.exam||{};
   let html=`
     <div class="notice-box" style="margin-bottom:20px">
       <strong>💡 注意事項</strong>
-      填入的前後測數據僅用於生成報告，不會儲存在系統內。請在匯出後自行保存報告。
+      數據會自動儲存於本裝置，下次開啟可繼續編輯。日期從計畫設定自動帶入。
     </div>
     <div class="form-section">
       <div class="form-section-title">基本資訊</div>
       <div class="form-grid">
-        <div class="form-field"><label class="form-label">姓名</label><input class="form-input" id="rpt-name" placeholder="（選填）"/></div>
-        <div class="form-field"><label class="form-label">性別</label><select class="form-input" id="rpt-gender"><option value="">不填</option><option value="男">男</option><option value="女">女</option></select></div>
+        <div class="form-field"><label class="form-label">姓名</label><input class="form-input" id="rpt-name" placeholder="（選填）" value="${sb.name||''}"/></div>
+        <div class="form-field"><label class="form-label">性別</label><select class="form-input" id="rpt-gender"><option value="">不填</option><option value="男"${sb.gender==='男'?' selected':''}>男</option><option value="女"${sb.gender==='女'?' selected':''}>女</option></select></div>
       </div>
     </div>
     <div class="form-section">
       <div class="form-section-title">體組成數據</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;font-size:12px;font-weight:700;text-align:center">
-        <div style="color:#6b7280">項目</div><div style="color:#7c3aed">前測</div><div style="color:#16a34a">後測</div>
+        <div style="color:#6b7280">項目</div>
+        <div style="color:#7c3aed">前測${state.pretestDate?'<br><span style="font-size:10px;font-weight:500">'+state.pretestDate+'</span>':''}</div>
+        <div style="color:#16a34a">後測${state.posttestDate?'<br><span style="font-size:10px;font-weight:500">'+state.posttestDate+'</span>':''}</div>
       </div>`;
   BODY_FIELDS.forEach(f=>{
+    const preVal=sb[f.id+'_pre']!==undefined?sb[f.id+'_pre']:'';
+    const postVal=sb[f.id+'_post']!==undefined?sb[f.id+'_post']:'';
     html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;align-items:center">
       <div style="font-size:13px;font-weight:600;color:#374151">${f.label}<span style="font-size:11px;color:#9ca3af;margin-left:2px">${f.unit}</span></div>
-      <input class="form-input" id="rpt-pre-${f.id}" type="number" placeholder="前測" style="padding:8px;text-align:center;font-size:14px"/>
-      <input class="form-input" id="rpt-post-${f.id}" type="number" placeholder="後測" style="padding:8px;text-align:center;font-size:14px"/>
+      <input class="form-input" id="rpt-pre-${f.id}" type="number" placeholder="前測" value="${preVal}" style="padding:8px;text-align:center;font-size:14px"/>
+      <input class="form-input" id="rpt-post-${f.id}" type="number" placeholder="後測" value="${postVal}" style="padding:8px;text-align:center;font-size:14px"/>
     </div>`;
   });
   html+=`</div>
     <div class="form-section">
-      <div class="form-section-title">體檢報告數據</div>
+      <div class="form-section-title">體檢結果數據</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;font-size:12px;font-weight:700;text-align:center">
-        <div style="color:#6b7280">項目</div><div style="color:#7c3aed">前測</div><div style="color:#16a34a">後測</div>
+        <div style="color:#6b7280">項目</div>
+        <div style="color:#7c3aed">前測${state.pretestDate?'<br><span style="font-size:10px;font-weight:500">'+state.pretestDate+'</span>':''}</div>
+        <div style="color:#16a34a">後測${state.posttestDate?'<br><span style="font-size:10px;font-weight:500">'+state.posttestDate+'</span>':''}</div>
       </div>`;
   EXAM_ITEMS.forEach(f=>{
+    const preVal=se[f.id+'_pre']!==undefined?se[f.id+'_pre']:'';
+    const postVal=se[f.id+'_post']!==undefined?se[f.id+'_post']:'';
     html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;align-items:center">
       <div><div style="font-size:13px;font-weight:600;color:#374151">${f.label}</div><div style="font-size:11px;color:#9ca3af">${f.unit}</div></div>
-      <input class="form-input" id="rpt-pre-${f.id}" type="number" placeholder="前測" style="padding:8px;text-align:center;font-size:14px"/>
-      <input class="form-input" id="rpt-post-${f.id}" type="number" placeholder="後測" style="padding:8px;text-align:center;font-size:14px"/>
+      <input class="form-input" id="rpt-pre-${f.id}" type="number" placeholder="前測" value="${preVal}" style="padding:8px;text-align:center;font-size:14px"/>
+      <input class="form-input" id="rpt-post-${f.id}" type="number" placeholder="後測" value="${postVal}" style="padding:8px;text-align:center;font-size:14px"/>
     </div>`;
   });
   html+=`</div>
@@ -1290,14 +1570,54 @@ function showReportForm(){
   document.body.style.overflow='hidden';
 }
 
+
+function showNewPlanModal(){
+  const m=document.getElementById('new-plan-modal');
+  m.style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+function closeNewPlanModal(){
+  document.getElementById('new-plan-modal').style.display='none';
+  document.body.style.overflow='';
+}
+
+function confirmNewPlan(){
+  // 封存目前計畫（state 已持久化），建立新計畫
+  closeNewPlanModal();
+  const plans=_loadPlans();
+  const newId=plans.length>0?Math.max(...plans.map(p=>p.id))+1:1;
+  const newPlan={id:newId,createdAt:todayISO(),state:{...DEFAULT_STATE},reportData:{}};
+  plans.push(newPlan);
+  _savePlans(plans);
+  _setCurrentId(newId);
+  state={...DEFAULT_STATE};
+  showNewPlanSetup();
+}
 function closeReportModal(){document.getElementById('report-modal').style.display='none';document.body.style.overflow='';}
 function closeReportPage(){document.getElementById('report-page').style.display='none';document.body.style.overflow='';}
 
 function generateReport(){
   const name=document.getElementById('rpt-name')?.value||'';
   const gender=document.getElementById('rpt-gender')?.value||'';
-  const getVal=id=>{const el=document.getElementById(id);return el&&el.value?parseFloat(el.value):null;};
+  const getVal=id=>{const el=document.getElementById(id);return el&&el.value!==''?parseFloat(el.value):null;};
 
+  // ── 持久化儲存 ──────────────────────────────────────────
+  const bodyData={name,gender};
+  BODY_FIELDS.forEach(f=>{
+    const pre=getVal(`rpt-pre-${f.id}`),post=getVal(`rpt-post-${f.id}`);
+    if(pre!==null)bodyData[f.id+'_pre']=pre;
+    if(post!==null)bodyData[f.id+'_post']=post;
+  });
+  const examData={};
+  EXAM_ITEMS.forEach(f=>{
+    const pre=getVal(`rpt-pre-${f.id}`),post=getVal(`rpt-post-${f.id}`);
+    if(pre!==null)examData[f.id+'_pre']=pre;
+    if(post!==null)examData[f.id+'_post']=post;
+  });
+  saveReportData(bodyData,examData);
+
+  // ── 統計 ────────────────────────────────────────────────
   const start=state.startDate,end=addDays(start,44);
   const today=todayISO();
   let td=0,tp=0;const ws=[];
@@ -1309,24 +1629,43 @@ function generateReport(){
     :pct>=50?{icon:'💪',title:'完成了一半——這是一個好的開始！',text:'每一天的堅持都是進步。健康的旅程不是一帆風順的，重要的是你沒有放棄。這次的經驗讓你更了解自己的身體，為下一次做好準備。'}
     :{icon:'🌱',title:'開始是最難的一步',text:'能夠踏出第一步就已經很勇敢了。健康管理是一輩子的事，每一次的嘗試都在累積，不要氣餒，繼續前行。'};
 
-  // 體組成對比
+  // ── 日期標題 ─────────────────────────────────────────────
+  const fmtDate=iso=>iso?iso.replace(/-/g,'/'):null;
+  const preDateStr=fmtDate(state.pretestDate);
+  const postDateStr=fmtDate(state.posttestDate);
+  const preHead=`前測${preDateStr?'<div style="font-size:10px;font-weight:500;margin-top:2px;opacity:.85">'+preDateStr+'</div>':''}`;
+  const postHead=`後測${postDateStr?'<div style="font-size:10px;font-weight:500;margin-top:2px;opacity:.85">'+postDateStr+'</div>':''}`;
+
+  // ── 體組成對比 ────────────────────────────────────────────
+  // 下降為好：weight, bodyfat, visceral, waist, bmi, bodyage
+  // 上升為好：muscle, bmr
+  const BODY_GOOD_DOWN=new Set(['weight','bodyfat','visceral','waist','bmi','bodyage']);
   let bodyHtml='';
   let hasBodyData=false;
   BODY_FIELDS.forEach(f=>{
     const pre=getVal(`rpt-pre-${f.id}`),post=getVal(`rpt-post-${f.id}`);
-    if(pre!==null||post!==null){
-      hasBodyData=true;
-      const diff=pre!==null&&post!==null?Math.round((post-pre)*10)/10:null;
-      const isGoodDown=['weight','bodyfat','visceral','waist','bmi'].includes(f.id);
-      const diffColor=diff===null?'#9ca3af':diff===0?'#9ca3af':isGoodDown?(diff<0?'#16a34a':'#dc2626'):(diff>0?'#16a34a':'#dc2626');
-      const diffArrow=diff===null?'—':diff===0?'—':diff<0?`▼ ${Math.abs(diff)}`:`▲ ${Math.abs(diff)}`;
-      bodyHtml+=`<div class="report-cell${bodyHtml?'':''} "><div class="report-cell-label">${f.label}${f.unit?' ('+f.unit+')':''}</div><div class="report-cell-val" style="color:#111827">${pre!==null?pre:'—'}</div></div>
-      <div class="report-cell-diff" style="color:${diffColor}">${diffArrow}</div>
-      <div class="report-cell"><div class="report-cell-label">${f.label}${f.unit?' ('+f.unit+')':''}</div><div class="report-cell-val" style="color:${diff!==null&&diff!==0?diffColor:'#111827'}">${post!==null?post:'—'}</div></div>`;
+    if(pre===null&&post===null)return;
+    hasBodyData=true;
+    const diff=pre!==null&&post!==null?Math.round((post-pre)*10)/10:null;
+    const isGoodDown=BODY_GOOD_DOWN.has(f.id);
+    let diffColor='#9ca3af',diffText='—';
+    if(diff!==null&&diff!==0){
+      const isGood=isGoodDown?(diff<0):(diff>0);
+      diffColor=isGood?'#16a34a':'#dc2626';
+      diffText=diff<0?`▼ ${Math.abs(diff)}`:`▲ ${Math.abs(diff)}`;
     }
+    const postColor=diff!==null&&diff!==0?(BODY_GOOD_DOWN.has(f.id)?(diff<0?'#16a34a':'#dc2626'):(diff>0?'#16a34a':'#dc2626')):'#111827';
+    bodyHtml+=`<div style="display:grid;grid-template-columns:1fr 80px 52px 80px;gap:6px;align-items:center;padding:9px 0;border-bottom:1px solid #f3f4f6">
+      <div><div style="font-size:13px;font-weight:600;color:#111827">${f.label}</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">${f.unit}</div></div>
+      <div style="text-align:center"><div style="font-size:14px;font-weight:700;color:#111827">${pre!==null?pre:'—'}</div></div>
+      <div style="text-align:center;font-size:12px;font-weight:900;color:${diffColor}">${diffText}</div>
+      <div style="text-align:center"><div style="font-size:14px;font-weight:700;color:${post!==null?postColor:'#9ca3af'}">${post!==null?post:'—'}</div></div>
+    </div>`;
   });
 
-  // 體檢對比
+  // ── 體檢結果對比 ──────────────────────────────────────────
+  // 上升為好：hdl（高密度膽固醇）、egfr（腎絲球過濾率）
+  const EXAM_GOOD_UP=new Set(['hdl','egfr']);
   const examGroups=[
     {label:'🩸 血糖代謝',color:'#dc2626',ids:['acglu','hba1c']},
     {label:'🫀 心血管',color:'#2563eb',ids:['tc','tg','hdl','ldl']},
@@ -1338,25 +1677,42 @@ function generateReport(){
     grp.ids.forEach(id=>{
       const item=EXAM_ITEMS.find(x=>x.id===id);
       const pre=getVal(`rpt-pre-${id}`),post=getVal(`rpt-post-${id}`);
-      if(pre!==null||post!==null){
-        hasExamData=true;
-        const preLevel=pre!==null?item.check(pre,gender):null;
-        const postLevel=post!==null?item.check(post,gender):null;
-        grpHtml+=`<div class="exam-item">
-          <div><div class="exam-name">${item.label}</div><div class="exam-range">${item.unit}　${item.range}</div></div>
-          <div class="exam-val">
-            ${pre!==null?`<div class="exam-val-num" style="color:#111827">${pre}</div><div><span class="exam-badge ${BADGE_CLASS[preLevel]}">${BADGE_TEXT[preLevel]}</span></div>`:'<div style="color:#9ca3af;font-size:13px">—</div>'}
-          </div>
-          <div class="exam-val">
-            ${post!==null?`<div class="exam-val-num" style="color:${postLevel==='normal'?'#16a34a':postLevel==='warn'?'#d97706':'#dc2626'}">${post}</div><div><span class="exam-badge ${BADGE_CLASS[postLevel]}">${BADGE_TEXT[postLevel]}</span></div>`:'<div style="color:#9ca3af;font-size:13px">—</div>'}
-          </div>
-        </div>`;
+      if(pre===null&&post===null)return;
+      hasExamData=true;
+      const preLevel=pre!==null?item.check(pre,gender):null;
+      const postLevel=post!==null?item.check(post,gender):null;
+      const diff=pre!==null&&post!==null?Math.round((post-pre)*10)/10:null;
+      const isGoodUp=EXAM_GOOD_UP.has(id);
+      let diffColor='#9ca3af',diffText='—';
+      if(diff!==null&&diff!==0){
+        const isGood=isGoodUp?(diff>0):(diff<0);
+        diffColor=isGood?'#16a34a':'#dc2626';
+        diffText=diff<0?`▼ ${Math.abs(diff)}`:`▲ ${Math.abs(diff)}`;
       }
+      const postValColor=postLevel==='normal'?'#16a34a':postLevel==='warn'?'#d97706':'#dc2626';
+      grpHtml+=`<div style="display:grid;grid-template-columns:1fr 80px 52px 80px;gap:6px;align-items:center;padding:9px 0;border-bottom:1px solid #f3f4f6">
+        <div><div class="exam-name">${item.label}</div><div class="exam-range">${item.unit}　${item.range}</div></div>
+        <div class="exam-val">
+          ${pre!==null?`<div class="exam-val-num" style="color:#111827">${pre}</div><div><span class="exam-badge ${BADGE_CLASS[preLevel]}">${BADGE_TEXT[preLevel]}</span></div>`:'<div style="color:#9ca3af;font-size:13px">—</div>'}
+        </div>
+        <div style="text-align:center;font-size:12px;font-weight:900;color:${diffColor}">${diffText}</div>
+        <div class="exam-val">
+          ${post!==null?`<div class="exam-val-num" style="color:${postValColor}">${post}</div><div><span class="exam-badge ${BADGE_CLASS[postLevel]}">${BADGE_TEXT[postLevel]}</span></div>`:'<div style="color:#9ca3af;font-size:13px">—</div>'}
+        </div>
+      </div>`;
     });
     if(grpHtml) examHtml+=`<div class="exam-group-label" style="color:${grp.color}">${grp.label}</div>${grpHtml}`;
   });
 
   const bars=ws.map((w,i)=>w.wt>0?`<div class="r-bar-row"><div class="r-bar-label">第${i+1}週</div><div class="r-bar-track"><div class="r-bar-fill" style="width:${w.pct||0}%"></div></div><div class="r-bar-val">${w.pct}%</div></div>`:'').join('');
+
+  // ── 共用欄標題 ─────────────────────────────────────────────
+  const compareHeader=`<div style="display:grid;grid-template-columns:1fr 80px 52px 80px;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #ede9fe;font-size:11px;font-weight:700">
+    <div style="color:#6b7280">項目</div>
+    <div style="text-align:center;color:#7c3aed">${preHead}</div>
+    <div style="text-align:center;color:#6b7280">差異</div>
+    <div style="text-align:center;color:#16a34a">${postHead}</div>
+  </div>`;
 
   document.getElementById('report-content').innerHTML=`
     <div class="report-hero">
@@ -1383,18 +1739,13 @@ function generateReport(){
 
     ${hasBodyData?`<div class="report-section" style="margin-bottom:12px">
       <div class="report-section-title">體組成對比</div>
-      <div class="report-compare-grid">
-        <div class="report-compare-header" style="color:#7c3aed">前測</div><div></div>
-        <div class="report-compare-header" style="color:#16a34a">後測</div>
-        ${bodyHtml}
-      </div>
+      ${compareHeader}
+      ${bodyHtml}
     </div>`:''}
 
     ${hasExamData?`<div class="report-section" style="margin-bottom:12px">
-      <div class="report-section-title">體檢報告對比</div>
-      <div style="display:grid;grid-template-columns:1fr 90px 90px;gap:8px;font-size:11px;font-weight:700;color:#6b7280;padding-bottom:6px;border-bottom:1px solid #f3f4f6;margin-bottom:4px">
-        <div>項目</div><div style="text-align:center;color:#7c3aed">前測</div><div style="text-align:center;color:#16a34a">後測</div>
-      </div>
+      <div class="report-section-title">體檢結果對比</div>
+      ${compareHeader}
       ${examHtml}
       <div style="margin-top:10px;font-size:11px;color:#9ca3af;line-height:1.6">⚠️ 以上為一般健管參考值，實際結果請以醫師診斷為準。</div>
     </div>`:''}
@@ -1426,6 +1777,500 @@ function downloadPDF(){
 
 function toggleQA(el){const a=el.nextElementSibling,isOpen=a.classList.contains('open');document.querySelectorAll('.qa-a.open').forEach(x=>{x.classList.remove('open');x.previousElementSibling.querySelector('span').textContent='▼';});if(!isOpen){a.classList.add('open');el.querySelector('span').textContent='▲';}}
 
+
+// ── 歷史計畫 ──────────────────────────────────────────────────
+
+// ── 匯出 / 匯入 ────────────────────────────────────────────
+function exportPlans(){
+  const plans=_loadPlans();
+  if(plans.length===0){alert('目前沒有任何計畫資料可以備份。');return;}
+  const payload={version:1,exportedAt:new Date().toISOString(),plans};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const today=todayISO().replace(/-/g,'');
+  a.href=url;a.download=`DX計畫備份_${today}.json`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+let _pendingImportData=null;
+
+function handleImportFile(input){
+  const file=input.files[0];
+  if(!file)return;
+  input.value=''; // 允許重複選同一檔
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      // 驗證格式
+      if(!data.plans||!Array.isArray(data.plans)||data.plans.length===0){
+        alert('❌ 檔案格式不正確，請選擇由本程式匯出的備份檔。');return;
+      }
+      _pendingImportData=data;
+      // 組預覽
+      const total=data.plans.length;
+      const dates=data.plans.map(p=>{
+        const s=p.state||{};
+        const start=s.startDate,end=start?addDays(start,44):null;
+        return start?`${start.replace(/-/g,'/')}–${end.replace(/-/g,'/')}`:'（未設定日期）';
+      });
+      const exportedAt=data.exportedAt?new Date(data.exportedAt).toLocaleString('zh-TW'):'—';
+      document.getElementById('import-preview').innerHTML=`
+        <div class="import-preview-card">
+          <strong>📋 備份內容摘要</strong>
+          備份日期：${exportedAt}<br/>
+          計畫筆數：${total} 筆<br/>
+          ${dates.map((d,i)=>`第 ${i+1} 次：${d}`).join('<br/>')}
+        </div>`;
+      const m=document.getElementById('import-modal');
+      m.style.display='flex';
+      document.body.style.overflow='hidden';
+    }catch(err){
+      alert('❌ 檔案讀取失敗，請確認為有效的 JSON 備份檔。');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function closeImportModal(){
+  document.getElementById('import-modal').style.display='none';
+  document.body.style.overflow='';
+  _pendingImportData=null;
+}
+
+function confirmImport(){
+  if(!_pendingImportData)return;
+  const data=_pendingImportData;
+  // 取代 localStorage 資料
+  _savePlans(data.plans);
+  // 設定 current id 為最後一筆
+  const lastId=data.plans[data.plans.length-1].id;
+  _setCurrentId(lastId);
+  // 重新載入 state
+  state={...DEFAULT_STATE};
+  loadState();
+  closeImportModal();
+  // 返回歷史頁，刷新
+  renderHistory();
+  showScreen('screen-history','nav-history');
+  // 若匯入的計畫已有 startDate，顯示 nav
+  if(state.startDate){document.getElementById('nav-bar').style.display='flex';}
+  alert(`✅ 匯入成功！共還原 ${data.plans.length} 筆計畫。`);
+}
+
+// ── 體組成紀錄 ─────────────────────────────────────────────
+const BLOG_FIELDS=[
+  {id:'weight',label:'體重',unit:'kg'},
+  {id:'bodyfat',label:'體脂率',unit:'%'},
+  {id:'muscle',label:'骨骼肌',unit:'%'},
+  {id:'visceral',label:'內臟脂肪',unit:''},
+  {id:'bmi',label:'BMI',unit:''},
+  {id:'bodyage',label:'體年齡',unit:'歲'},
+];
+// 折線圖：下降為好 → 趨勢線顏色判定用
+const BLOG_GOOD_DOWN=new Set(['weight','bodyfat','visceral','bmi','bodyage']);
+
+let blogActiveMetric='weight'; // 目前顯示的折線指標
+
+function showBodyLog(){renderBodyLog();showScreen('screen-bodylog','nav-bodylog');}
+
+function renderBodyLog(){
+  const logs=(state.bodyLogs||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const start=state.startDate;
+
+  // ── 輸入區 ──────────────────────────────────────────────
+  let addHtml=`<div class="blog-add-card">
+    <div class="blog-add-title">➕ 新增量測紀錄</div>
+    <div style="margin-bottom:10px">
+      <div class="blog-field-label" style="margin-bottom:4px">量測日期</div>
+      <input type="date" id="blog-date" value="${todayISO()}" style="width:100%;border:1.5px solid var(--purple-light);border-radius:10px;padding:9px 10px;font-size:var(--font-md);font-weight:600;color:var(--purple-dark);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);overflow:hidden"/>
+    </div>
+    <div class="blog-field-grid">`;
+  BLOG_FIELDS.forEach(f=>{
+    addHtml+=`<div class="blog-field">
+      <div class="blog-field-label">${f.label}${f.unit?' ('+f.unit+')':''}</div>
+      <input type="number" id="blog-input-${f.id}" class="blog-field-input" placeholder="—" step="0.1"/>
+    </div>`;
+  });
+  addHtml+=`</div>
+    <button class="blog-save-btn" onclick="saveBodyLog()">💾 儲存紀錄</button>
+  </div>`;
+
+  // ── 折線圖 ──────────────────────────────────────────────
+  let chartHtml='';
+  if(logs.length>=2){
+    // 指標選擇 Tab
+    let metricTabs=BLOG_FIELDS.map(f=>
+      `<button class="blog-metric-tab${blogActiveMetric===f.id?' active':''}" onclick="setBlogMetric('${f.id}')">${f.label}</button>`
+    ).join('');
+
+    // 取得目前指標的數值序列
+    const series=logs.map(l=>({date:l.date,val:l[blogActiveMetric]!==undefined?l[blogActiveMetric]:null})).filter(p=>p.val!==null);
+    const field=BLOG_FIELDS.find(f=>f.id===blogActiveMetric);
+    const goodDown=BLOG_GOOD_DOWN.has(blogActiveMetric);
+
+    let svgContent='';
+    if(series.length>=2){
+      const W=Math.min(440,series.length*52+40);
+      const H=140;
+      const PAD={t:16,b:28,l:36,r:12};
+      const cw=W-PAD.l-PAD.r,ch=H-PAD.t-PAD.b;
+      const vals=series.map(p=>p.val);
+      const minV=Math.min(...vals),maxV=Math.max(...vals);
+      const range=maxV-minV||1;
+      const xStep=cw/(series.length-1);
+      const toX=(i)=>PAD.l+i*xStep;
+      const toY=(v)=>PAD.t+ch*(1-(v-minV)/range);
+
+      // 折線
+      const pts=series.map((p,i)=>`${toX(i).toFixed(1)},${toY(p.val).toFixed(1)}`).join(' ');
+      // 趨勢色：首尾比較
+      const trendGood=goodDown?(series[series.length-1].val<=series[0].val):(series[series.length-1].val>=series[0].val);
+      const lineColor=trendGood?'#16a34a':'#dc2626';
+
+      // Y 軸刻度（3條）
+      let yLines='';
+      for(let i=0;i<=2;i++){
+        const v=minV+range*i/2;
+        const y=toY(v);
+        yLines+=`<line x1="${PAD.l}" y1="${y.toFixed(1)}" x2="${W-PAD.r}" y2="${y.toFixed(1)}" stroke="#f3f4f6" stroke-width="1"/>`;
+        yLines+=`<text x="${PAD.l-4}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="9" fill="#9ca3af">${v%1===0?v:v.toFixed(1)}</text>`;
+      }
+
+      // X 軸日期標籤（最多顯示 6 個）
+      let xLabels='';
+      const step=Math.max(1,Math.floor(series.length/6));
+      series.forEach((p,i)=>{
+        if(i%step===0||i===series.length-1){
+          const d=new Date(p.date+'T00:00:00');
+          const lbl=`${d.getMonth()+1}/${d.getDate()}`;
+          xLabels+=`<text x="${toX(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" fill="#9ca3af">${lbl}</text>`;
+        }
+      });
+
+      // 資料點
+      let dots='';
+      series.forEach((p,i)=>{
+        dots+=`<circle cx="${toX(i).toFixed(1)}" cy="${toY(p.val).toFixed(1)}" r="3.5" fill="${lineColor}" stroke="white" stroke-width="1.5"/>`;
+      });
+
+      // 最新值標籤
+      const last=series[series.length-1];
+      const lastX=toX(series.length-1),lastY=toY(last.val);
+      const labelY=lastY<PAD.t+20?lastY+16:lastY-8;
+      dots+=`<text x="${lastX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="${lineColor}">${last.val}${field.unit}</text>`;
+
+      svgContent=`<svg class="blog-chart-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+        ${yLines}
+        <polyline points="${pts}" fill="none" stroke="${lineColor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        ${dots}
+        ${xLabels}
+      </svg>`;
+    }
+
+    chartHtml=`<div class="blog-chart-card">
+      <div class="blog-chart-title">${field.label} 趨勢${field.unit?' ('+field.unit+')':''}</div>
+      <div class="blog-metric-tabs">${metricTabs}</div>
+      <div class="blog-chart-wrap">${svgContent||'<div style="font-size:13px;color:var(--gray-500);padding:16px 0">此指標尚無足夠資料繪製圖表</div>'}</div>
+    </div>`;
+  } else if(logs.length===1){
+    chartHtml=`<div class="blog-chart-card" style="text-align:center;padding:20px">
+      <div style="font-size:22px;margin-bottom:6px">📊</div>
+      <div style="font-size:var(--font-sm);color:var(--gray-500)">再新增一筆紀錄即可查看趨勢圖</div>
+    </div>`;
+  }
+
+  // ── 紀錄列表 ───────────────────────────────────────────
+  let listHtml='';
+  if(logs.length===0){
+    listHtml=`<div style="text-align:center;padding:24px 0;color:var(--gray-500);font-size:var(--font-sm)">📋 尚未有任何紀錄<br/><span style="font-size:12px;margin-top:6px;display:block">填入數值後按「儲存紀錄」新增</span></div>`;
+  } else {
+    // 倒序：最新在上
+    [...logs].reverse().forEach((log,i)=>{
+      const realIdx=logs.length-1-i; // 原陣列索引
+      const d=new Date(log.date+'T00:00:00');
+      const dayLabel=start?`計畫第 ${daysBetween(start,log.date)+1} 天`:'';
+      const vals=BLOG_FIELDS.filter(f=>log[f.id]!==undefined)
+        .map(f=>`<span class="blog-log-val"><span class="blog-log-val-label">${f.label}</span><span class="blog-log-val-num">${log[f.id]}${f.unit}</span></span>`).join('');
+      listHtml+=`<div class="blog-log-card">
+        <div class="blog-log-header">
+          <div class="blog-log-date">${log.date.replace(/-/g,'/')}</div>
+          <div class="blog-log-day">${dayLabel}</div>
+          <button class="blog-log-del" onclick="deleteBodyLog(${realIdx})">刪除</button>
+        </div>
+        <div class="blog-log-vals">${vals||'<span style="font-size:12px;color:var(--gray-500)">無數值</span>'}</div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('blog-body').innerHTML=addHtml+chartHtml+
+    (logs.length>0?`<div style="font-size:var(--font-sm);font-weight:700;color:#111827;margin-bottom:8px">歷史紀錄（${logs.length} 筆）</div>`:'')+listHtml;
+}
+
+function saveBodyLog(){
+  const date=document.getElementById('blog-date').value;
+  if(!date){alert('請選擇量測日期');return;}
+  const entry={date};
+  let hasVal=false;
+  BLOG_FIELDS.forEach(f=>{
+    const el=document.getElementById('blog-input-'+f.id);
+    if(el&&el.value!==''){entry[f.id]=parseFloat(el.value);hasVal=true;}
+  });
+  if(!hasVal){alert('請至少填入一項數值');return;}
+  const logs=state.bodyLogs||[];
+  // 同日期更新（合併）
+  const existIdx=logs.findIndex(l=>l.date===date);
+  if(existIdx>=0){
+    Object.assign(logs[existIdx],entry);
+  } else {
+    logs.push(entry);
+  }
+  state.bodyLogs=logs;
+  saveState();
+  // 清空輸入
+  BLOG_FIELDS.forEach(f=>{const el=document.getElementById('blog-input-'+f.id);if(el)el.value='';});
+  renderBodyLog();
+}
+
+function deleteBodyLog(idx){
+  if(!confirm('確定刪除這筆紀錄？'))return;
+  const logs=state.bodyLogs||[];
+  logs.splice(idx,1);
+  state.bodyLogs=logs;
+  saveState();
+  renderBodyLog();
+}
+
+function setBlogMetric(metric){
+  blogActiveMetric=metric;
+  renderBodyLog();
+}
+function showHistory(){renderHistory();showScreen('screen-history','nav-history');}
+
+function renderHistory(){
+  const plans=_loadPlans();
+  const currentId=_getCurrentId();
+  // 倒序：最新在上
+  const sorted=[...plans].sort((a,b)=>b.id-a.id);
+
+  if(sorted.length<=1&&sorted[0]?.id===currentId){
+    document.getElementById('history-body').innerHTML=
+      '<div class="history-empty">📭 尚無歷史計畫<br/><span style="font-size:12px;margin-top:6px;display:block">完成第一輪計畫後，封存紀錄將出現在這裡</span></div>';
+    return;
+  }
+
+  let html='';
+  sorted.forEach((plan,i)=>{
+    const isCurrent=plan.id===currentId;
+    if(isCurrent)return; // 進行中計畫不列入歷史
+    const s=plan.state||{};
+    const start=s.startDate,end=start?addDays(start,44):null;
+    const dateRange=start&&end?`${start.replace(/-/g,'/')} – ${end.replace(/-/g,'/')}`:'—';
+    const planNo=plan.id;
+
+    // 計算完成率
+    let td=0,tp=0;
+    if(start){
+      for(let d=0;d<45;d++){
+        const schedule=buildSchedule(d,s.doses||{},s.useSlim,s.useProbio);
+        schedule.forEach((_,bi)=>{if((s.checks||{})[`day${d}b${bi}`])td++;tp++;});
+      }
+    }
+    const pct=tp>0?Math.round(td/tp*100):0;
+    const pctColor=pct>=75?'var(--green)':pct>=50?'var(--yellow)':'var(--red)';
+
+    const cardId=`hplan-${plan.id}`;
+    html+=`<div class="history-plan-card">
+      <div class="history-plan-header" onclick="toggleHistoryCard('${cardId}')">
+        <div class="history-plan-badge">🗂️</div>
+        <div class="history-plan-info">
+          <div class="history-plan-title">第 ${planNo} 次計畫</div>
+          <div class="history-plan-date">${dateRange}</div>
+        </div>
+        <div class="history-plan-pct" style="color:${pctColor}">${pct}%</div>
+        <div class="history-plan-chevron" id="${cardId}-chev">▼</div>
+      </div>
+      <div class="history-plan-body" id="${cardId}">
+        <div class="history-tab-row">
+          <button class="history-tab-btn active" onclick="switchHistoryTab('${cardId}','report',this)">📊 完成報告</button>
+          <button class="history-tab-btn" onclick="switchHistoryTab('${cardId}','checkin',this)">✅ 打卡紀錄</button>
+        </div>
+        <div class="history-panel active" id="${cardId}-report">${renderHistoryReport(plan,td,tp,pct)}</div>
+        <div class="history-panel" id="${cardId}-checkin">${renderHistoryCheckin(plan)}</div>
+      </div>
+    </div>`;
+  });
+
+  if(!html) html='<div class="history-empty">📭 尚無已封存的計畫</div>';
+  document.getElementById('history-body').innerHTML=html;
+}
+
+function toggleHistoryCard(cardId){
+  const body=document.getElementById(cardId);
+  const chev=document.getElementById(cardId+'-chev');
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chev.style.transform=isOpen?'':'rotate(180deg)';
+}
+
+function switchHistoryTab(cardId,tab,btn){
+  ['report','checkin'].forEach(t=>{
+    document.getElementById(cardId+'-'+t)?.classList.toggle('active',t===tab);
+  });
+  btn.closest('.history-tab-row').querySelectorAll('.history-tab-btn')
+    .forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function renderHistoryReport(plan,td,tp,pct){
+  const s=plan.state||{},rd=plan.reportData||{};
+  const body=rd.body||{},exam=rd.exam||{};
+  const start=s.startDate,end=start?addDays(start,44):null;
+  const fmtDate=iso=>iso?iso.replace(/-/g,'/'):null;
+  const preDateStr=fmtDate(s.pretestDate);
+  const postDateStr=fmtDate(s.posttestDate);
+  const gender=body.gender||'';
+
+  // 完成率統計卡
+  let html=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <div style="background:var(--purple-light);border-radius:12px;padding:12px;text-align:center">
+      <div style="font-size:11px;color:var(--purple-dark);margin-bottom:4px">整體完成率</div>
+      <div style="font-size:28px;font-weight:900;color:var(--purple-dark)">${pct}<span style="font-size:13px;font-weight:500">%</span></div>
+    </div>
+    <div style="background:var(--purple-light);border-radius:12px;padding:12px;text-align:center">
+      <div style="font-size:11px;color:var(--purple-dark);margin-bottom:4px">完成時間點</div>
+      <div style="font-size:28px;font-weight:900;color:var(--purple-dark)">${td}<span style="font-size:13px;font-weight:500;color:var(--purple-mid)">/${tp}</span></div>
+    </div>
+  </div>`;
+
+  // 體組成對比
+  const BODY_GOOD_DOWN=new Set(['weight','bodyfat','visceral','waist','bmi','bodyage']);
+  const hasBodyData=BODY_FIELDS.some(f=>body[f.id+'_pre']!==undefined||body[f.id+'_post']!==undefined);
+  if(hasBodyData){
+    const preHead=`前測${preDateStr?'<div style="font-size:10px;font-weight:500;margin-top:1px;opacity:.85">'+preDateStr+'</div>':''}`;
+    const postHead=`後測${postDateStr?'<div style="font-size:10px;font-weight:500;margin-top:1px;opacity:.85">'+postDateStr+'</div>':''}`;
+    const hdr=`<div style="display:grid;grid-template-columns:1fr 80px 52px 80px;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #ede9fe;font-size:11px;font-weight:700">
+      <div style="color:#6b7280">項目</div>
+      <div style="text-align:center;color:#7c3aed">${preHead}</div>
+      <div style="text-align:center;color:#6b7280">差異</div>
+      <div style="text-align:center;color:#16a34a">${postHead}</div>
+    </div>`;
+    let rows='';
+    BODY_FIELDS.forEach(f=>{
+      const pre=body[f.id+'_pre']!==undefined?body[f.id+'_pre']:null;
+      const post=body[f.id+'_post']!==undefined?body[f.id+'_post']:null;
+      if(pre===null&&post===null)return;
+      const diff=pre!==null&&post!==null?Math.round((post-pre)*10)/10:null;
+      const isGoodDown=BODY_GOOD_DOWN.has(f.id);
+      let diffColor='#9ca3af',diffText='—';
+      if(diff!==null&&diff!==0){const isGood=isGoodDown?(diff<0):(diff>0);diffColor=isGood?'#16a34a':'#dc2626';diffText=diff<0?`▼ ${Math.abs(diff)}`:`▲ ${Math.abs(diff)}`;}
+      const postColor=diff!==null&&diff!==0?(isGoodDown?(diff<0?'#16a34a':'#dc2626'):(diff>0?'#16a34a':'#dc2626')):'#111827';
+      rows+=`<div style="display:grid;grid-template-columns:1fr 80px 52px 80px;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6">
+        <div><div style="font-size:13px;font-weight:600;color:#111827">${f.label}</div><div style="font-size:10px;color:#9ca3af">${f.unit}</div></div>
+        <div style="text-align:center;font-size:13px;font-weight:700;color:#111827">${pre!==null?pre:'—'}</div>
+        <div style="text-align:center;font-size:12px;font-weight:900;color:${diffColor}">${diffText}</div>
+        <div style="text-align:center;font-size:13px;font-weight:700;color:${post!==null?postColor:'#9ca3af'}">${post!==null?post:'—'}</div>
+      </div>`;
+    });
+    html+=`<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:10px">體組成對比</div>${hdr}${rows}</div>`;
+  }
+
+  // 體檢結果對比
+  const EXAM_GOOD_UP=new Set(['hdl','egfr']);
+  const examGroups=[
+    {label:'🩸 血糖代謝',color:'#dc2626',ids:['acglu','hba1c']},
+    {label:'🫀 心血管',color:'#2563eb',ids:['tc','tg','hdl','ldl']},
+    {label:'🫘 腎臟肝臟',color:'#7c3aed',ids:['got','gpt','egfr','ua']},
+  ];
+  let examRows='';let hasExam=false;
+  examGroups.forEach(grp=>{
+    let grpHtml='';
+    grp.ids.forEach(id=>{
+      const item=EXAM_ITEMS.find(x=>x.id===id);
+      const pre=exam[id+'_pre']!==undefined?exam[id+'_pre']:null;
+      const post=exam[id+'_post']!==undefined?exam[id+'_post']:null;
+      if(pre===null&&post===null)return;
+      hasExam=true;
+      const preLevel=pre!==null?item.check(pre,gender):null;
+      const postLevel=post!==null?item.check(post,gender):null;
+      const diff=pre!==null&&post!==null?Math.round((post-pre)*10)/10:null;
+      const isGoodUp=EXAM_GOOD_UP.has(id);
+      let diffColor='#9ca3af',diffText='—';
+      if(diff!==null&&diff!==0){const isGood=isGoodUp?(diff>0):(diff<0);diffColor=isGood?'#16a34a':'#dc2626';diffText=diff<0?`▼ ${Math.abs(diff)}`:`▲ ${Math.abs(diff)}`;}
+      const postValColor=postLevel==='normal'?'#16a34a':postLevel==='warn'?'#d97706':'#dc2626';
+      grpHtml+=`<div style="display:grid;grid-template-columns:1fr 80px 52px 80px;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6">
+        <div><div class="exam-name">${item.label}</div><div class="exam-range">${item.unit}　${item.range}</div></div>
+        <div class="exam-val">${pre!==null?`<div class="exam-val-num" style="color:#111827">${pre}</div><span class="exam-badge ${BADGE_CLASS[preLevel]}">${BADGE_TEXT[preLevel]}</span>`:'<div style="color:#9ca3af;font-size:12px">—</div>'}</div>
+        <div style="text-align:center;font-size:12px;font-weight:900;color:${diffColor}">${diffText}</div>
+        <div class="exam-val">${post!==null?`<div class="exam-val-num" style="color:${postValColor}">${post}</div><span class="exam-badge ${BADGE_CLASS[postLevel]}">${BADGE_TEXT[postLevel]}</span>`:'<div style="color:#9ca3af;font-size:12px">—</div>'}</div>
+      </div>`;
+    });
+    if(grpHtml) examRows+=`<div class="exam-group-label" style="color:${grp.color}">${grp.label}</div>${grpHtml}`;
+  });
+
+  if(hasExam){
+    const preHead=`前測${preDateStr?'<div style="font-size:10px;font-weight:500;margin-top:1px;opacity:.85">'+preDateStr+'</div>':''}`;
+    const postHead=`後測${postDateStr?'<div style="font-size:10px;font-weight:500;margin-top:1px;opacity:.85">'+postDateStr+'</div>':''}`;
+    const hdr=`<div style="display:grid;grid-template-columns:1fr 80px 52px 80px;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #ede9fe;font-size:11px;font-weight:700">
+      <div style="color:#6b7280">項目</div>
+      <div style="text-align:center;color:#7c3aed">${preHead}</div>
+      <div style="text-align:center;color:#6b7280">差異</div>
+      <div style="text-align:center;color:#16a34a">${postHead}</div>
+    </div>`;
+    html+=`<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:10px">體檢結果對比</div>${hdr}${examRows}<div style="margin-top:8px;font-size:11px;color:#9ca3af;line-height:1.6">⚠️ 以上為一般健管參考值，實際結果請以醫師診斷為準。</div></div>`;
+  }
+
+  if(!hasBodyData&&!hasExam){
+    html+=`<div class="history-empty" style="padding:16px 0">📋 此計畫尚未填寫前後測數據</div>`;
+  }
+  return html;
+}
+
+function renderHistoryCheckin(plan){
+  const s=plan.state||{};
+  const start=s.startDate;
+  if(!start) return '<div class="history-empty">無打卡資料</div>';
+
+  // 5週 × 9天格子（45天）
+  let html='<div style="margin-bottom:8px;font-size:11px;color:var(--gray-500)">每列為一週，顏色代表當日完成率</div>';
+  html+='<div class="history-day-grid">';
+  for(let i=0;i<45;i++){
+    const schedule=buildSchedule(i,s.doses||{},s.useSlim,s.useProbio);
+    let done=0,total=schedule.length;
+    schedule.forEach((_,bi)=>{if((s.checks||{})[`day${i}b${bi}`])done++;});
+    const pct=total>0?Math.round(done/total*100):0;
+    const bg=done===0?'#f3f4f6':pct>=100?'#16a34a':pct>=50?'#86efac':'#bbf7d0';
+    const color=done===0?'#d1d5db':pct>=100?'white':'#166534';
+    const type=TYPE_INFO[DAY_TYPES[i]];
+    html+=`<div class="history-day-cell" style="background:${bg};color:${color}" title="第${i+1}天 ${type.label} ${done}/${total}">${i+1}</div>`;
+  }
+  html+='</div>';
+
+  // 圖例
+  html+=`<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px;color:var(--gray-500)">
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;vertical-align:middle;margin-right:3px"></span>全完成</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#86efac;vertical-align:middle;margin-right:3px"></span>部分</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f3f4f6;vertical-align:middle;margin-right:3px"></span>未打卡</span>
+  </div>`;
+
+  // 每週完成率長條
+  html+='<div style="margin-top:14px">';
+  for(let w=0;w<7;w++){
+    let wd=0,wt=0;
+    for(let d=0;d<7;d++){
+      const i=w*7+d;if(i>=45)break;
+      const schedule=buildSchedule(i,s.doses||{},s.useSlim,s.useProbio);
+      schedule.forEach((_,bi)=>{if((s.checks||{})[`day${i}b${bi}`])wd++;wt++;});
+    }
+    if(wt===0)continue;
+    const wp=Math.round(wd/wt*100);
+    html+=`<div class="r-bar-row"><div class="r-bar-label">第${w+1}週</div><div class="r-bar-track"><div class="r-bar-fill" style="width:${wp}%"></div></div><div class="r-bar-val">${wp}%</div></div>`;
+  }
+  html+='</div>';
+  return html;
+}
 function init(){
   loadState();
   if(state.startDate){
