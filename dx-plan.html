@@ -134,6 +134,21 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .days-ok{background:var(--green-bg);color:var(--green)}
 .days-low{background:var(--yellow-bg);color:var(--yellow)}
 .days-out{background:var(--red-bg);color:var(--red)}
+.supply-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:var(--font-xs);font-weight:700;white-space:nowrap}
+.supply-badge-ok{background:var(--green-bg);color:#14532d}
+.supply-badge-warn{background:var(--yellow-bg);color:#78350f}
+.supply-badge-danger{background:var(--red-bg);color:#7f1d1d}
+.supply-badge-out{background:var(--red-bg);color:#7f1d1d}
+.supply-badge-empty{background:var(--gray-100);color:var(--gray-500)}
+.supply-val-ok{color:var(--green)}
+.supply-val-warn{color:var(--yellow)}
+.supply-val-danger{color:var(--red)}
+.supply-modal-row{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--gray-100);gap:8px;font-size:var(--font-sm)}
+.supply-modal-row:last-child{border-bottom:none}
+.supply-modal-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.supply-modal-name{flex:1;color:#374151}
+.supply-modal-qty{color:var(--gray-500);font-size:var(--font-xs);white-space:nowrap}
+.supply-modal-price{font-weight:700;color:var(--purple-dark);white-space:nowrap;font-size:var(--font-sm)}
 .add-stock-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
 .add-stock-btn{background:var(--purple);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap}
 .add-note-input{flex:1;min-width:80px;border:1.5px solid var(--purple-light);border-radius:8px;padding:6px 8px;font-size:var(--font-sm);outline:none;font-family:'Noto Sans TC',sans-serif}
@@ -674,7 +689,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 </div>
 
 <script>
-let state={startDate:null,pretestDate:null,posttestDate:null,doses:{},useSlim:true,useProbio:true,checks:{},amounts:{},checkedAmounts:{},stockLogs:{},optionalItems:{dx_box:false,shaker:false}};
+let state={startDate:null,pretestDate:null,posttestDate:null,doses:{},useSlim:true,useProbio:true,checks:{},amounts:{},stockLogs:{},optionalItems:{dx_box:false,shaker:false}};
 const STORAGE_KEY='dx_plan';
 function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
 function loadState(){
@@ -700,7 +715,7 @@ const PRODUCTS=[
   {id:'bvit',name:'B群',formal:'雙效B群能量錠',icon:'🔵',price:990,pkgQty:120,unit:'錠',pkgUnit:'罐',optional:false,recFn:(d,dm)=>45*4*(dm.b||1),dailyFn:(t,dm)=>4*(dm.b||1)},
   {id:'calcium',name:'鈣鎂',formal:'加美D鈣片',icon:'🟡',price:660,pkgQty:180,unit:'錠',pkgUnit:'罐',optional:false,recFn:(d,dm)=>45*4*(dm.ca||1),dailyFn:(t,dm)=>4*(dm.ca||1)},
   {id:'vitc',name:'維生素C',formal:'強效C營養片',icon:'🟠',price:925,pkgQty:60,unit:'錠',pkgUnit:'罐',optional:false,recFn:(d,dm)=>45*4*(dm.c||1),dailyFn:(t,dm)=>4*(dm.c||1)},
-  {id:'probio',name:'活悅益生菌',formal:'活悅益生菌膠囊',icon:'🦠',price:1820,pkgQty:30,unit:'粒',pkgUnit:'盒',optional:'probio',recFn:(d,dm)=>3*9,dailyFn:(t,dm)=>t==='probio'?9:0},
+  {id:'probio',name:'活悅益生菌',formal:'活悅益生菌膠囊',icon:'🦠',price:1820,pkgQty:30,unit:'粒',pkgUnit:'盒',optional:'probio',recFn:(d,dm)=>3*9+42*1,dailyFn:(t,dm)=>t==='probio'?9:1},
   {id:'slim',name:'瘦瘦菌',formal:'易孅菌膠囊',icon:'⭐',price:1820,pkgQty:60,unit:'粒',pkgUnit:'盒',optional:'slim',recFn:(d,dm)=>45*2,dailyFn:(t,dm)=>2},
   {id:'dx_box',name:'DOUBLE X 盒子',formal:'DOUBLE X 盒子（選購）',icon:'📦',price:100,pkgQty:1,unit:'個',pkgUnit:'個',optional:'dx_box',recFn:(d,dm)=>1,dailyFn:(t,dm)=>0},
   {id:'shaker',name:'搖搖杯',formal:'搖搖杯（選購）',icon:'🥤',price:160,pkgQty:1,unit:'個',pkgUnit:'個',optional:'shaker',recFn:(d,dm)=>1,dailyFn:(t,dm)=>0},
@@ -918,43 +933,7 @@ function expandBlock(el){const body=el.nextElementSibling;const isOpen=body.styl
 function toggleBlock(dayIdx,bi){
   const bKey=`day${dayIdx}b${bi}`;
   if(!state.checks)state.checks={};
-  const wasChecked=!!state.checks[bKey];
-  state.checks[bKey]=!wasChecked;
-  const schedule=buildSchedule(dayIdx,state.doses||{},state.useSlim,state.useProbio);
-  const block=schedule[bi];
-  if(!block){saveState();renderChecklist(dayIdx);return;}
-  if(!wasChecked){
-    if(!state.checkedAmounts)state.checkedAmounts={};
-    block.items.forEach((item,ii)=>{
-      if(item.productId&&item.unit!==''){
-        const aKey=`day${dayIdx}b${bi}i${ii}`;
-        const used=parseFloat((state.amounts||{})[aKey]||item.defaultVal||0);
-        if(!isNaN(used)&&used>0){
-          state.checkedAmounts[aKey]=used;
-          if(!state.stockLogs)state.stockLogs={};
-          if(!state.stockLogs[item.productId])state.stockLogs[item.productId]=[];
-          const logs=state.stockLogs[item.productId];
-          if(logs.length>0){let rem=used;for(let i=logs.length-1;i>=0&&rem>0;i--){const deduct=Math.min(logs[i].units,rem);logs[i].units-=deduct;rem-=deduct;}}
-        }
-      }
-    });
-  } else {
-    if(state.checkedAmounts){
-      block.items.forEach((item,ii)=>{
-        if(item.productId&&item.unit!==''){
-          const aKey=`day${dayIdx}b${bi}i${ii}`;
-          const used=state.checkedAmounts[aKey]||0;
-          if(used>0){
-            if(!state.stockLogs)state.stockLogs={};
-            if(!state.stockLogs[item.productId])state.stockLogs[item.productId]=[];
-            const logs=state.stockLogs[item.productId];
-            if(logs.length>0){logs[logs.length-1].units+=used;}
-            delete state.checkedAmounts[aKey];
-          }
-        }
-      });
-    }
-  }
+  state.checks[bKey]=!state.checks[bKey];
   saveState();renderChecklist(dayIdx);
 }
 
@@ -991,7 +970,26 @@ function renderStats(){
 }
 
 function getVisibleProducts(){return PRODUCTS.filter(p=>{if(p.optional===false)return true;if(p.optional==='slim')return state.useSlim;if(p.optional==='probio')return state.useProbio;return true;});}
-function getTotalStockUnits(pid){return((state.stockLogs||{})[pid]||[]).reduce((s,l)=>s+l.units,0);}
+function calcTotalUsed(pid){
+  let total=0;
+  for(let i=0;i<45;i++){
+    const schedule=buildSchedule(i,state.doses||{},state.useSlim,state.useProbio);
+    schedule.forEach((block,bi)=>{
+      if((state.checks||{})[`day${i}b${bi}`]){
+        block.items.forEach((item,ii)=>{
+          if(item.productId===pid&&item.unit!==''){
+            const aKey=`day${i}b${bi}i${ii}`;
+            const used=parseFloat((state.amounts||{})[aKey]??item.defaultVal??0);
+            if(!isNaN(used))total+=used;
+          }
+        });
+      }
+    });
+  }
+  return Math.round(total*10)/10;
+}
+function getTotalStockIn(pid){return((state.stockLogs||{})[pid]||[]).reduce((s,l)=>s+(l.units||0),0);}
+function getTotalStockUnits(pid){return Math.max(0,Math.round((getTotalStockIn(pid)-calcTotalUsed(pid))*10)/10);}
 
 function calcDynamicNeed(product){
   const dm=state.doses||{};
@@ -1002,7 +1000,7 @@ function calcDynamicNeed(product){
       const bKey=`day${i}b${bi}`,isChecked=!!(state.checks||{})[bKey];
       block.items.forEach((item,ii)=>{
         if(item.productId===product.id&&item.unit!==''){
-          if(isChecked){const aKey=`day${i}b${bi}i${ii}`;const used=parseFloat((state.checkedAmounts||{})[aKey]||(state.amounts||{})[aKey]||item.defaultVal||0);if(!isNaN(used))total+=used;}
+          if(isChecked){const aKey=`day${i}b${bi}i${ii}`;const used=parseFloat((state.amounts||{})[aKey]??item.defaultVal??0);if(!isNaN(used))total+=used;}
           else{total+=parseFloat(item.defaultVal||0);}
         }
       });
@@ -1011,30 +1009,204 @@ function calcDynamicNeed(product){
   return Math.round(total*10)/10;
 }
 
-function calcDaysLeft(product){const units=getTotalStockUnits(product.id);if(units<=0)return 0;const dm=state.doses||{};let t=0;DAY_TYPES.forEach(type=>{t+=product.dailyFn(type,dm);});const avg=t/45;if(avg<=0)return null;return Math.floor(units/avg);}
+function calcDaysLeft(product){
+  let remaining=getTotalStockUnits(product.id);
+  if(remaining<=0)return 0;
+  const today=todayISO(),dm=state.doses||{};
+  const startIdx=state.startDate?Math.max(0,daysBetween(state.startDate,today)):0;
+  for(let i=startIdx;i<45;i++){
+    const daily=product.dailyFn(DAY_TYPES[i],dm);
+    remaining-=daily;
+    if(remaining<0)return i-startIdx;
+  }
+  return null;
+}
 function calcRecPkgs(product){const dm=state.doses||{};return Math.ceil(product.recFn(product,dm)/product.pkgQty);}
 
-function renderSupply(){
+function getStockBadge(totalUnits,daysLeft,p){
+  const stockIn=getTotalStockIn(p.id);
+  if(stockIn===0)return{cls:'supply-badge-empty',text:'未填庫存',priority:3};
+  if(totalUnits<=0)return{cls:'supply-badge-out',text:'庫存不足',priority:0};
+  if(daysLeft===null)return{cls:'supply-badge-ok',text:'充足',priority:2};
+  if(daysLeft<=3)return{cls:'supply-badge-danger',text:`剩 ${daysLeft} 天`,priority:0};
+  if(daysLeft<=7)return{cls:'supply-badge-warn',text:`剩 ${daysLeft} 天`,priority:1};
+  return{cls:'supply-badge-ok',text:`剩 ${daysLeft} 天`,priority:2};
+}
+function renderSupply(filterMode){
+  filterMode=filterMode||'all';
   const dm=state.doses||{},opt=state.optionalItems||{},visible=getVisibleProducts();
   let totalCost=0;
-  visible.forEach(p=>{if(p.optional==='dx_box'){if(opt.dx_box)totalCost+=p.price;return;}if(p.optional==='shaker'){if(opt.shaker)totalCost+=p.price;return;}totalCost+=p.price*calcRecPkgs(p);});
-  const missed=getMissedPastDays();
-  let warnHtml=missed.length>0?`<div class="supply-warning">⚠️ 第 ${missed.slice(0,5).join('、')}${missed.length>5?'…等':''}天有未完成的打卡，庫存計算可能不準確。<br/>請返回日曆補完打卡以確保庫存準確。</div>`:'';
-  let html=warnHtml+`<div class="supply-total-card"><div class="supply-total-label">45天建議採購總費用</div><div class="supply-total-num">NT$ ${totalCost.toLocaleString()}</div><div class="supply-total-sub">依個人設定劑量計算</div></div><div class="section-title" style="padding:0 4px">產品明細與庫存</div>`;
   visible.forEach(p=>{
-    const logs=(state.stockLogs||{})[p.id]||[],totalUnits=getTotalStockUnits(p.id),daysLeft=calcDaysLeft(p),recPkgs=calcRecPkgs(p),needUnits=calcDynamicNeed(p);
-    let daysBadge='';
-    if(totalUnits>0&&daysLeft!==null){if(daysLeft>=7)daysBadge=`<span class="days-badge days-ok">約剩 ${daysLeft} 天</span>`;else if(daysLeft>3)daysBadge=`<span class="days-badge days-low">剩 ${daysLeft} 天</span>`;else daysBadge=`<span class="days-badge days-out">僅剩 ${daysLeft} 天</span>`;}
-    const isToggle=p.optional==='dx_box'||p.optional==='shaker',isChecked=(opt[p.id]||false);
-    html+=`<div class="supply-item"><div class="supply-item-header"><div style="display:flex;align-items:center;gap:8px;flex:1"><span style="font-size:22px">${p.icon}</span><div><div class="supply-item-name">${p.name}</div><div class="supply-item-formal">${p.formal}</div></div></div>${p.price?`<div class="supply-item-price">NT$${p.price.toLocaleString()}</div>`:''}</div><div class="supply-detail">`;
-    if(isToggle){html+=`<label class="optional-toggle"><input type="checkbox" ${isChecked?'checked':''} onchange="toggleOptional('${p.id}',this.checked)"/>加入採購清單</label>`;}
-    else{html+=`<div class="supply-row"><div class="supply-row-label">需求量</div><div class="supply-row-val">${needUnits} ${p.unit}</div></div><div class="supply-row"><div class="supply-row-label">建議採購</div><div class="supply-row-val">${recPkgs} ${p.pkgUnit}</div></div><div class="supply-row"><div class="supply-row-label">每${p.pkgUnit}容量</div><div class="supply-row-val">${p.pkgQty} ${p.unit}</div></div><div class="supply-stock-section"><div class="supply-stock-title">庫存紀錄 ${daysBadge}</div><div id="logs-${p.id}">${logs.map((l,i)=>`<div class="supply-stock-row"><span style="color:var(--gray-500);font-size:var(--font-sm);flex:1">${l.date}${l.note?' · '+l.note:''}</span><span style="font-weight:600">${l.pkgs} ${p.pkgUnit} = ${l.units} ${p.unit}</span><button onclick="removeLog('${p.id}',${i})" style="background:var(--red-bg);color:var(--red);border:none;border-radius:6px;padding:3px 10px;font-size:var(--font-sm);cursor:pointer;flex-shrink:0">刪</button></div>`).join('')}</div><div class="add-stock-row"><input id="add-pkgs-${p.id}" type="number" min="0.5" step="0.5" placeholder="${p.pkgUnit}數" class="supply-stock-input"/><input id="add-note-${p.id}" type="text" placeholder="備註(選填)" class="add-note-input"/><button class="add-stock-btn" onclick="addStockLog('${p.id}')">+ 新增</button></div><div style="font-size:var(--font-sm);color:var(--gray-500);margin-top:6px">目前庫存：${totalUnits} ${p.unit}</div></div>`;}
-    html+='</div></div>';
+    if(p.optional==='dx_box'){if(opt.dx_box)totalCost+=p.price;return;}
+    if(p.optional==='shaker'){if(opt.shaker)totalCost+=p.price;return;}
+    totalCost+=p.price*calcRecPkgs(p);
   });
-  document.getElementById('supply-body').innerHTML=html;
+
+  // 採購 Modal HTML
+  let modalRows='';
+  visible.forEach(p=>{
+    const isToggle=p.optional==='dx_box'||p.optional==='shaker';
+    if(isToggle){
+      const isChecked=opt[p.id]||false;
+      modalRows+=`<div class="supply-modal-row"><span class="supply-modal-icon">${p.icon}</span><span class="supply-modal-name">${p.name}</span><label style="display:flex;align-items:center;gap:6px;font-size:var(--font-sm);cursor:pointer;flex-shrink:0"><input type="checkbox" ${isChecked?'checked':''} onchange="toggleOptional('${p.id}',this.checked)" style="width:16px;height:16px;accent-color:var(--purple)"/>加入</label><span class="supply-modal-price">${isChecked?'NT$'+p.price.toLocaleString():'—'}</span></div>`;
+    } else {
+      const recPkgs=calcRecPkgs(p);
+      modalRows+=`<div class="supply-modal-row"><span class="supply-modal-icon">${p.icon}</span><span class="supply-modal-name">${p.name}</span><span class="supply-modal-qty">${recPkgs} ${p.pkgUnit}</span><span class="supply-modal-price">NT$${(p.price*recPkgs).toLocaleString()}</span></div>`;
+    }
+  });
+
+  // 計算警示產品
+  const lowProducts=visible.filter(p=>{
+    if(p.optional==='dx_box'||p.optional==='shaker')return false;
+    const dl=calcDaysLeft(p);
+    const stockIn=getTotalStockIn(p.id);
+    return stockIn===0||(dl!==null&&dl<=7);
+  });
+  const warnBanner=lowProducts.length>0
+    ?`<div class="supply-warning">⚠️ ${lowProducts.map(p=>p.name).join('、')} 庫存不足或偏低，建議儘快補貨</div>`:'';
+
+  // 篩選 Tab
+  const tabs=`<div style="display:flex;gap:6px;margin-bottom:4px">
+    <button onclick="renderSupply('all')" style="flex:1;padding:7px 0;border-radius:10px;border:1px solid ${filterMode==='all'?'transparent':'var(--gray-300)'};background:${filterMode==='all'?'var(--purple-light)':'white'};color:${filterMode==='all'?'var(--purple-dark)':'var(--gray-500)'};font-size:var(--font-sm);font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif">全部</button>
+    <button onclick="renderSupply('warn')" style="flex:1;padding:7px 0;border-radius:10px;border:1px solid ${filterMode==='warn'?'transparent':'var(--gray-300)'};background:${filterMode==='warn'?'var(--red-bg)':'white'};color:${filterMode==='warn'?'var(--red)':'var(--gray-500)'};font-size:var(--font-sm);font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif">需注意</button>
+    <button onclick="renderSupply('ok')" style="flex:1;padding:7px 0;border-radius:10px;border:1px solid ${filterMode==='ok'?'transparent':'var(--gray-300)'};background:${filterMode==='ok'?'var(--green-bg)':'white'};color:${filterMode==='ok'?'var(--green)':'var(--gray-500)'};font-size:var(--font-sm);font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif">充足</button>
+  </div>`;
+
+  // 產品卡片
+  // 先排序：priority 0(危險)→1(警告)→2(OK)→3(未填)
+  const sortedProducts=[...visible].sort((a,b)=>{
+    if(a.optional==='dx_box'||a.optional==='shaker')return 1;
+    if(b.optional==='dx_box'||b.optional==='shaker')return -1;
+    const ba=getStockBadge(getTotalStockUnits(a.id),calcDaysLeft(a),a);
+    const bb=getStockBadge(getTotalStockUnits(b.id),calcDaysLeft(b),b);
+    return ba.priority-bb.priority;
+  });
+
+  let cardsHtml='';
+  sortedProducts.forEach(p=>{
+    const isToggle=p.optional==='dx_box'||p.optional==='shaker';
+    const totalUnits=getTotalStockUnits(p.id);
+    const daysLeft=calcDaysLeft(p);
+    const badge=getStockBadge(totalUnits,daysLeft,p);
+
+    // 篩選
+    if(filterMode==='warn'&&badge.priority>1)return;
+    if(filterMode==='ok'&&badge.priority!==2)return;
+
+    const logs=(state.stockLogs||{})[p.id]||[];
+    const totalIn=getTotalStockIn(p.id);
+    const totalUsed=calcTotalUsed(p.id);
+    const recPkgs=calcRecPkgs(p);
+    const fullNeed=calcDynamicNeed(p);
+    const remainNeed=Math.max(0,Math.round((fullNeed-totalUsed)*10)/10);
+    const remainNeedPkgs=Math.ceil(remainNeed/p.pkgQty);
+    const needMoreUnits=Math.max(0,Math.round((remainNeed-totalUnits)*10)/10);
+    const needMorePkgs=Math.ceil(needMoreUnits/p.pkgQty);
+    const isChecked=opt[p.id]||false;
+
+    const detailId=`supply-detail-${p.id}`;
+    const chevId=`supply-chev-${p.id}`;
+
+    let detailHtml='';
+    if(isToggle){
+      detailHtml=`<div style="padding:12px 16px;border-top:1px solid var(--gray-100)">
+        <label class="optional-toggle"><input type="checkbox" ${isChecked?'checked':''} onchange="toggleOptional('${p.id}',this.checked)"/>加入採購清單</label>
+      </div>`;
+    } else {
+      const logRows=logs.map((l,i)=>`<div class="supply-stock-row">
+        <span style="color:var(--gray-500);font-size:var(--font-sm);flex:1">${l.date}${l.note?' · '+l.note:''}</span>
+        <span style="font-weight:600;font-size:var(--font-sm)">${l.pkgs} ${p.pkgUnit} = ${l.units} ${p.unit}</span>
+        <button onclick="removeLog('${p.id}',${i})" style="background:var(--red-bg);color:var(--red);border:none;border-radius:6px;padding:3px 10px;font-size:var(--font-sm);cursor:pointer;flex-shrink:0;font-family:'Noto Sans TC',sans-serif">刪</button>
+      </div>`).join('');
+
+      detailHtml=`<div style="padding:12px 16px;border-top:1px solid var(--gray-100);display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div class="supply-stock-title" style="margin-bottom:6px">需求概況</div>
+          <div class="supply-row"><div class="supply-row-label">全程預估</div><div class="supply-row-val">${fullNeed} ${p.unit}（${recPkgs} ${p.pkgUnit}）</div></div>
+          <div class="supply-row"><div class="supply-row-label">剩餘需求</div><div class="supply-row-val${remainNeedPkgs>0?' supply-val-warn':''}">${remainNeed} ${p.unit}（${remainNeedPkgs} ${p.pkgUnit}）</div></div>
+        </div>
+        <div>
+          <div class="supply-stock-title" style="margin-bottom:6px">庫存狀況</div>
+          <div class="supply-row"><div class="supply-row-label">補貨總量</div><div class="supply-row-val">${totalIn} ${p.unit}</div></div>
+          <div class="supply-row"><div class="supply-row-label">已消耗量</div><div class="supply-row-val">${totalUsed} ${p.unit}</div></div>
+          <div class="supply-row"><div class="supply-row-label">目前庫存</div><div class="supply-row-val${totalUnits<=0?' supply-val-danger':daysLeft!==null&&daysLeft<=7?' supply-val-warn':' supply-val-ok'}">${totalUnits} ${p.unit}${daysLeft!==null?' （剩 '+daysLeft+' 天）':daysLeft===null&&totalIn>0?' （計畫內充足）':''}</div></div>
+          ${needMoreUnits>0?`<div class="supply-row"><div class="supply-row-label">尚需補貨</div><div class="supply-row-val supply-val-warn">${needMoreUnits} ${p.unit}（${needMorePkgs} ${p.pkgUnit}）</div></div>`:''}
+        </div>
+        <div>
+          <div class="supply-stock-title" style="margin-bottom:6px">補貨紀錄</div>
+          <div id="logs-${p.id}">${logRows}</div>
+          <div class="add-stock-row" style="margin-top:8px">
+            <input id="add-date-${p.id}" type="date" value="${todayISO()}" style="width:140px;font-size:var(--font-sm);border:1px solid var(--gray-300);border-radius:8px;padding:6px 8px;font-family:'Noto Sans TC',sans-serif;overflow:hidden"/>
+            <input id="add-pkgs-${p.id}" type="number" min="0.5" step="0.5" placeholder="${p.pkgUnit}數" class="supply-stock-input"/>
+            <input id="add-note-${p.id}" type="text" placeholder="備註(選填)" class="add-note-input"/>
+            <button class="add-stock-btn" onclick="addStockLog('${p.id}')">+ 新增</button>
+          </div>
+          <div style="font-size:var(--font-xs);color:var(--gray-500);margin-top:6px;line-height:1.5">💡 可補填過去的購買日期，系統依打卡紀錄自動計算消耗量</div>
+        </div>
+      </div>`;
+    }
+
+    cardsHtml+=`<div class="supply-item" id="supply-card-${p.id}">
+      <div class="supply-item-header" onclick="toggleSupplyCard('${p.id}')" style="cursor:pointer">
+        <div style="display:flex;align-items:center;gap:8px;flex:1">
+          <span style="font-size:22px">${p.icon}</span>
+          <div>
+            <div class="supply-item-name">${p.name}</div>
+            ${!isToggle?`<div style="font-size:var(--font-xs);color:var(--gray-500);margin-top:1px">剩餘 ${totalUnits} ${p.unit}</div>`:''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="supply-badge ${badge.cls}">${badge.text}</span>
+          <span id="${chevId}" style="font-size:12px;color:var(--gray-500);transition:transform .2s">▼</span>
+        </div>
+      </div>
+      <div id="${detailId}" style="display:none">${detailHtml}</div>
+    </div>`;
+  });
+
+  document.getElementById('supply-body').innerHTML=`
+    <div class="supply-total-card" style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="supply-total-label">45 天採購總費用估算</div>
+        <div class="supply-total-num">NT$ ${totalCost.toLocaleString()}</div>
+        <div class="supply-total-sub">依個人設定劑量計算</div>
+      </div>
+      <button onclick="document.getElementById('supply-modal').style.display='flex'" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:white;border-radius:10px;padding:9px 14px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap">📋 採購清單</button>
+    </div>
+    ${warnBanner}
+    ${tabs}
+    ${cardsHtml}
+
+    <!-- 採購清單 Modal -->
+    <div id="supply-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:500;align-items:flex-start;justify-content:center;padding-top:60px;max-width:480px;left:50%;transform:translateX(-50%)">
+      <div style="background:white;border-radius:16px;width:88%;max-height:80vh;overflow-y:auto">
+        <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--gray-100)">
+          <span style="font-size:var(--font-md);font-weight:700;flex:1;color:#111827">📋 45 天採購清單</span>
+          <button onclick="document.getElementById('supply-modal').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-500);line-height:1">✕</button>
+        </div>
+        <div style="padding:12px 16px">
+          ${modalRows}
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;margin-top:6px;border-top:2px solid var(--gray-100)">
+            <span style="font-size:var(--font-sm);color:var(--gray-500)">合計（依個人劑量）</span>
+            <span style="font-size:var(--font-lg);font-weight:900;color:var(--purple-dark)">NT$ ${totalCost.toLocaleString()}</span>
+          </div>
+          <div style="font-size:var(--font-xs);color:var(--gray-500);margin-top:4px;line-height:1.5">※ 全程建議採購量，計畫開始前一次採購的參考用途</div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
-function addStockLog(pid){const pkgsEl=document.getElementById('add-pkgs-'+pid),noteEl=document.getElementById('add-note-'+pid),pkgs=parseFloat(pkgsEl.value);if(!pkgs||isNaN(pkgs)||pkgs<=0){alert('請填入罐/盒數');return;}const p=PRODUCTS.find(x=>x.id===pid),units=Math.round(pkgs*p.pkgQty*10)/10;if(!state.stockLogs)state.stockLogs={};if(!state.stockLogs[pid])state.stockLogs[pid]=[];state.stockLogs[pid].push({date:todayISO(),pkgs,units,note:noteEl.value||''});saveState();renderSupply();}
+function toggleSupplyCard(pid){
+  const detail=document.getElementById('supply-detail-'+pid);
+  const chev=document.getElementById('supply-chev-'+pid);
+  if(!detail)return;
+  const isOpen=detail.style.display!=='none';
+  detail.style.display=isOpen?'none':'block';
+  if(chev)chev.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';
+}
+
+function addStockLog(pid){const dateEl=document.getElementById('add-date-'+pid),pkgsEl=document.getElementById('add-pkgs-'+pid),noteEl=document.getElementById('add-note-'+pid),pkgs=parseFloat(pkgsEl.value);if(!pkgs||isNaN(pkgs)||pkgs<=0){alert('請填入罐/盒數');return;}const p=PRODUCTS.find(x=>x.id===pid),units=Math.round(pkgs*p.pkgQty*10)/10,date=dateEl&&dateEl.value?dateEl.value:todayISO();if(!state.stockLogs)state.stockLogs={};if(!state.stockLogs[pid])state.stockLogs[pid]=[];state.stockLogs[pid].push({date,pkgs,units,note:noteEl.value||''});saveState();renderSupply();}
 function removeLog(pid,idx){if(!state.stockLogs||!state.stockLogs[pid])return;state.stockLogs[pid].splice(idx,1);saveState();renderSupply();}
 function toggleOptional(id,val){if(!state.optionalItems)state.optionalItems={};state.optionalItems[id]=val;saveState();renderSupply();}
 function toggleMenu(el){const body=el.nextElementSibling,toggle=el.querySelector('.full-menu-toggle'),isOpen=body.classList.contains('open');body.classList.toggle('open');toggle.textContent=isOpen?'展開 ▼':'收合 ▲';}
