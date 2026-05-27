@@ -715,7 +715,8 @@ const PRODUCTS=[
   {id:'bvit',name:'B群',formal:'雙效B群能量錠',icon:'🔵',price:990,pkgQty:120,unit:'錠',pkgUnit:'罐',optional:false,recFn:(d,dm)=>45*4*(dm.b||1),dailyFn:(t,dm)=>4*(dm.b||1)},
   {id:'calcium',name:'鈣鎂',formal:'加美D鈣片',icon:'🟡',price:660,pkgQty:180,unit:'錠',pkgUnit:'罐',optional:false,recFn:(d,dm)=>45*4*(dm.ca||1),dailyFn:(t,dm)=>4*(dm.ca||1)},
   {id:'vitc',name:'維生素C',formal:'強效C營養片',icon:'🟠',price:925,pkgQty:60,unit:'錠',pkgUnit:'罐',optional:false,recFn:(d,dm)=>45*4*(dm.c||1),dailyFn:(t,dm)=>4*(dm.c||1)},
-  {id:'probio',name:'活悅益生菌',formal:'活悅益生菌膠囊',icon:'🦠',price:1820,pkgQty:30,unit:'粒',pkgUnit:'盒',optional:'probio',recFn:(d,dm)=>3*9+42*1,dailyFn:(t,dm)=>t==='probio'?9:1},
+  {id:'compound_probio',name:'強效複合益生菌',formal:'強效複合益生菌',icon:'🧫',price:1650,pkgQty:30,unit:'包',pkgUnit:'盒',optional:false,recFn:(d,dm)=>3*9,dailyFn:(t,dm)=>t==='probio'?9:0},
+  {id:'probio',name:'活悅益生菌',formal:'活悅益生菌膠囊',icon:'🦠',price:1820,pkgQty:30,unit:'粒',pkgUnit:'盒',optional:'probio',recFn:(d,dm)=>39,dailyFn:(t,dm)=>t==='fiber'||t==='protein'||t==='meta'?1:0},
   {id:'slim',name:'瘦瘦菌',formal:'易孅菌膠囊',icon:'⭐',price:1820,pkgQty:60,unit:'粒',pkgUnit:'盒',optional:'slim',recFn:(d,dm)=>45*2,dailyFn:(t,dm)=>2},
   {id:'dx_box',name:'DOUBLE X 盒子',formal:'DOUBLE X 盒子（選購）',icon:'📦',price:100,pkgQty:1,unit:'個',pkgUnit:'個',optional:'dx_box',recFn:(d,dm)=>1,dailyFn:(t,dm)=>0},
   {id:'shaker',name:'搖搖杯',formal:'搖搖杯（選購）',icon:'🥤',price:160,pkgQty:1,unit:'個',pkgUnit:'個',optional:'shaker',recFn:(d,dm)=>1,dailyFn:(t,dm)=>0},
@@ -734,7 +735,7 @@ function buildSchedule(dayIdx,doses,useSlim,useProbio){
   const snackItems=()=>[{icon:'🥛',text:'蛋白素',key:'protein',unit:'匙',defaultVal:ps,productId:'protein'},{icon:'🧬',text:'卵磷脂粉',key:'lecithin',unit:'匙',defaultVal:ls,productId:'lecithin'},{icon:'🔵',text:'B群',key:'b',unit:'錠',defaultVal:b,productId:'bvit'},{icon:'🟡',text:'鈣鎂',key:'ca',unit:'錠',defaultVal:ca,productId:'calcium'},{icon:'🟠',text:'維生素C',key:'c',unit:'錠',defaultVal:c,productId:'vitc'},{icon:'💧',text:'水',key:'water300',unit:'cc',defaultVal:300}];
   const slim=useSlim?[{icon:'⭐',text:'瘦瘦菌',key:'slim',unit:'粒',defaultVal:2,productId:'slim'}]:[];
   const activ=useProbio?[{icon:'🦠',text:'活悅益生菌',key:'activ',unit:'粒',defaultVal:1,productId:'probio'}]:[];
-  const probio3=useProbio?[{icon:'🦠',text:'活悅益生菌',key:'probio',unit:'粒',defaultVal:3,productId:'probio'}]:[];
+  const compound3=[{icon:'🧫',text:'強效複合益生菌',key:'compound',unit:'包',defaultVal:3,productId:'compound_probio'}];
   const fext=[...slim,...activ];
   const egg=[{icon:'🥚',text:'水煮蛋',key:'egg',unit:'顆',defaultVal:1}];
   const p2=[{icon:'🥩',text:'蛋白質食物',key:'prot',unit:'份',defaultVal:2}];
@@ -755,7 +756,7 @@ function buildSchedule(dayIdx,doses,useSlim,useProbio){
   const fr3=[{icon:'🍎',text:'水果',key:'fruit3',unit:'份',defaultVal:1}];
   const norm=[{icon:'🍳',text:'正常吃',key:'normal',unit:'',defaultVal:''}];
   if(type==='prep')return[FB('07:45',slim),{time:'08:00',title:'早餐',items:mainItems(norm)},{time:'10:00',title:'小餐',items:snackItems()},FB('11:45'),{time:'12:00',title:'午餐',items:mainItems(norm)},{time:'14:00',title:'小餐',items:snackItems()},{time:'16:00',title:'小餐',items:snackItems()},FB('17:45'),{time:'18:00',title:'晚餐',items:mainItems(norm)},{time:'20:00',title:'小餐',items:snackItems()}];
-  if(type==='probio')return[FB('07:45',[...slim,...probio3]),{time:'08:00',title:'早餐',items:mainItems(egg)},{time:'10:00',title:'小餐',items:snackItems()},FB('11:45',probio3),{time:'12:00',title:'午餐',items:mainItems(p2)},{time:'14:00',title:'小餐',items:snackItems()},{time:'16:00',title:'小餐',items:snackItems()},FB('17:45',probio3),{time:'18:00',title:'晚餐',items:mainItems(p2b)},{time:'20:00',title:'小餐',items:snackItems()}];
+  if(type==='probio')return[FB('07:45',[...slim,...compound3]),{time:'08:00',title:'早餐',items:mainItems(egg)},{time:'10:00',title:'小餐',items:snackItems()},FB('11:45',compound3),{time:'12:00',title:'午餐',items:mainItems(p2)},{time:'14:00',title:'小餐',items:snackItems()},{time:'16:00',title:'小餐',items:snackItems()},FB('17:45',compound3),{time:'18:00',title:'晚餐',items:mainItems(p2b)},{time:'20:00',title:'小餐',items:snackItems()}];
   if(type==='fiber')return[FB('07:45',fext),{time:'08:00',title:'早餐',items:mainItems([...egg,...fr])},{time:'10:00',title:'小餐',items:snackItems()},FB('11:45'),{time:'12:00',title:'午餐',items:mainItems([...p2,...veg,...coo,...fr2])},{time:'14:00',title:'小餐',items:snackItems()},{time:'16:00',title:'小餐',items:snackItems()},FB('17:45'),{time:'18:00',title:'晚餐',items:mainItems([...p2b,...veg2,...coo2,...fr3])},{time:'20:00',title:'小餐',items:snackItems()}];
   if(type==='protein')return[FB('07:45',fext),{time:'08:00',title:'早餐',items:mainItems(egg)},{time:'10:00',title:'小餐',items:snackItems()},FB('11:45'),{time:'12:00',title:'午餐',items:mainItems(p2)},{time:'14:00',title:'小餐',items:snackItems()},{time:'16:00',title:'小餐',items:snackItems()},FB('17:45'),{time:'18:00',title:'晚餐',items:mainItems(p2b)},{time:'20:00',title:'小餐',items:snackItems()}];
   return[FB('07:45',fext),{time:'08:00',title:'早餐',items:mainItems([...egg,...gr,...fr])},{time:'10:00',title:'小餐',items:snackItems()},FB('11:45'),{time:'12:00',title:'午餐',items:mainItems([...p4,...vegu,...coo,...gr2,...fr2])},{time:'14:00',title:'小餐',items:snackItems()},{time:'16:00',title:'小餐',items:snackItems()},FB('17:45'),{time:'18:00',title:'晚餐',items:mainItems([...p4b,...vegu2,...coo2,...gr3,...fr3])},{time:'20:00',title:'小餐',items:snackItems()}];
