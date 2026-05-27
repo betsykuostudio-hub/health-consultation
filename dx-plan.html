@@ -253,13 +253,13 @@ input[type=date].field-input{width:145px;overflow:hidden}
 
 
 /* ── 體組成紀錄 Tab ───────────────────────────── */
-.blog-body{padding:16px 16px 100px}
-.blog-add-card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.blog-body{padding:16px 16px 100px;overflow-x:hidden}
+.blog-add-card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
 .blog-add-title{font-size:var(--font-sm);font-weight:700;color:var(--purple-dark);margin-bottom:12px}
-.blog-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.blog-field{display:flex;flex-direction:column;gap:4px}
+.blog-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;width:100%;box-sizing:border-box}
+.blog-field{display:flex;flex-direction:column;gap:4px;min-width:0;overflow:hidden}
 .blog-field-label{font-size:11px;font-weight:700;color:var(--gray-500)}
-.blog-field-input{border:1.5px solid var(--purple-light);border-radius:10px;padding:9px 10px;font-size:var(--font-md);font-weight:600;color:var(--purple-dark);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);text-align:center}
+.blog-field-input{border:1.5px solid var(--purple-light);border-radius:10px;padding:9px 10px;font-size:var(--font-md);font-weight:600;color:var(--purple-dark);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);text-align:center;width:100%;min-width:0;box-sizing:border-box}
 .blog-field-input:focus{border-color:var(--purple);background:white}
 .blog-save-btn{width:100%;background:var(--purple);color:white;border:none;border-radius:12px;padding:13px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
 .blog-chart-card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
@@ -1885,7 +1885,7 @@ function renderBodyLog(){
     <div class="blog-add-title">➕ 新增量測紀錄</div>
     <div style="margin-bottom:10px">
       <div class="blog-field-label" style="margin-bottom:4px">量測日期</div>
-      <input type="date" id="blog-date" value="${todayISO()}" style="width:100%;border:1.5px solid var(--purple-light);border-radius:10px;padding:9px 10px;font-size:var(--font-md);font-weight:600;color:var(--purple-dark);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);overflow:hidden"/>
+      <div style="overflow:hidden;border-radius:10px"><input type="date" id="blog-date" value="${todayISO()}" style="width:100%;border:1.5px solid var(--purple-light);border-radius:10px;padding:9px 10px;font-size:var(--font-md);font-weight:600;color:var(--purple-dark);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);box-sizing:border-box"/></div>
     </div>
     <div class="blog-field-grid">`;
   BLOG_FIELDS.forEach(f=>{
