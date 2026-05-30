@@ -1490,7 +1490,8 @@ function renderCalendar(){
     else if(isPre){html+=`<div class="cal-day type-pretest${iso===today?' today':''}" onclick="openTestDay('pre')"><div class="day-num">${cur.getDate()}</div><div class="day-type">🩸</div></div>`;}
     else if(isPost){html+=`<div class="cal-day type-posttest${iso===today?' today':''}" onclick="openTestDay('post')"><div class="day-num">${cur.getDate()}</div><div class="day-type">🔬</div></div>`;}
     else{
-      const ti=TYPE_INFO[DAY_TYPES[dayIdx]],{done,total}=getDayProgress(dayIdx);
+      const ti=TYPE_INFO[DAY_TYPES[dayIdx]]||{color:'type-empty',emoji:'—'};
+      const{done,total}=getDayProgress(dayIdx);
       const full=done===total&&total>0,partial=done>0&&done<total,isPast=iso<today,isMissed=isPast&&done<total;
       html+=`<div class="cal-day ${ti.color}${iso===today?' today':''}${full?' done':''}${partial&&!isPast?' partial':''}${isMissed?' missed-past':''}" onclick="openDay(${dayIdx})"><div class="day-num">${cur.getDate()}</div><div class="day-type">${ti.emoji}</div>${full?'<div class="check">✅</div>':(partial&&!isPast?'<div class="check">🔶</div>':'')}</div>`;
     }
@@ -1544,7 +1545,10 @@ function saveTestCheck(prefix,i,val){
 
 let currentDayIdx=null;
 function openDay(dayIdx){
+  dayIdx=parseInt(dayIdx,10);
+  if(isNaN(dayIdx)||dayIdx<0||dayIdx>=45){console.warn('openDay: invalid dayIdx',dayIdx);showCalendar();return;}
   currentDayIdx=dayIdx;const ti=TYPE_INFO[DAY_TYPES[dayIdx]];
+  if(!ti){console.warn('openDay: unknown type for dayIdx',dayIdx);showCalendar();return;}
   document.getElementById('day-hero').style.background=`linear-gradient(135deg,#1e293b,${ti.heroBg})`;
   document.getElementById('day-badge').innerHTML=`${ti.emoji} ${ti.label}`;
   document.getElementById('day-title').textContent=`第 ${dayIdx+1} 天`;
@@ -1909,13 +1913,13 @@ const EXAM_ITEMS=[
 const BADGE_TEXT={normal:'正常',warn:'留意',danger:'異常'};
 const BADGE_CLASS={normal:'badge-normal',warn:'badge-warn',danger:'badge-danger'};
 
-function showReportForm(){
-  const saved=getReportData();
+async function showReportForm(){
+  const saved=await getReportData();
   const sb=saved.body||{},se=saved.exam||{};
   let html=`
     <div class="notice-box" style="margin-bottom:20px">
       <strong>💡 注意事項</strong>
-      數據會自動儲存於本裝置，下次開啟可繼續編輯。日期從計畫設定自動帶入。
+      數據會自動儲存於雲端，下次開啟可繼續編輯。日期從計畫設定自動帶入。
     </div>
     <div class="form-section">
       <div class="form-section-title">基本資訊</div>
@@ -2658,7 +2662,7 @@ function renderHistoryCheckin(plan){
     const pct=total>0?Math.round(done/total*100):0;
     const bg=done===0?'#f3f4f6':pct>=100?'#16a34a':pct>=50?'#86efac':'#bbf7d0';
     const color=done===0?'#d1d5db':pct>=100?'white':'#166534';
-    const type=TYPE_INFO[DAY_TYPES[i]];
+    const type=TYPE_INFO[DAY_TYPES[i]]||{label:'?'};
     html+=`<div class="history-day-cell" style="background:${bg};color:${color}" title="第${i+1}天 ${type.label} ${done}/${total}">${i+1}</div>`;
   }
   html+='</div>';
