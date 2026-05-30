@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>DX 健康管理計畫</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --purple:#7c3aed;--purple-dark:#5b21b6;--purple-light:#ede9fe;--purple-mid:#a78bfa;
@@ -241,6 +242,38 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .r-bar-track{flex:1;height:8px;background:#f3f4f6;border-radius:99px;overflow:hidden}
 .r-bar-fill{height:100%;background:#7c3aed;border-radius:99px}
 .r-bar-val{font-size:12px;font-weight:700;color:#7c3aed;width:34px;text-align:right}
+/* ── 登入 / 註冊頁 ───────────────────────────────── */
+.auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:linear-gradient(160deg,var(--purple-dark) 0%,var(--purple) 50%,var(--purple-mid) 100%)}
+.auth-card{background:white;border-radius:24px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo-icon{font-size:52px;margin-bottom:8px}
+.auth-logo-title{font-size:22px;font-weight:900;color:var(--purple-dark)}
+.auth-logo-sub{font-size:var(--font-sm);color:var(--gray-500);margin-top:4px}
+.auth-field{margin-bottom:16px}
+.auth-field-label{font-size:var(--font-sm);font-weight:700;color:var(--gray-700);margin-bottom:6px;display:block}
+.auth-field-input{width:100%;border:2px solid var(--purple-light);border-radius:12px;padding:14px 16px;font-size:var(--font-md);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);color:var(--purple-dark);font-weight:600;transition:border-color .15s}
+.auth-field-input:focus{border-color:var(--purple);background:white}
+.auth-submit-btn{width:100%;background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border:none;border-radius:14px;padding:16px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:8px;transition:opacity .15s}
+.auth-submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-switch{text-align:center;margin-top:18px;font-size:var(--font-sm);color:var(--gray-500)}
+.auth-switch-btn{background:none;border:none;color:var(--purple);font-weight:700;cursor:pointer;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;text-decoration:underline}
+.auth-msg{border-radius:10px;padding:12px 14px;font-size:var(--font-sm);margin-bottom:14px;line-height:1.6;display:none}
+.auth-msg.error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;display:block}
+.auth-msg.success{background:var(--green-bg);color:var(--green);border:1px solid #bbf7d0;display:block}
+.auth-msg.info{background:var(--purple-light);color:var(--purple-dark);border:1px solid #ddd6fe;display:block}
+/* ── 管理者後台頁 ─────────────────────────────────── */
+.admin-body{padding:16px 16px 100px}
+.admin-user-card{background:white;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:14px 16px}
+.admin-user-email{font-size:var(--font-md);font-weight:700;color:#111827;margin-bottom:4px}
+.admin-user-meta{font-size:var(--font-sm);color:var(--gray-500);margin-bottom:10px}
+.admin-role-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.admin-role-btn{padding:7px 14px;border-radius:20px;border:2px solid var(--purple-light);background:white;font-size:var(--font-sm);font-weight:700;color:var(--gray-500);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+.admin-role-btn.active-client{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8}
+.admin-role-btn.active-consultant{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
+.admin-role-btn.active-admin{background:var(--purple-light);border-color:var(--purple-mid);color:var(--purple-dark)}
+.admin-invite-btn{padding:7px 14px;border-radius:20px;border:none;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+.admin-invite-on{background:var(--green-bg);color:var(--green)}
+.admin-invite-off{background:var(--red-bg);color:var(--red)}
 #nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--gray-100);display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:200}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;cursor:pointer;padding:5px 0;position:relative}
 .nav-icon{font-size:20px;transition:all .15s}
@@ -324,7 +357,104 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <body>
 
 <!-- SETUP -->
-<div id="screen-setup" class="screen active">
+<!-- AUTH: LOGIN -->
+<div id="screen-login" class="screen active">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🎯</div>
+        <div class="auth-logo-title">DX 健康管理計畫</div>
+        <div class="auth-logo-sub">請登入以繼續</div>
+      </div>
+      <div id="login-msg" class="auth-msg"></div>
+      <div class="auth-field">
+        <label class="auth-field-label">📧 電子郵件</label>
+        <input type="email" id="login-email" class="auth-field-input" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-field-label">🔒 密碼</label>
+        <input type="password" id="login-password" class="auth-field-input" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button class="auth-submit-btn" id="login-btn" onclick="doLogin()">登入</button>
+      <div class="auth-switch">
+        還沒有帳號？<button class="auth-switch-btn" onclick="showAuthScreen('register')">點此註冊</button>
+      </div>
+      <div style="text-align:center;margin-top:10px">
+        <button class="auth-switch-btn" onclick="showAuthScreen('forgot')">忘記密碼？</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH: REGISTER -->
+<div id="screen-register" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🎯</div>
+        <div class="auth-logo-title">建立帳號</div>
+        <div class="auth-logo-sub">註冊後需等待管理者開通權限</div>
+      </div>
+      <div id="register-msg" class="auth-msg"></div>
+      <div class="auth-field">
+        <label class="auth-field-label">👤 姓名</label>
+        <input type="text" id="register-name" class="auth-field-input" placeholder="你的名字" autocomplete="name"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-field-label">📧 電子郵件</label>
+        <input type="email" id="register-email" class="auth-field-input" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-field-label">🔒 密碼（至少 6 位）</label>
+        <input type="password" id="register-password" class="auth-field-input" placeholder="••••••••" autocomplete="new-password"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-field-label">🔒 確認密碼</label>
+        <input type="password" id="register-password2" class="auth-field-input" placeholder="••••••••" autocomplete="new-password"/>
+      </div>
+      <button class="auth-submit-btn" id="register-btn" onclick="doRegister()">註冊</button>
+      <div class="auth-switch">
+        已有帳號？<button class="auth-switch-btn" onclick="showAuthScreen('login')">返回登入</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH: FORGOT PASSWORD -->
+<div id="screen-forgot" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🔑</div>
+        <div class="auth-logo-title">重設密碼</div>
+        <div class="auth-logo-sub">輸入帳號 email，我們將寄送重設連結</div>
+      </div>
+      <div id="forgot-msg" class="auth-msg"></div>
+      <div class="auth-field">
+        <label class="auth-field-label">📧 電子郵件</label>
+        <input type="email" id="forgot-email" class="auth-field-input" placeholder="your@email.com"/>
+      </div>
+      <button class="auth-submit-btn" id="forgot-btn" onclick="doForgotPassword()">寄送重設連結</button>
+      <div class="auth-switch">
+        <button class="auth-switch-btn" onclick="showAuthScreen('login')">← 返回登入</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="screen-admin" class="screen">
+  <div class="header">
+    <span style="font-size:22px">⚙️</span>
+    <span class="header-title">管理者後台</span>
+    <button class="back-btn" onclick="showAppMain()">← 返回</button>
+  </div>
+  <div class="admin-body" id="admin-body">
+    <div style="text-align:center;padding:40px 0;color:var(--gray-500)">載入中...</div>
+  </div>
+</div>
+
+<div id="screen-setup" class="screen">
   <div class="setup-hero">
     <div class="emoji">🎯</div>
     <h1>DX 健康管理計畫</h1>
@@ -828,98 +958,369 @@ input[type=date].field-input{width:145px;overflow:hidden}
   <button class="nav-btn" id="nav-menu" onclick="showScreen('screen-menu','nav-menu')"><div class="nav-icon">🍽️</div><div class="nav-label">菜單</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-notes" onclick="showScreen('screen-notes','nav-notes')"><div class="nav-icon">📋</div><div class="nav-label">須知</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-history" onclick="showHistory()"><div class="nav-icon">📖</div><div class="nav-label">歷史</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-account" onclick="showAccountMenu()"><div class="nav-icon">👤</div><div class="nav-label">帳號</div><div class="nav-indicator"></div></button>
+</div>
+
+<!-- ACCOUNT MENU MODAL -->
+<div id="account-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:510;align-items:flex-end;justify-content:center">
+  <div style="max-width:480px;width:100%;background:white;border-radius:24px 24px 0 0;padding:24px 20px 40px;box-shadow:0 -4px 20px rgba(0,0,0,.12)">
+    <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:0 auto 20px"></div>
+    <div id="account-modal-user" style="background:var(--purple-light);border-radius:14px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-size:var(--font-sm);color:var(--gray-500);margin-bottom:2px">目前登入</div>
+      <div id="account-modal-email" style="font-size:var(--font-md);font-weight:700;color:var(--purple-dark)"></div>
+      <div id="account-modal-role" style="font-size:var(--font-sm);color:var(--gray-500);margin-top:2px"></div>
+    </div>
+    <div id="account-modal-admin-btn" style="display:none;margin-bottom:10px">
+      <button onclick="closeAccountModal();showAdminPanel()" style="width:100%;padding:14px;background:var(--purple-light);color:var(--purple-dark);border:none;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">⚙️ 管理者後台</button>
+    </div>
+    <div id="account-modal-import-btn" style="margin-bottom:10px">
+      <button onclick="closeAccountModal();showImportFromLocalStorage()" style="width:100%;padding:14px;background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">📥 匯入本機備份資料</button>
+    </div>
+    <button onclick="closeAccountModal();doLogout()" style="width:100%;padding:14px;background:var(--red-bg);color:var(--red);border:1px solid #fecaca;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">登出</button>
+    <button onclick="closeAccountModal()" style="width:100%;padding:14px;background:white;color:var(--gray-500);border:2px solid var(--gray-300);border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:10px">取消</button>
+  </div>
 </div>
 
 <script>
-// ── 多筆計畫架構 ──────────────────────────────────────────
-// localStorage 結構：
-//   dx_plans       : Array of PlanRecord
-//   dx_current_id  : number（目前計畫 id）
-//
-// PlanRecord: { id, createdAt, state, reportData }
-//   state      : 原本的完整 state 物件
-//   reportData : { body:{...}, exam:{...} }（前後測數據，不含日期，日期從 state 取）
+// ══════════════════════════════════════════════════════
+// Supabase 設定（請替換為你自己的值）
+// ══════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://jcsvehkjekjusnsohcfg.supabase.co’;
+const SUPABASE_KEY = 'sb_publishable_gLajdxB3lH7XknARG-FAUQ_lvCf9YwP';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const PLANS_KEY='dx_plans';
-const CUR_KEY='dx_current_id';
+// ── 目前登入使用者 ────────────────────────────────────
+let currentUser = null;
+let currentProfile = null;
+
+// ── Auth UI 工具 ──────────────────────────────────────
+function showAuthScreen(name) {
+  // name: 'login' | 'register' | 'forgot'
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-bar').style.display = 'none';
+  // 清除訊息
+  ['login-msg','register-msg','forgot-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.className = 'auth-msg'; el.textContent = ''; }
+  });
+}
+
+function setAuthMsg(id, type, text) {
+  const el = document.getElementById(id);
+  el.className = 'auth-msg ' + type;
+  el.textContent = text;
+}
+
+function setAuthLoading(btnId, loading, defaultText) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.textContent = loading ? '處理中...' : defaultText;
+}
+
+// ── 登入 ─────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { setAuthMsg('login-msg','error','請填寫電子郵件與密碼'); return; }
+  setAuthLoading('login-btn', true, '登入');
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      const msg = error.message.includes('Invalid') ? '電子郵件或密碼錯誤' : '登入失敗：' + error.message;
+      setAuthMsg('login-msg', 'error', msg);
+      return;
+    }
+    await handleAuthSuccess(data.user);
+  } catch(e) {
+    setAuthMsg('login-msg', 'error', '連線失敗，請稍後再試');
+  } finally {
+    setAuthLoading('login-btn', false, '登入');
+  }
+}
+
+// ── 註冊 ─────────────────────────────────────────────
+async function doRegister() {
+  const name = document.getElementById('register-name').value.trim();
+  const email = document.getElementById('register-email').value.trim();
+  const pw = document.getElementById('register-password').value;
+  const pw2 = document.getElementById('register-password2').value;
+  if (!name) { setAuthMsg('register-msg','error','請填寫姓名'); return; }
+  if (!email) { setAuthMsg('register-msg','error','請填寫電子郵件'); return; }
+  if (pw.length < 6) { setAuthMsg('register-msg','error','密碼至少需要 6 位'); return; }
+  if (pw !== pw2) { setAuthMsg('register-msg','error','兩次密碼不一致'); return; }
+  setAuthLoading('register-btn', true, '註冊');
+  try {
+    const { data, error } = await sb.auth.signUp({ email, password: pw });
+    if (error) { setAuthMsg('register-msg','error','註冊失敗：' + error.message); return; }
+    // 更新姓名
+    if (data.user) {
+      await sb.from('profiles').update({ display_name: name }).eq('id', data.user.id);
+    }
+    setAuthMsg('register-msg','success','✅ 註冊成功！請等待管理者開通權限後再登入。');
+    setTimeout(() => showAuthScreen('login'), 3000);
+  } catch(e) {
+    setAuthMsg('register-msg','error','連線失敗，請稍後再試');
+  } finally {
+    setAuthLoading('register-btn', false, '註冊');
+  }
+}
+
+// ── 忘記密碼 ──────────────────────────────────────────
+async function doForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { setAuthMsg('forgot-msg','error','請填寫電子郵件'); return; }
+  setAuthLoading('forgot-btn', true, '寄送重設連結');
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.href
+    });
+    if (error) { setAuthMsg('forgot-msg','error','寄送失敗：' + error.message); return; }
+    setAuthMsg('forgot-msg','success','✅ 重設連結已寄出，請檢查信箱');
+  } catch(e) {
+    setAuthMsg('forgot-msg','error','連線失敗，請稍後再試');
+  } finally {
+    setAuthLoading('forgot-btn', false, '寄送重設連結');
+  }
+}
+
+// ── 登出 ─────────────────────────────────────────────
+async function doLogout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  currentProfile = null;
+  state = {...DEFAULT_STATE};
+  showAuthScreen('login');
+}
+
+// ── 登入後處理 ────────────────────────────────────────
+async function handleAuthSuccess(user) {
+  currentUser = user;
+  // 取得 profile
+  const { data: profile, error } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  if (error || !profile) {
+    setAuthMsg('login-msg','error','無法取得帳號資料，請稍後再試');
+    await sb.auth.signOut();
+    return;
+  }
+  if (!profile.is_invited) {
+    setAuthMsg('login-msg','info','⏳ 帳號尚未獲得授權，請聯繫管理者開通後再登入。');
+    await sb.auth.signOut();
+    return;
+  }
+  currentProfile = profile;
+  await loadStateFromSupabase();
+  showAppMain();
+}
+
+// ── 進入主畫面 ────────────────────────────────────────
+function showAppMain() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('nav-bar').style.display = 'flex';
+  if (state.startDate) {
+    const today = todayISO();
+    if (state.pretestDate && today === state.pretestDate) {
+      openTestDay('pre');
+      document.getElementById('nav-today')?.classList.add('active');
+    } else if (state.posttestDate && today === state.posttestDate) {
+      openTestDay('post');
+      document.getElementById('nav-today')?.classList.add('active');
+    } else {
+      const di = daysBetween(state.startDate, today);
+      if (di >= 0 && di < 45) { goToToday(); }
+      else { showCalendar(); }
+    }
+  } else {
+    document.getElementById('screen-setup').classList.add('active');
+    document.getElementById('start-date').value = todayISO();
+  }
+}
+
+// ── 帳號選單 ──────────────────────────────────────────
+function showAccountMenu() {
+  if (!currentProfile) return;
+  document.getElementById('account-modal-email').textContent = currentProfile.email;
+  const roleMap = { admin:'管理者', consultant:'諮詢師', client:'客戶', pending:'待審核' };
+  document.getElementById('account-modal-role').textContent = roleMap[currentProfile.role] || currentProfile.role;
+  document.getElementById('account-modal-admin-btn').style.display = currentProfile.role === 'admin' ? 'block' : 'none';
+  document.getElementById('account-modal').style.display = 'flex';
+}
+function closeAccountModal() {
+  document.getElementById('account-modal').style.display = 'none';
+}
+
+// ── Supabase 資料讀寫 ──────────────────────────────────
+async function loadStateFromSupabase() {
+  if (!currentUser) return;
+  const { data, error } = await sb.from('dx_plans')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .is('archived_at', null)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+  if (error || !data) {
+    // 沒有進行中的計畫，用預設 state
+    state = {...DEFAULT_STATE};
+    _currentPlanId = null;
+    return;
+  }
+  _currentPlanId = data.id;
+  state = { ...DEFAULT_STATE, ...data.plan_state };
+}
+
+let _currentPlanId = null;
+let _saveTimer = null;
+
+async function saveState() {
+  if (!currentUser) return;
+  // debounce 500ms 避免頻繁寫入
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async () => {
+    if (_currentPlanId) {
+      await sb.from('dx_plans')
+        .update({ plan_state: state })
+        .eq('id', _currentPlanId);
+    } else {
+      const { data, error } = await sb.from('dx_plans')
+        .insert({ user_id: currentUser.id, plan_state: state, report_data: {} })
+        .select()
+        .single();
+      if (!error && data) _currentPlanId = data.id;
+    }
+  }, 500);
+}
+
+async function saveReportData(body, exam) {
+  if (!currentUser || !_currentPlanId) return;
+  const update = {};
+  const { data: cur } = await sb.from('dx_plans').select('report_data').eq('id', _currentPlanId).single();
+  const existing = cur?.report_data || {};
+  if (body !== undefined) existing.body = body;
+  if (exam !== undefined) existing.exam = exam;
+  await sb.from('dx_plans').update({ report_data: existing }).eq('id', _currentPlanId);
+}
+
+async function getReportData() {
+  if (!currentUser || !_currentPlanId) return {};
+  const { data } = await sb.from('dx_plans').select('report_data').eq('id', _currentPlanId).single();
+  return data?.report_data || {};
+}
+
+// ── 開始新計畫（封存舊計畫）─────────────────────────
+async function archiveAndNewPlan(newState) {
+  if (!currentUser) return;
+  if (_currentPlanId) {
+    await sb.from('dx_plans')
+      .update({ archived_at: new Date().toISOString(), plan_state: state })
+      .eq('id', _currentPlanId);
+  }
+  const { data, error } = await sb.from('dx_plans')
+    .insert({ user_id: currentUser.id, plan_state: newState, report_data: {} })
+    .select().single();
+  if (!error && data) {
+    _currentPlanId = data.id;
+    state = { ...DEFAULT_STATE, ...newState };
+  }
+}
+
+// ── 取得所有歷史計畫 ──────────────────────────────────
+async function loadAllPlans() {
+  if (!currentUser) return [];
+  const { data, error } = await sb.from('dx_plans')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+  return error ? [] : (data || []);
+}
+
+// ── 匯入本機 localStorage 備份到 Supabase ─────────────
+function showImportFromLocalStorage() {
+  document.getElementById('import-file-input').click();
+}
+
+// ── 管理者後台 ────────────────────────────────────────
+async function showAdminPanel() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-admin').classList.add('active');
+  document.getElementById('nav-bar').style.display = 'none';
+  renderAdminPanel();
+}
+
+async function renderAdminPanel() {
+  const body = document.getElementById('admin-body');
+  body.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gray-500)">載入中...</div>';
+  const { data: profiles, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
+  if (error) { body.innerHTML = '<div style="padding:20px;color:var(--red)">載入失敗：' + error.message + '</div>'; return; }
+  const roleMap = { admin:'管理者', consultant:'諮詢師', client:'客戶', pending:'待審核' };
+  const pendingUsers = profiles.filter(p => !p.is_invited || p.role === 'pending');
+  const activeUsers = profiles.filter(p => p.is_invited && p.role !== 'pending');
+  let html = '';
+  if (pendingUsers.length > 0) {
+    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${pendingUsers.length}</span>待審核帳號</div>`;
+    pendingUsers.forEach(p => { html += renderAdminUserCard(p, roleMap); });
+    html += '<div style="height:1px;background:var(--gray-100);margin:16px 0"></div>';
+  }
+  if (activeUsers.length > 0) {
+    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">已開通帳號（${activeUsers.length} 人）</div>`;
+    activeUsers.forEach(p => { html += renderAdminUserCard(p, roleMap); });
+  }
+  if (profiles.length === 0) html = '<div style="padding:40px 0;text-align:center;color:var(--gray-500)">目前沒有任何使用者</div>';
+  body.innerHTML = html;
+}
+
+function renderAdminUserCard(p, roleMap) {
+  const isSelf = currentUser && p.id === currentUser.id;
+  const roleColors = { admin:'active-admin', consultant:'active-consultant', client:'active-client', pending:'' };
+  const roles = ['client','consultant','admin'];
+  const roleBtns = roles.map(r =>
+    `<button class="admin-role-btn ${p.role===r?roleColors[r]:''}" onclick="adminSetRole('${p.id}','${r}',this)">${roleMap[r]||r}</button>`
+  ).join('');
+  const inviteBtn = `<button class="admin-invite-btn ${p.is_invited?'admin-invite-on':'admin-invite-off'}" onclick="adminToggleInvite('${p.id}',${p.is_invited},this)">${p.is_invited?'✅ 已開通':'🔒 待審核'}</button>`;
+  return `<div class="admin-user-card" id="admin-card-${p.id}">
+    <div class="admin-user-email">${p.display_name||'（未填姓名）'} ${isSelf?'<span style="font-size:11px;background:var(--purple-light);color:var(--purple-dark);padding:2px 6px;border-radius:99px">我</span>':''}</div>
+    <div class="admin-user-meta">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
+    <div class="admin-role-row">${roleBtns}${inviteBtn}</div>
+  </div>`;
+}
+
+async function adminSetRole(userId, role, btn) {
+  btn.disabled = true;
+  const { error } = await sb.from('profiles').update({ role }).eq('id', userId);
+  if (!error) { renderAdminPanel(); }
+  else { btn.disabled = false; alert('更新失敗：' + error.message); }
+}
+
+async function adminToggleInvite(userId, currentVal, btn) {
+  btn.disabled = true;
+  const { error } = await sb.from('profiles').update({ is_invited: !currentVal }).eq('id', userId);
+  if (!error) { renderAdminPanel(); }
+  else { btn.disabled = false; alert('更新失敗：' + error.message); }
+}
+
+// ── 頁面啟動：檢查既有 session ────────────────────────
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    await handleAuthSuccess(session.user);
+  }
+  // 監聽 auth 狀態變化（例如重設密碼後跳回）
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      showAuthScreen('login');
+      setAuthMsg('login-msg','info','請重新登入');
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// 以下為原有多筆計畫架構（localStorage → 改為 Supabase）
+// ══════════════════════════════════════════════════════
 
 const DEFAULT_STATE={startDate:null,pretestDate:null,posttestDate:null,doses:{},useSlim:true,useProbio:true,checks:{},amounts:{},stockLogs:{},optionalItems:{dx_box:false,shaker:false},bodyLogs:[]};
 let state={...DEFAULT_STATE};
 
-function _loadPlans(){
-  try{return JSON.parse(localStorage.getItem(PLANS_KEY))||[];}catch(e){return[];}
-}
-function _savePlans(plans){localStorage.setItem(PLANS_KEY,JSON.stringify(plans));}
-function _getCurrentId(){
-  const v=localStorage.getItem(CUR_KEY);
-  return v!==null?parseInt(v):null;
-}
-function _setCurrentId(id){localStorage.setItem(CUR_KEY,String(id));}
-
-function saveState(){
-  const plans=_loadPlans();
-  const id=_getCurrentId();
-  if(id===null)return;
-  const idx=plans.findIndex(p=>p.id===id);
-  if(idx>=0){plans[idx].state=state;}
-  else{plans.push({id,createdAt:todayISO(),state,reportData:{}});}
-  _savePlans(plans);
-}
-
-function saveReportData(body,exam){
-  const plans=_loadPlans();
-  const id=_getCurrentId();
-  if(id===null)return;
-  const idx=plans.findIndex(p=>p.id===id);
-  if(idx>=0){
-    plans[idx].reportData=plans[idx].reportData||{};
-    if(body!==undefined)plans[idx].reportData.body=body;
-    if(exam!==undefined)plans[idx].reportData.exam=exam;
-    _savePlans(plans);
-  }
-}
-
-function getReportData(){
-  const plans=_loadPlans();
-  const id=_getCurrentId();
-  if(id===null)return{};
-  const plan=plans.find(p=>p.id===id);
-  return plan?.reportData||{};
-}
-
-function loadState(){
-  // ── 舊版資料搬移（單筆 → 多筆）──
-  const legacyKeys=['dx_plan','dx_plan_v1','dx_plan_v2','dx_plan_v3','dx_plan_v4'];
-  let plans=_loadPlans();
-  let currentId=_getCurrentId();
-
-  if(plans.length===0){
-    // 嘗試從舊版 key 搬移
-    let raw=null;
-    for(const k of legacyKeys){raw=localStorage.getItem(k);if(raw)break;}
-    if(raw){
-      try{
-        const oldState=JSON.parse(raw);
-        const newPlan={id:1,createdAt:oldState.startDate||todayISO(),state:{...DEFAULT_STATE,...oldState},reportData:{}};
-        plans=[newPlan];
-        _savePlans(plans);
-        _setCurrentId(1);
-        currentId=1;
-        legacyKeys.forEach(k=>localStorage.removeItem(k));
-      }catch(e){}
-    }
-  }
-
-  if(currentId===null&&plans.length>0){
-    currentId=plans[plans.length-1].id;
-    _setCurrentId(currentId);
-  }
-
-  if(currentId!==null){
-    const plan=plans.find(p=>p.id===currentId);
-    if(plan){state={...DEFAULT_STATE,...plan.state};}
-  }
-}
 function dateToISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function todayISO(){return dateToISO(new Date());}
 function addDays(iso,n){const d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+n);return dateToISO(d);}
@@ -1061,14 +1462,7 @@ function startPlan(){
   state.doses={protein_snack:parseFloat(document.getElementById('dose-protein-snack').value)||null,lecithin_snack:parseFloat(document.getElementById('dose-lecithin-snack').value)||null,b:parseFloat(document.getElementById('dose-b').value)||null,ca:parseFloat(document.getElementById('dose-ca').value)||null,c:parseFloat(document.getElementById('dose-c').value)||null};
   state.useSlim=document.getElementById('use-slim').value==='yes';
   state.useProbio=document.getElementById('use-probio').value==='yes';
-  // 若尚無計畫 id，建立第一筆
-  if(_getCurrentId()===null){
-    const plans=_loadPlans();
-    const newId=plans.length>0?Math.max(...plans.map(p=>p.id))+1:1;
-    plans.push({id:newId,createdAt:todayISO(),state:{...state},reportData:{}});
-    _savePlans(plans);
-    _setCurrentId(newId);
-  }
+  // 若尚無計畫 id，saveState 會自動建立新計畫
   saveState();document.getElementById('nav-bar').style.display='flex';showCalendar();
 }
 
@@ -1582,16 +1976,14 @@ function closeNewPlanModal(){
   document.body.style.overflow='';
 }
 
-function confirmNewPlan(){
-  // 封存目前計畫（state 已持久化），建立新計畫
+async function confirmNewPlan(){
   closeNewPlanModal();
-  const plans=_loadPlans();
-  const newId=plans.length>0?Math.max(...plans.map(p=>p.id))+1:1;
-  const newPlan={id:newId,createdAt:todayISO(),state:{...DEFAULT_STATE},reportData:{}};
-  plans.push(newPlan);
-  _savePlans(plans);
-  _setCurrentId(newId);
-  state={...DEFAULT_STATE};
+  const newState = {...DEFAULT_STATE};
+  // 沿用劑量設定
+  if (state.doses) newState.doses = {...state.doses};
+  if (state.useSlim !== undefined) newState.useSlim = state.useSlim;
+  if (state.useProbio !== undefined) newState.useProbio = state.useProbio;
+  await archiveAndNewPlan(newState);
   showNewPlanSetup();
 }
 function closeReportModal(){document.getElementById('report-modal').style.display='none';document.body.style.overflow='';}
@@ -1781,10 +2173,17 @@ function toggleQA(el){const a=el.nextElementSibling,isOpen=a.classList.contains(
 // ── 歷史計畫 ──────────────────────────────────────────────────
 
 // ── 匯出 / 匯入 ────────────────────────────────────────────
-function exportPlans(){
-  const plans=_loadPlans();
+async function exportPlans(){
+  const plans = await loadAllPlans();
   if(plans.length===0){alert('目前沒有任何計畫資料可以備份。');return;}
-  const payload={version:1,exportedAt:new Date().toISOString(),plans};
+  // 轉換格式相容舊版
+  const exportPlans = plans.map(p => ({
+    id: p.id,
+    createdAt: p.created_at,
+    state: p.plan_state,
+    reportData: p.report_data || {}
+  }));
+  const payload={version:2,exportedAt:new Date().toISOString(),plans:exportPlans};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -1799,20 +2198,18 @@ let _pendingImportData=null;
 function handleImportFile(input){
   const file=input.files[0];
   if(!file)return;
-  input.value=''; // 允許重複選同一檔
+  input.value='';
   const reader=new FileReader();
   reader.onload=e=>{
     try{
       const data=JSON.parse(e.target.result);
-      // 驗證格式
       if(!data.plans||!Array.isArray(data.plans)||data.plans.length===0){
         alert('❌ 檔案格式不正確，請選擇由本程式匯出的備份檔。');return;
       }
       _pendingImportData=data;
-      // 組預覽
       const total=data.plans.length;
       const dates=data.plans.map(p=>{
-        const s=p.state||{};
+        const s=p.state||p.plan_state||{};
         const start=s.startDate,end=start?addDays(start,44):null;
         return start?`${start.replace(/-/g,'/')}–${end.replace(/-/g,'/')}`:'（未設定日期）';
       });
@@ -1840,24 +2237,34 @@ function closeImportModal(){
   _pendingImportData=null;
 }
 
-function confirmImport(){
-  if(!_pendingImportData)return;
+async function confirmImport(){
+  if(!_pendingImportData||!currentUser)return;
+  const btn=document.getElementById('import-confirm-btn');
+  btn.disabled=true;btn.textContent='匯入中...';
   const data=_pendingImportData;
-  // 取代 localStorage 資料
-  _savePlans(data.plans);
-  // 設定 current id 為最後一筆
-  const lastId=data.plans[data.plans.length-1].id;
-  _setCurrentId(lastId);
-  // 重新載入 state
-  state={...DEFAULT_STATE};
-  loadState();
-  closeImportModal();
-  // 返回歷史頁，刷新
-  renderHistory();
-  showScreen('screen-history','nav-history');
-  // 若匯入的計畫已有 startDate，顯示 nav
-  if(state.startDate){document.getElementById('nav-bar').style.display='flex';}
-  alert(`✅ 匯入成功！共還原 ${data.plans.length} 筆計畫。`);
+  try{
+    // 先將現有計畫全部標記封存
+    await sb.from('dx_plans').update({archived_at:new Date().toISOString()}).eq('user_id',currentUser.id).is('archived_at',null);
+    // 逐筆寫入（舊版 v1 或新版 v2 格式皆可）
+    for(const p of data.plans){
+      const planState=p.state||p.plan_state||{};
+      const reportData=p.reportData||p.report_data||{};
+      await sb.from('dx_plans').insert({
+        user_id:currentUser.id,
+        plan_state:planState,
+        report_data:reportData,
+        archived_at:p===data.plans[data.plans.length-1]?null:new Date(p.createdAt||p.created_at||Date.now()).toISOString()
+      });
+    }
+    // 重新載入
+    await loadStateFromSupabase();
+    closeImportModal();
+    showAppMain();
+    alert(`✅ 匯入成功！共還原 ${data.plans.length} 筆計畫。`);
+  }catch(err){
+    alert('❌ 匯入失敗：'+err.message);
+    btn.disabled=false;btn.textContent='確定匯入 →';
+  }
 }
 
 // ── 體組成紀錄 ─────────────────────────────────────────────
@@ -2047,31 +2454,32 @@ function setBlogMetric(metric){
   blogActiveMetric=metric;
   renderBodyLog();
 }
-function showHistory(){renderHistory();showScreen('screen-history','nav-history');}
+function showHistory(){
+  showScreen('screen-history','nav-history');
+  renderHistory();
+}
 
-function renderHistory(){
-  const plans=_loadPlans();
-  const currentId=_getCurrentId();
-  // 倒序：最新在上
-  const sorted=[...plans].sort((a,b)=>b.id-a.id);
+async function renderHistory(){
+  const historyBody = document.getElementById('history-body');
+  historyBody.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gray-500)">載入中...</div>';
+  const allPlans = await loadAllPlans();
+  // 已封存 = archived_at 不為 null
+  const archived = allPlans.filter(p => p.archived_at !== null);
 
-  if(sorted.length<=1&&sorted[0]?.id===currentId){
-    document.getElementById('history-body').innerHTML=
+  if(archived.length === 0){
+    historyBody.innerHTML =
       '<div class="history-empty">📭 尚無歷史計畫<br/><span style="font-size:12px;margin-top:6px;display:block">完成第一輪計畫後，封存紀錄將出現在這裡</span></div>';
     return;
   }
 
   let html='';
-  sorted.forEach((plan,i)=>{
-    const isCurrent=plan.id===currentId;
-    if(isCurrent)return; // 進行中計畫不列入歷史
-    const s=plan.state||{};
-    const start=s.startDate,end=start?addDays(start,44):null;
-    const dateRange=start&&end?`${start.replace(/-/g,'/')} – ${end.replace(/-/g,'/')}`:'—';
-    const planNo=plan.id;
+  archived.forEach((plan, i)=>{
+    const s = plan.plan_state || {};
+    const start = s.startDate, end = start ? addDays(start,44) : null;
+    const dateRange = start&&end ? `${start.replace(/-/g,'/')} – ${end.replace(/-/g,'/')}` : '—';
+    const planNo = archived.length - i; // 最新的是最後一次
 
-    // 計算完成率
-    let td=0,tp=0;
+    let td=0, tp=0;
     if(start){
       for(let d=0;d<45;d++){
         const schedule=buildSchedule(d,s.doses||{},s.useSlim,s.useProbio);
@@ -2080,6 +2488,13 @@ function renderHistory(){
     }
     const pct=tp>0?Math.round(td/tp*100):0;
     const pctColor=pct>=75?'var(--green)':pct>=50?'var(--yellow)':'var(--red)';
+
+    // 轉換格式供 renderHistoryReport/renderHistoryCheckin 使用
+    const planCompat = {
+      id: plan.id,
+      state: s,
+      reportData: plan.report_data || {}
+    };
 
     const cardId=`hplan-${plan.id}`;
     html+=`<div class="history-plan-card">
@@ -2097,14 +2512,14 @@ function renderHistory(){
           <button class="history-tab-btn active" onclick="switchHistoryTab('${cardId}','report',this)">📊 完成報告</button>
           <button class="history-tab-btn" onclick="switchHistoryTab('${cardId}','checkin',this)">✅ 打卡紀錄</button>
         </div>
-        <div class="history-panel active" id="${cardId}-report">${renderHistoryReport(plan,td,tp,pct)}</div>
-        <div class="history-panel" id="${cardId}-checkin">${renderHistoryCheckin(plan)}</div>
+        <div class="history-panel active" id="${cardId}-report">${renderHistoryReport(planCompat,td,tp,pct)}</div>
+        <div class="history-panel" id="${cardId}-checkin">${renderHistoryCheckin(planCompat)}</div>
       </div>
     </div>`;
   });
 
   if(!html) html='<div class="history-empty">📭 尚無已封存的計畫</div>';
-  document.getElementById('history-body').innerHTML=html;
+  historyBody.innerHTML=html;
 }
 
 function toggleHistoryCard(cardId){
@@ -2272,14 +2687,8 @@ function renderHistoryCheckin(plan){
   return html;
 }
 function init(){
-  loadState();
-  if(state.startDate){
-    document.getElementById('nav-bar').style.display='flex';
-    const today=todayISO();
-    if(state.pretestDate&&today===state.pretestDate){openTestDay('pre');document.getElementById('nav-today').classList.add('active');}
-    else if(state.posttestDate&&today===state.posttestDate){openTestDay('post');document.getElementById('nav-today').classList.add('active');}
-    else{const di=daysBetween(state.startDate,today);if(di>=0&&di<45){goToToday();}else{showCalendar();}}
-  }else{document.getElementById('start-date').value=todayISO();}
+  // 先顯示登入頁，等 Supabase session 確認後再切換
+  initAuth();
 }
 init();
 </script>
